@@ -1,6 +1,6 @@
 ---
 # the default layout is 'page'
-icon: fas fa-home
+icon: fas fa-map-marker-alt
 order: 4
 ---
 
