@@ -19,7 +19,7 @@ We are expecting to invite about 30 participants. You will be expected to fully 
 > We are offering ten scholarships of **up to 400£** to reimburse travel and subsistence expenses (including accommodation) to participants travelling from outside of Oxford[^footnote]
 {: .prompt-tip }
 
-Interested? Apply here [**link**](https://forms.gle/BVYmKGhepGE9Y5HT6). 💼 Don't forget to include your CV and a brief statement of interest.  
+Interested? Apply here [**link**](https://forms.gle/bFCMEm7ZGu9weA6f9). 💼 Don't forget to include your CV and a brief statement of interest.  
 > Hurry, applications close on `22 July 2024` ⏰
 {: .prompt-warning }
 
