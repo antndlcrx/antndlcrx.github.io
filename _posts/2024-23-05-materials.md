@@ -1,13 +1,15 @@
 ---
-title: Oxford LLMs 2023 Materials
+title: Oxford LLMs Materials
 author: maksim
 date: 2024-05-23
 categories: [Programme, Materials]
 tags: [programme, fundamentals, alignment, interpretability, peft, prompts, llama2]
 pin: true
+image:
+  path: /assets/img/logo/logo_llms.png
 ---
 
-Explore our comprehensive 2023 lecture and workshop series, featuring materials created by Elena Voita and Ilya Boytsov. Delve into the evolutionary journey of NLP, understand biases and interpretability in LLMs, and learn about alignment from lecture slides and in our upcoming(!) lecture videos. Our workshops cover essential topics such as setting up Google Colab, using Huggingface transformers, topic modeling with BERTopic, fine-tuning pretrained models, parameter-efficient fine-tuning, transformer interpretability, classic NLP with Spacy, prompts and instructions with Llama 2, and detoxifying summarization models with reinforcement learning. Stay tuned for the release of the video recordings!
+Explore our 2023 lecture and workshop series, featuring materials created by Elena Voita and Ilya Boytsov. Start with the evolutionary journey of NLP, understand biases and interpretability in LLMs, and learn about alignment from lecture slides and in our upcoming(!) lecture videos. Our workshops cover essential topics such as setting up Google Collab, using Huggingface transformers, topic modeling with BERTopic, fine-tuning pretrained models, parameter-efficient fine-tuning, transformer interpretability, classic NLP with Spacy, prompts and instructions with Llama 2, and detoxifying summarization models with reinforcement learning. Stay tuned for the release of the video recordings!
 
 # 2023 Lectures
 
@@ -20,12 +22,12 @@ Video coming soon!
 # 2023 Workshops
 The following workshop materials were designed and implemented by [Ilya Boytsov](https://www.linkedin.com/in/ieboytsov/).
 We will upload the workshop recordings soon!
-- [Google Colab environment setup, general intro](https://github.com/antndlcrx/oxford-llms-workshop/blob/main/materials/seminars/day_1/0_Env%20setup%20and%20intro.ipynb)
+- [Google Collab environment setup, general intro](https://github.com/antndlcrx/oxford-llms-workshop/blob/main/materials/seminars/day_1/0_Env%20setup%20and%20intro.ipynb)
 - [Introduction to Huggingface transformers library](https://github.com/antndlcrx/oxford-llms-workshop/blob/main/materials/seminars/day_1/1_Intro%20to%20transformers.ipynb)
 - [Topic modelling with Transformers using BERTopic library](https://github.com/antndlcrx/oxford-llms-workshop/blob/main/materials/seminars/day_1/2_Topic%20modelling%20with%20transformers.ipynb)
 - [A guide how to fine-tune pretrained model for a classification task](https://github.com/antndlcrx/oxford-llms-workshop/blob/main/materials/seminars/day_1/3_Fine%20tune%20pretrained%20model.ipynb)
 - [Parameter Efficient Fine Tuning (PEFT)](https://github.com/antndlcrx/oxford-llms-workshop/blob/main/materials/seminars/day_2/4_Parameter%20efficient%20fine%20tuning.ipynb)
-- [Transformers interpretability, Attention visualisation, and saliancy methods (e.g. Integrated gradients)](https://github.com/antndlcrx/oxford-llms-workshop/blob/main/materials/seminars/day_2/5_Transformers%20interpretability.ipynb)
+- [Transformers interpretability, Attention visualisation, and saliency methods (e.g. Integrated gradients)](https://github.com/antndlcrx/oxford-llms-workshop/blob/main/materials/seminars/day_2/5_Transformers%20interpretability.ipynb)
 - [Model analys with classic NLP using Spacy](https://github.com/antndlcrx/oxford-llms-workshop/blob/main/materials/seminars/day_2/6_Sentiment%20analysis%20with%20classic%20NLP.ipynb)
 - [Prompts and instructions with Llama 2](https://github.com/antndlcrx/oxford-llms-workshop/blob/main/materials/seminars/day_3/7_Prompts%20and%20instructions%20with%20Llama%202.ipynb)
 - [Detoxifying summarisation model with Reinforcement Learning from Human Feedback (RLHF)](https://github.com/antndlcrx/oxford-llms-workshop/blob/main/materials/seminars/day_3/8_LLMs%20alignment%20with%20RLHF.ipynb)
