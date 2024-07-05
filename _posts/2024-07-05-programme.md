@@ -1,5 +1,5 @@
 ---
-title: Oxford LLMs Materials
+title: Programme 2024
 author: maksim
 date: 2024-07-05
 categories: [Programme]
@@ -19,7 +19,7 @@ The workshop is divided into two main parts - the Instruction part and Collabora
 Every day, we start with a technical lecture offering a deep dive into the functioning of modern LLMs, covering both theoretical and practical aspects. After a lunch break, we continue with practical coding sessions: these will provide you with the skills and tools needed to effectively use LLMs in your research. In the afternoon, we conclude with a research talk or panel during which invited social science researchers will share their ongoing projects at the intersections of social science and natural language processing (NLP).
 
 
-### Collaborative Research Projects (active phase: Thursday 26 - Friday 27 September)
+### Collaborative Research Projects (active phase: Thursday 26 Sept - Friday 27 Sept)
 Participants and school conveners will engage in collaborative research projects that aim to result in peer-reviewed publications.
 These projects will start online slightly before the workshop, intensify during the final two days, and continue afterward.
 
