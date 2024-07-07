@@ -12,7 +12,7 @@ Rapid advancements in LLMs offer exciting new opportunities for social science a
 
 
 ## Workshop Structure: 
-The workshop is divided into two main parts - the Instruction part and Collaborative Research part.
+The workshop is divided into two main parts - the Instruction part happening during the first three days of the workshop and Collaborative Research part, which starts online before the workshop, commences during the last two days of the workshop, and continues afterwards until the projects are finished.
 
 ### Instruction (Monday 23 Sept - Wednesday 25 Sept)
 
