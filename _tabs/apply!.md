@@ -19,11 +19,11 @@ We are expecting to invite about 30 participants. You will be expected to fully 
 > We are offering ten scholarships of **up to 400£** to reimburse travel and subsistence expenses (including accommodation) to participants travelling from outside of Oxford[^footnote2]
 {: .prompt-tip }
 
-Interested? Apply here [**link**](https://forms.gle/bFCMEm7ZGu9weA6f9). 💼 Don't forget to include your CV and a brief statement of interest.  
-> Hurry, applications close on `22 July 2024` ⏰
+Interested? Apply [**here"**](https://forms.gle/bFCMEm7ZGu9weA6f9). 💼 Don't forget to include your CV and a brief statement of interest.  
+> Hurry, applications close on `29 July 2024` ⏰
 {: .prompt-warning }
 
-We will notify all applicants on the application outcome on Tuesday `01 Aug 2023`.
+We will notify all applicants on the application outcome on Thursday `08 Aug 2024`.
 
 Let's explore the world of large language models together! 🎉
 
