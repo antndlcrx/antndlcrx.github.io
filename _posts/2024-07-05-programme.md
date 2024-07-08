@@ -20,13 +20,13 @@ Every day, we start with a technical lecture offering a deep dive into the funct
 
 1. **Introduction to LLMs** with deep dives into how everything works under the hood
 
-2. **LLM Evaluation**: a brief history of LLM evaluation methods, from `Turing test` to `Chatbot Arena`. You will learn about generalisation abilities of LLMs, societal impact metrics and many more!
+2. **LLM Evaluation**: a brief history of LLM evaluation methods, from Turing test to Chatbot Arena. You will learn about generalisation abilities of LLMs, societal impact metrics and many more!
 
 3. **AI Agents**: overviewing the limits of autonomy for the current state of LLMs. Case studies and discussions of existing frameworks and evaluation methods.
 
-4. **LLMs Finetuning and Alignment**: supervised finetuning and preference tuning methods (`RLHF`, `DPO`, etc). Case studies with respect to social science applications.
+4. **LLMs Finetuning and Alignment**: supervised finetuning and preference tuning methods (RLHF, DPO, etc). Case studies with respect to social science applications.
 
-5. **Practical tips and tricks with LLMs**: advanced `prompt engineering`, retrieval augmented generation (`RAG`) and other useful approaches and tools to get the most from LLMs!
+5. **Practical tips and tricks with LLMs**: advanced prompt engineering, retrieval augmented generation (RAG) and other useful approaches and tools to get the most from LLMs!
 
 
 ## Collaborative Research Projects (active phase: Thursday 26 Sept - Friday 27 Sept)
@@ -46,7 +46,7 @@ After confirming your participation, you will be offered to join one of the seve
 > All people who have in any way contributed to a project will be invited to join a co-authors list, should the project make it through to a paper stage! 
 {: .prompt-info }
 
-> We are working on securing funding for `API` and `cloud computing` access and will update you soon on that!
+> We are working on securing funding for API and cloud computing access and will update you soon on that!
 {: .prompt-info }
 
 > You would be able to switch to a different research project during the initial stage **but not after the 23 September**
