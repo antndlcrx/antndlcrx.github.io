@@ -39,3 +39,17 @@ These projects will start online slightly before the workshop, intensify during 
 The focus will be on interdisciplinary projects that lie at the intersection of NLP and social sciences.
 By the end of the workshop, attendees will be equipped with the knowledge and skills to integrate LLMs responsibly and effectively into their social science research, fostering innovative and ethical applications.
 
+After confirming your participation, you will be offered to join one of the several research projects curated by the workshop organisers. Alternatively, you can propose your own project idea and we will help you develop it further. Before the workshop, we will discuss and refine the ideas and develop research implementation plan and test proof of concepts. On Thursday - Friday 26-27 September, we will test out and refine the research implementation plans with feedback from our invited speakers and lecturers. After the workshop, we will enter the final implementation and write-up stage that will culminate in sending out final papers to peer-reviewed conferences and journals.  
+
+
+### Points of clarification on the Collaborative Research Projects
+> All people who have in any way contributed to a project will be invited to join a co-authors list, should the project make it through to a paper stage! 
+{: .prompt-info }
+
+> We are working on securing funding for `API` and `cloud computing` access and will update you soon on that!
+{: .prompt-info }
+
+> You would be able to switch to a different research project during the initial stage **but not after the 23 September**
+{: .prompt-info }
+
+
