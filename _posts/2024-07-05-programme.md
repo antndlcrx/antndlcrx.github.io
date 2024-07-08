@@ -12,7 +12,7 @@ Rapid advancements in LLMs offer exciting new opportunities for social science a
 
 The workshop is divided into two main parts - the Instruction part happening during the first three days of the workshop and Collaborative Research part, which starts online before the workshop, commences during the last two days of the workshop, and continues afterwards until the projects are finished.
 
-## Instruction (Monday 23 Sept - Wednesday 25 Sept)
+## **Instruction**: Monday 23 Sept - Wednesday 25 Sept
 
 Every day, we start with a technical lecture offering a deep dive into the functioning of modern LLMs, covering both theoretical and practical aspects. After a lunch break, we continue with practical coding sessions: these will provide you with the skills and tools needed to effectively use LLMs in your research. In the afternoon, we conclude with a research talk or panel during which invited social science researchers will share their ongoing projects at the intersections of social science and natural language processing (NLP).
 
@@ -29,7 +29,7 @@ Every day, we start with a technical lecture offering a deep dive into the funct
 5. **Practical tips and tricks with LLMs**: advanced prompt engineering, retrieval augmented generation (RAG) and other useful approaches and tools to get the most from LLMs!
 
 
-## Collaborative Research Projects (active phase: Thursday 26 Sept - Friday 27 Sept)
+## **Collaborative Research Projects**: Thursday 26 Sept - Friday 27 Sept (active phase)
 Participants and school conveners will engage in collaborative research projects that aim to result in peer-reviewed publications.
 These projects will start online slightly before the workshop, intensify during the final two days, and continue afterward.
 
