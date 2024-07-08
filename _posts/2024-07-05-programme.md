@@ -20,13 +20,13 @@ Every day, we start with a technical lecture offering a deep dive into the funct
 
 1. **Introduction to LLMs** with deep dives into how everything works under the hood
 
-2. **LLM Evaluation**: a brief history of LLM evaluation methods, from Turing test to Chatbot Arena. You will learn about generalisation abilities of LLMs, societal impact metrics and many more!
+2. **LLM Evaluation**: a brief history of LLM evaluation methods, from `Turing test` to `Chatbot Arena`. You will learn about generalisation abilities of LLMs, societal impact metrics and many more!
 
 3. **AI Agents**: overviewing the limits of autonomy for the current state of LLMs. Case studies and discussions of existing frameworks and evaluation methods.
 
 4. **LLMs Finetuning and Alignment**: supervised finetuning and preference tuning methods (`RLHF`, `DPO`, etc). Case studies with respect to social science applications.
 
-5. **Practical tips and tricks with LLMs**: advanced prompt engineering, retrieval augmented generation (`RAG`) and other useful approaches and tools to get the most from LLMs!
+5. **Practical tips and tricks with LLMs**: advanced `prompt engineering`, retrieval augmented generation (`RAG`) and other useful approaches and tools to get the most from LLMs!
 
 
 ## Collaborative Research Projects (active phase: Thursday 26 Sept - Friday 27 Sept)
@@ -39,7 +39,7 @@ These projects will start online slightly before the workshop, intensify during 
 The focus will be on interdisciplinary projects that lie at the intersection of NLP and social sciences.
 By the end of the workshop, attendees will be equipped with the knowledge and skills to integrate LLMs responsibly and effectively into their social science research, fostering innovative and ethical applications.
 
-After confirming your participation, you will be offered to join one of the several research projects curated by the workshop organisers. Alternatively, you can propose your own project idea and we will help you develop it further. Before the workshop, we will discuss and refine the ideas and develop research implementation plan and test proof of concepts. On Thursday - Friday 26-27 September, we will test out and refine the research implementation plans with feedback from our invited speakers and lecturers. After the workshop, we will enter the final implementation and write-up stage that will culminate in sending out final papers to peer-reviewed conferences and journals.  
+After confirming your participation, you will be offered to join one of the several research projects curated by the workshop organisers. Alternatively, you can propose your own project idea and we will help you develop it further. Before the workshop, we will discuss and refine the ideas and develop research implementation plan and test proof of concepts. During the workshop project sessions on 26-27 September, we will test out and refine the research implementation plans with feedback from our invited speakers and lecturers. After the workshop, we will enter the final implementation and write-up stage that will culminate in sending out final papers to peer-reviewed conferences and journals.  
 
 
 ### Points of clarification on the Collaborative Research Projects
