@@ -4,7 +4,7 @@ author: maksim
 date: 2024-05-23
 categories: [Programme, Materials]
 tags: [programme, fundamentals, alignment, interpretability, peft, prompts, llama2]
-pin: true
+pin: false
 image:
   path: /assets/img/logo/logo_llms.png
 ---
