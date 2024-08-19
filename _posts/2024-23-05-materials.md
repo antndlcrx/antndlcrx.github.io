@@ -5,8 +5,7 @@ date: 2024-05-23
 categories: [Programme, Materials]
 tags: [programme, fundamentals, alignment, interpretability, peft, prompts, llama2]
 pin: false
-image:
-  path: /assets/img/logo/logo_llms.png
+
 ---
 
 Explore our 2023 lecture and workshop series, featuring materials created by Elena Voita and Ilya Boytsov. Start with the evolutionary journey of NLP, understand biases and interpretability in LLMs, and learn about alignment from lecture slides and in our upcoming(!) lecture videos. Our workshops cover essential topics such as setting up Google Collab, using Huggingface transformers, topic modeling with BERTopic, fine-tuning pretrained models, parameter-efficient fine-tuning, transformer interpretability, classic NLP with Spacy, prompts and instructions with Llama 2, and detoxifying summarization models with reinforcement learning. Stay tuned for the release of the video recordings!
