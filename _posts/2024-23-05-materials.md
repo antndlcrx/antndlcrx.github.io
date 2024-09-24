@@ -13,21 +13,21 @@ pin: false
 
 ## Lectures
 
-[Introduction to LLMs](https://docs.google.com/presentation/d/1avuQJE-Gf8t0an-sinXqkvKjzv1u4rLpO94ONOE_Vx4/edit#slide=id.p) by Grigory Sapunov
+- [Introduction to LLMs](https://docs.google.com/presentation/d/1avuQJE-Gf8t0an-sinXqkvKjzv1u4rLpO94ONOE_Vx4/edit#slide=id.p) by Grigory Sapunov
 
-[LLM Evaluation](https://docs.google.com/presentation/d/1n_wwOPwbK9FPkVMKGA9Vneya4Jaf4lh13D9YO9byves/edit#slide=id.g303d6023e88_1_58) by Tatiana Shavrina
+- [LLM Evaluation](https://docs.google.com/presentation/d/1n_wwOPwbK9FPkVMKGA9Vneya4Jaf4lh13D9YO9byves/edit#slide=id.g303d6023e88_1_58) by Tatiana Shavrina
 
-[LLM Agents](https://docs.google.com/presentation/d/10-6Erne_Fo62y2i4OOEaNkGTrcEEIk9sOObuSJlhR80/edit#slide=id.g303d938f784_1_58) by Tatiana Shavrina
+- [LLM Agents](https://docs.google.com/presentation/d/10-6Erne_Fo62y2i4OOEaNkGTrcEEIk9sOObuSJlhR80/edit#slide=id.g303d938f784_1_58) by Tatiana Shavrina
 
-[LLM Agents (continued)](https://docs.google.com/presentation/d/1Zlt3ARDbGBhVvmPaz7omaj6MlXIlIOFs7wm6P8GGrpc/edit#slide=id.p) by Grigory Sapunov
+- [LLM Agents (continued)](https://docs.google.com/presentation/d/1Zlt3ARDbGBhVvmPaz7omaj6MlXIlIOFs7wm6P8GGrpc/edit#slide=id.p) by Grigory Sapunov
 
 
 
 ## Seminars
 
-[Navigating RAG for Social Science](https://docs.google.com/presentation/d/1ngAVq0Ks3_rgDw5Qnif_A483G6M6RoL2shVklabrYDI/edit#slide=id.g1ff45be8172_1_0) by Atita Arora
+- [Navigating RAG for Social Science](https://docs.google.com/presentation/d/1ngAVq0Ks3_rgDw5Qnif_A483G6M6RoL2shVklabrYDI/edit#slide=id.g1ff45be8172_1_0) by Atita Arora
 
-[LLM Observability and Evaluation](https://docs.google.com/presentation/d/1wCGSwBqo4iNx_MQXwQLHRyVW__t8UlMU9K6HPLmq4hM/edit#slide=id.g2f39ad35ae4_0_641) by John Githuly
+- [LLM Observability and Evaluation](https://docs.google.com/presentation/d/1wCGSwBqo4iNx_MQXwQLHRyVW__t8UlMU9K6HPLmq4hM/edit#slide=id.g2f39ad35ae4_0_641) by John Githuly
 
 
 
