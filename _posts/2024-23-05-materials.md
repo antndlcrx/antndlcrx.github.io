@@ -29,6 +29,8 @@ pin: false
 
 - [LLM Observability and Evaluation](https://docs.google.com/presentation/d/1wCGSwBqo4iNx_MQXwQLHRyVW__t8UlMU9K6HPLmq4hM/edit#slide=id.g2f39ad35ae4_0_641) by John Githuly
 
+- [Tutorial: Creating LLama-Researcher using LlamaIndex workflows](https://github.com/Jgilhuly/Llama-Researcher) by John Githuly
+
 
 
 # 2023
