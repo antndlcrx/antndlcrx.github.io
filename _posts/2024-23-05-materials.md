@@ -25,7 +25,7 @@ pin: false
 
 ## Seminars
 
-[Introduciton to RAG]()
+[Navigating RAG for Social Science](https://docs.google.com/presentation/d/1ngAVq0Ks3_rgDw5Qnif_A483G6M6RoL2shVklabrYDI/edit#slide=id.g1ff45be8172_1_0) by Atita Arora
 
 [LLM Observability and Evaluation](https://docs.google.com/presentation/d/1wCGSwBqo4iNx_MQXwQLHRyVW__t8UlMU9K6HPLmq4hM/edit#slide=id.g2f39ad35ae4_0_641) by John Githuly
 
