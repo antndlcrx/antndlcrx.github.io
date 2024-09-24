@@ -13,6 +13,13 @@ pin: false
 
 ## Lectures
 
+[Introduction to LLMs](https://docs.google.com/presentation/d/1avuQJE-Gf8t0an-sinXqkvKjzv1u4rLpO94ONOE_Vx4/edit#slide=id.p)
+
+[LLM Evaluation](https://docs.google.com/presentation/d/1n_wwOPwbK9FPkVMKGA9Vneya4Jaf4lh13D9YO9byves/edit#slide=id.g303d6023e88_1_58)
+
+[LLM Agents](https://docs.google.com/presentation/d/10-6Erne_Fo62y2i4OOEaNkGTrcEEIk9sOObuSJlhR80/edit#slide=id.g303d938f784_1_58)
+[LLM Agents (continued)](https://docs.google.com/presentation/d/1Zlt3ARDbGBhVvmPaz7omaj6MlXIlIOFs7wm6P8GGrpc/edit#slide=id.p)
+
 
 ## Seminars
 
