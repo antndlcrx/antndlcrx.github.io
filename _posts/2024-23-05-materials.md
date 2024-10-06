@@ -6,7 +6,7 @@ categories: [Programme, Materials]
 tags: [programme, fundamentals, alignment, interpretability, peft, prompts, llama2]
 pin: true
 image:
-  path: /assets/img/logo/logo_llms_transp.png
+  path: /assets/img/logo/logo_llms_light.jpg
 
 ---
 
