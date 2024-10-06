@@ -11,9 +11,9 @@ image:
 ---
 
 
-# 2024
+## 2024
 
-## Lectures
+### Lectures
 
 - [Introduction to LLMs](https://docs.google.com/presentation/d/1avuQJE-Gf8t0an-sinXqkvKjzv1u4rLpO94ONOE_Vx4/edit#slide=id.p) by Grigory Sapunov.
 
@@ -26,7 +26,7 @@ image:
 - [Fine-Tuning and Alignment](https://docs.google.com/presentation/d/1-Kf059z24W65GgPNbjw6vOvABFOdxFf4BD_Hsenc-U8/edit) by Ilya Boytsov.
 
 
-## Seminars
+### Seminars
 
 - [Navigating RAG for Social Science](https://docs.google.com/presentation/d/1ngAVq0Ks3_rgDw5Qnif_A483G6M6RoL2shVklabrYDI/edit#slide=id.g1ff45be8172_1_0) by Atita Arora.
 
@@ -40,11 +40,11 @@ image:
 
 
 
-# 2023
+## 2023
 
 Explore our 2023 lecture and workshop series, featuring materials created by Elena Voita and Ilya Boytsov. Start with the evolutionary journey of NLP, understand biases and interpretability in LLMs, and learn about alignment from lecture slides and in our upcoming(!) lecture videos. Our workshops cover essential topics such as setting up Google Collab, using Huggingface transformers, topic modeling with BERTopic, fine-tuning pretrained models, parameter-efficient fine-tuning, transformer interpretability, classic NLP with Spacy, prompts and instructions with Llama 2, and detoxifying summarization models with reinforcement learning. Stay tuned for the release of the video recordings!
 
-## Lectures
+### Lectures
 
 The following lecture materials were and created by [Elena Voita](https://lena-voita.github.io/).
 - [The Evolutionary Journey of NLP](https://github.com/antndlcrx/oxford-llms-workshop/blob/main/materials/lectures/day_1/The%20Evolutionary%20Journey%20in%20NLP.pdf) from rule-based systems to modern Transformers-based models, which are the core technology underpinning LLMs. Video coming soon! 
@@ -52,7 +52,7 @@ The following lecture materials were and created by [Elena Voita](https://lena-v
 - [LLMs and Alignment](https://github.com/antndlcrx/oxford-llms-workshop/blob/main/materials/lectures/day_3/Prompt%20engineering%2C%20RHLF%2C%20ChatGPT.pdf)
 Video coming soon!
 
-## Workshops
+### Workshops
 The following workshop materials were designed and implemented by [Ilya Boytsov](https://www.linkedin.com/in/ieboytsov/).
 We will upload the workshop recordings soon!
 - [Google Collab environment setup, general intro](https://github.com/antndlcrx/oxford-llms-workshop/blob/main/materials/seminars/day_1/0_Env%20setup%20and%20intro.ipynb)
