@@ -1,19 +1,17 @@
 ---
-title: Preliminaries and Tutorials
-author: maksim
-date: 2023-08-31
-categories: [Tutorial]
-tags: [tutorial, preliminaries]
+# the default layout is 'page'
+icon: fas fa-book
+order: 4
 ---
 
 
-## Preliminaries
+# Preliminaries
 To gain most of this workshop, you would need (if you have not already) to familiarise yourself with the following concepts and skills: 
 
 > If you lack familiarity with any of the preliminarily skills do not worry! We provide links to great third-party tutorials for you!
 {: .prompt-tip }
 
-### Python:
+## Python:
 - Basic concepts: objects, functions, data structures
 - Data processing:
   + Pandas
@@ -30,7 +28,7 @@ To gain most of this workshop, you would need (if you have not already) to famil
     * [Video Walkthrough on Building Neural Networks with PyTorch](https://www.youtube.com/watch?v=Jy4wM2X21u0&list=PLhhyoLH6IjfxeoooqP9rhU3HJIAVAJ3Vz&index=5) 
 - Familiarity with Jupiter Notebooks UI
 
-### Machine Learning and NLP:
+## Machine Learning and NLP:
 - Basic understanding of ML concepts: model training and evaluation stages, loss functions, metrics
 - Familiarity with NLP domain: [word embeddings](https://lena-voita.github.io/nlp_course/word_embeddings.html), text data handling (e.g. tokenisation), familiar with classic NLP problems (e.g., [text classifiction](https://lena-voita.github.io/nlp_course/text_classification.html))
 - Basic knowledge of deep learning (gradients, backpropagation, activation functions)
