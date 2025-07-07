@@ -1,55 +1,61 @@
 ---
 title: Programme 2024
 author: maksim
-date: 2024-07-05
+date: 2025-07-05
 categories: [Programme]
-tags: [programme, oxllms 2024]
+tags: [programme, oxllms 2025]
 pin: false
 
 ---
 
-Rapid advancements in LLMs offer exciting new opportunities for social science applications. However, it is crucial to address the limitations of these models, including their propensity to hallucinate, propagate social biases, and occasionally provide false information. The primary goal of the Oxford LLMs workshop is to promote the responsible and effective use of LLMs in social science research.
+## Program Overview
 
-The workshop is divided into two main parts - the Instruction part happening during the first three days of the workshop and Collaborative Research part, which starts online before the workshop, commences during the last two days of the workshop, and continues afterwards until the projects are finished.
+The Oxford LLMs Program is a five-day workshop that combines lectures, coding sessions, collaborative projects, and guest talks. Participants learn how large language models work, how to adapt them to new domains, how to evaluate them, and how to deploy them safely and fairly.
 
-## **Instruction**: Monday 23 Sept - Wednesday 25 Sept
+## Daily Structure
 
-Every day, we start with a technical lecture offering a deep dive into the functioning of modern LLMs, covering both theoretical and practical aspects. After a lunch break, we continue with practical coding sessions: these will provide you with the skills and tools needed to effectively use LLMs in your research. In the afternoon, we conclude with a research talk or panel during which invited social science researchers will share their ongoing projects at the intersections of social science and natural language processing (NLP).
+Each day follows the same four-part structure:
 
-**The programme covers**:
+1. **Lecture (90 min):** Core concepts and methods  
+2. **Coding Session (90 min):** Hands-on exercises using Python and Jupyter notebooks  
+3. **Collaborative Research (120 min):** Small teams work on a real research question, aiming for a peer-review write-up  
+4. **Guest Talk (60 min):** A social scientist presents their LLM research and answers questions  
 
-1. **Introduction to LLMs** with deep dives into how everything works under the hood
+## Main Topics
 
-2. **LLM Evaluation**: a brief history of LLM evaluation methods, from Turing test to Chatbot Arena. You will learn about generalisation abilities of LLMs, societal impact metrics and many more!
+### 1) Foundations of LLMs
 
-3. **AI Agents**: overviewing the limits of autonomy for the current state of LLMs. Case studies and discussions of existing frameworks and evaluation methods.
+- Training objectives for language models  
+- Transformer architecture and in-context learning  
+- Model reasoning and emergent capabilities  
 
-4. **LLMs Finetuning and Alignment**: supervised finetuning and preference tuning methods (RLHF, DPO, etc). Case studies with respect to social science applications.
+### 2) Adapting LLMs to Specific Domains
 
-5. **Practical tips and tricks with LLMs**: advanced prompt engineering, retrieval augmented generation (RAG) and other useful approaches and tools to get the most from LLMs!
+- Post-training methods (continued pre-training, fine-tuning)  
+- Data selection and annotation strategies  
+- Tooling for rapid domain adaptation  
 
+### 3) Evaluating Language Models
 
-## **Collaborative Research Projects**: Thursday 26 Sept - Friday 27 Sept (active phase)
-Participants and school conveners will engage in collaborative research projects that aim to result in peer-reviewed publications.
-These projects will start online slightly before the workshop, intensify during the final two days, and continue afterward.
+- Classic tests (e.g., Turing-style probes)  
+- Benchmarks for generalization and robustness  
+- Metrics for real-world performance and reliability  
 
-> This is the first time we are running an event with this format. We believe it offers great incentives to work on collaborative projects using the skills learned during the programme and provides a great opportunity to learn from each other. However, we would need to adjust things as we go along.
-{: .prompt-warning }
+### 4) Safety and Fairness in LLMs
 
-The focus will be on interdisciplinary projects that lie at the intersection of NLP and social sciences.
-By the end of the workshop, attendees will be equipped with the knowledge and skills to integrate LLMs responsibly and effectively into their social science research, fostering innovative and ethical applications.
+- Bias detection and mitigation techniques  
+- Alignment strategies (instruction tuning, RLHF)  
+- Ethical and societal considerations in deployment  
 
-After confirming your participation, you will be offered to join one of the several research projects curated by the workshop organisers. Alternatively, you can propose your own project idea and we will help you develop it further. Before the workshop, we will discuss and refine the ideas and develop research implementation plan and test proof of concepts. During the workshop project sessions on 26-27 September, we will test out and refine the research implementation plans with feedback from our invited speakers and lecturers. After the workshop, we will enter the final implementation and write-up stage that will culminate in sending out final papers to peer-reviewed conferences and journals.  
+## What You Will Gain
 
+- A clear understanding of transformer-based LLMs  
+- Practical experience with state-of-the-art tools and libraries  
+- Hands-on research skills in computational social science  
+- Insight into current LLM applications in political science and related fields  
 
-### Points of clarification on the Collaborative Research Projects
-> All people who have in any way contributed to a project will be invited to join a co-authors list, should the project make it through to a paper stage! 
-{: .prompt-info }
+## Preparation
 
-> We are working on securing funding for API and cloud computing access and will update you soon on that!
-{: .prompt-info }
+Participants should be ready to code in Python and have familiarity with basic NLP concepts. All materials, datasets, and example code will be provided ahead of time.
 
-> You would be able to switch to a different research project during the initial stage **but not after the 23 September**
-{: .prompt-info }
-
-
+> For anyone who needs a refresher on the basics, we also provide a short [self-study pack of readings and coding exercises](https://llmsforsocialscience.net/preliminaries/) to complete before the workshop. {: .prompt-info }
