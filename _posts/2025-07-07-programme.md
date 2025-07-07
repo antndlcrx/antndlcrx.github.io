@@ -58,4 +58,5 @@ Each day follows the same four-part structure:
 
 Participants should be ready to code in Python and have familiarity with basic NLP concepts. All materials, datasets, and example code will be provided ahead of time.
 
-> For anyone who needs a refresher on the basics, we also provide a short [self-study pack of readings and coding exercises](https://llmsforsocialscience.net/preliminaries/) to complete before the workshop. {: .prompt-info }
+> For anyone who needs a refresher on the basics, we also provide a short [self-study pack of readings and coding exercises](https://llmsforsocialscience.net/preliminaries/) to complete before the workshop. 
+{: .prompt-info }
