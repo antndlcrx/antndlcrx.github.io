@@ -23,29 +23,17 @@ Each day follows the same four-part structure:
 
 ## Main Topics
 
-### 1) Foundations of LLMs
+### 1) Foundations of LLMs  
+In this module, participants will explore **training objectives for language models**, learning how predictive tasks shape internal representations. They will dive into **transformer architecture and in-context learning**, examining how self-attention enables models to process and generate coherent text. Finally, the session covers **model reasoning and emergent capabilities**, demonstrating how large models can perform complex tasks without explicit fine-tuning.
 
-- Training objectives for language models  
-- Transformer architecture and in-context learning  
-- Model reasoning and emergent capabilities  
+### 2) Adapting LLMs to Specific Domains  
+This part focuses on **post-training methods**, such as continued pre-training and fine-tuning, to specialize models for target tasks. Participants will discuss **data selection and annotation strategies**, understanding how dataset quality impacts performance. The module concludes with an overview of **tooling for rapid domain adaptation**, introducing libraries and workflows for efficient model updates.
 
-### 2) Adapting LLMs to Specific Domains
+### 3) Evaluating Language Models  
+Here, we examine **classic tests**, including Turing-style probes, to assess basic language understanding. Next, we cover **benchmarks for generalization and robustness**, comparing standard datasets and stress-test protocols. The session ends with **metrics for real-world performance and reliability**, teaching how to measure model behavior on downstream tasks and in production scenarios.
 
-- Post-training methods (continued pre-training, fine-tuning)  
-- Data selection and annotation strategies  
-- Tooling for rapid domain adaptation  
-
-### 3) Evaluating Language Models
-
-- Classic tests (e.g., Turing-style probes)  
-- Benchmarks for generalization and robustness  
-- Metrics for real-world performance and reliability  
-
-### 4) Safety and Fairness in LLMs
-
-- Bias detection and mitigation techniques  
-- Alignment strategies (instruction tuning, RLHF)  
-- Ethical and societal considerations in deployment  
+### 4) Safety and Fairness in LLMs  
+Participants will learn **bias detection and mitigation techniques**, from dataset debiasing to counterfactual augmentation. We then explore **alignment strategies**, such as instruction tuning and RLHF, that steer models toward desired behaviors. The module wraps up with a discussion of **ethical and societal considerations**, highlighting best practices for responsible deployment.
 
 ## What You Will Gain
 
