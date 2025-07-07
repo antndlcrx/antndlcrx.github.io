@@ -1,5 +1,5 @@
 ---
-title: Programme 2024
+title: Programme 2025
 author: maksim
 date: 2025-07-05
 categories: [Programme]
