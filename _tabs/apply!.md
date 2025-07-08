@@ -18,7 +18,7 @@ Participation is restricted to postgraduate students, including master’s and d
 
 We are expecting to invite about 30 participants. You will be expected to fully attend, participate, and engage in the entire workshop programme. We will be providing you with lunch and coffee break refreshments. Unfortunately, we cannot offer you accommodation, but will send around a list of hotels, colleges, and hostels where you can find affordable options.
 
-> We are offering ten scholarships of **up to £400** to reimburse travel and subsistence expenses (including accommodation) to participants travelling from outside of Oxford.  
+> We are offering ten scholarships of **up to £400** to reimburse travel and subsistence expenses (including accommodation-related expenses) to participants travelling from outside of Oxford.  
 {: .prompt-tip }
 
 Interested? Apply with your CV and a short motivation statement [**here**](https://forms.gle/iPEBtZvTX9D86fkL9).
