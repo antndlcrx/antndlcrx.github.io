@@ -33,7 +33,7 @@ This part focuses on **post-training methods**, such as continued pre-training, 
 Here, we examine **classic tests**, including Turing-style probes, to assess basic language understanding. Next, we cover **benchmarks for generalization and robustness**. The session ends with **metrics for real-world performance and reliability**, teaching how to measure model behavior on downstream tasks and in production scenarios.
 
 ### 4) Safety and Fairness in LLMs  
-Participants will learn **bias detection and mitigation techniques**, from dataset debiasing to counterfactual augmentation. We then explore **alignment strategies**, such as instruction tuning and RLHF, that steer models toward desired behaviors. The module wraps up with a discussion of **ethical and societal considerations**, highlighting best practices for responsible deployment.
+Participants will learn **bias detection and mitigation techniques**. We explore **alignment strategies**, such as instruction tuning and RLHF, that steer models toward desired behaviors. The module wraps up with a discussion of **ethical and societal considerations**, highlighting best practices for responsible deployment.
 
 ## What You Will Gain
 
