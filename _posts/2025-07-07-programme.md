@@ -38,9 +38,9 @@ Participants will learn **bias detection and mitigation techniques**. We explore
 ## What You Will Gain
 
 - A clear understanding of transformer-based LLMs  
-- Practical experience with state-of-the-art tools and libraries  
+- Practical experience with main tools and libraries  
 - Hands-on research skills in computational social science  
-- Insight into current LLM applications in political science and related fields  
+- Insight into current LLM applications in political science, sociology, history, economics, and related fields  
 
 ## Preparation
 
