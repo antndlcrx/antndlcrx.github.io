@@ -7,7 +7,7 @@ order: 4
 
 Hello there,
 
-If you're an early career researcher — master’s, PhD student, postdoc, or even an early career professor — join us for a hands-on five-day workshop focused on Large Language Models in Social Sciences happening **22–26 September**.
+If you're an early career researcher — master’s, PhD student, postdoc, or a professor within three years of completing your PhD — join us for a hands-on five-day workshop focused on Large Language Models in Social Sciences happening **22–26 September**.
 
 ## Eligibility
 
