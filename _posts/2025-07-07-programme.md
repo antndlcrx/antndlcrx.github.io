@@ -8,9 +8,9 @@ pin: false
 
 ---
 
-## Program Overview
+## Programme Overview
 
-The Oxford LLMs Program is a five-day workshop that combines lectures, coding sessions, collaborative projects, and guest talks. Participants learn how large language models work, how to adapt them to new domains, how to evaluate them, and how to deploy them safely and fairly.
+The Oxford LLMs Programme is a five-day workshop that combines lectures, coding sessions, collaborative projects, and guest talks. Participants learn how large language models work, how to adapt them to new domains, how to evaluate them, and how to deploy them safely and fairly.
 
 ## Daily Structure
 
