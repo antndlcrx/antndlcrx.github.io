@@ -30,7 +30,7 @@ In this module, participants will explore **training objectives for language mod
 This part focuses on **post-training methods**, such as continued pre-training, fine-tuning, and reinforcement learning to specialise models for target tasks. Participants will discuss **data preparation**, understanding how dataset quality impacts performance. The module concludes with an overview of frameworks for efficient model updates.
 
 ### 3) Evaluating Language Models  
-Here, we examine **classic tests**, including Turing-style probes, to assess basic language understanding. Next, we cover **benchmarks for generalization and robustness**, comparing standard datasets and stress-test protocols. The session ends with **metrics for real-world performance and reliability**, teaching how to measure model behavior on downstream tasks and in production scenarios.
+Here, we examine **classic tests**, including Turing-style probes, to assess basic language understanding. Next, we cover **benchmarks for generalization and robustness**. The session ends with **metrics for real-world performance and reliability**, teaching how to measure model behavior on downstream tasks and in production scenarios.
 
 ### 4) Safety and Fairness in LLMs  
 Participants will learn **bias detection and mitigation techniques**, from dataset debiasing to counterfactual augmentation. We then explore **alignment strategies**, such as instruction tuning and RLHF, that steer models toward desired behaviors. The module wraps up with a discussion of **ethical and societal considerations**, highlighting best practices for responsible deployment.
