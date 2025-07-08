@@ -28,5 +28,5 @@ Interested? Apply with your CV and a short motivation statement [**here**](https
 
 We will notify all applicants of the outcome on Thursday `28 July 2025`.
 
-[^1]: If you are new to Python or unsure about your grasp of basic NLP concepts, we still encourage you to apply. You will just need to complete some extra preparation before the workshop. We’ve compiled a [list of preliminaries](https://llmsforsocialscience.net/preliminaries/) that you are welcome to review.
+[^1]: If you are new to Python or unsure about your grasp of basic NLP concepts, we still encourage you to apply. You will need to complete some extra preparation before the workshop. We’ve compiled a [list of preliminaries](https://llmsforsocialscience.net/preliminaries/) that you are welcome to review.
 
