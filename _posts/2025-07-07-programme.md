@@ -24,7 +24,7 @@ Each day follows the same four-part structure:
 ## Main Topics
 
 ### 1) Foundations of LLMs  
-In this module, participants will explore **training objectives for language models**. They will dive into **transformer architecture**, examining how self-attention enables models to process and generate coherent text. Finally, the session covers **model reasoning and emergent capabilities**, demonstrating how large models can perform complex tasks without explicit fine-tuning.
+In this module, participants will explore **training objectives for language models**. They will dive into **transformer architecture**, examining how self-attention enables models to process and generate coherent text. Finally, the session covers **in context-learning and model reasoning**, demonstrating how large models can perform complex tasks without explicit fine-tuning.
 
 ### 2) Adapting LLMs to Specific Domains  
 This part focuses on **post-training methods**, such as continued pre-training and fine-tuning, to specialize models for target tasks. Participants will discuss **data selection and annotation strategies**, understanding how dataset quality impacts performance. The module concludes with an overview of **tooling for rapid domain adaptation**, introducing libraries and workflows for efficient model updates.
