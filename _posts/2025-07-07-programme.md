@@ -27,7 +27,7 @@ Each day follows the same four-part structure:
 In this module, participants will explore **training objectives for language models**. They will dive into **transformer architecture**, examining how self-attention enables models to process and generate coherent text. Finally, the session covers **in context-learning and model reasoning**, demonstrating how large models can perform complex tasks without explicit fine-tuning.
 
 ### 2) Adapting LLMs to Specific Domains  
-This part focuses on **post-training methods**, such as continued pre-training, fine-tuning, and reinforcement learning to specialise models for target tasks. Participants will discuss **data preparation**, understanding how dataset quality impacts performance. The module concludes with an overview of **tooling for rapid domain adaptation**, introducing libraries and workflows for efficient model updates.
+This part focuses on **post-training methods**, such as continued pre-training, fine-tuning, and reinforcement learning to specialise models for target tasks. Participants will discuss **data preparation**, understanding how dataset quality impacts performance. The module concludes with an overview of frameworks for efficient model updates.
 
 ### 3) Evaluating Language Models  
 Here, we examine **classic tests**, including Turing-style probes, to assess basic language understanding. Next, we cover **benchmarks for generalization and robustness**, comparing standard datasets and stress-test protocols. The session ends with **metrics for real-world performance and reliability**, teaching how to measure model behavior on downstream tasks and in production scenarios.
