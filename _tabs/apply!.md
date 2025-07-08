@@ -11,7 +11,7 @@ If you're an early career researcher — master’s, PhD student, postdoc, or ev
 
 ## Eligibility
 
-Participation is restricted to postgraduate students, including master’s, doctoral, and early career researchers (within 3 years of PhD completion). You should be familiar with basic concepts in natural language processing (word embeddings) and be comfortable working with Python[^1]. We welcome applicants from all backgrounds and fields of study within social sciences and AI research.
+Participation is restricted to postgraduate students, including master’s and doctoral students, and early career researchers (within 3 years of PhD completion). You should be familiar with basic concepts in natural language processing (word embeddings) and be comfortable working with Python[^1]. We welcome applicants from all backgrounds and fields of study within social sciences and AI research.
 
 > We strongly encourage applications from those identifying with underrepresented groups in academia, NLP, and tech.  
 {: .prompt-tip }
