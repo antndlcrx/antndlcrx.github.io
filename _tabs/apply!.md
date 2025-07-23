@@ -26,7 +26,7 @@ Interested? Apply with your CV and a short motivation statement [**here**](https
 > Applications close on `22 July 2025` ⏰  
 {: .prompt-warning }
 
-We will notify all applicants of the outcome on Thursday `28 July 2025`.
+We will notify all applicants of the outcome on Monday `28 July 2025`.
 
 [^1]: If you are new to Python or unsure about your grasp of basic NLP concepts, we still encourage you to apply. You will need to complete extra preparation before the workshop. We have compiled a [list of preliminaries](https://llmsforsocialscience.net/preliminaries/) that you are welcome to review.
 
