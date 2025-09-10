@@ -9,9 +9,13 @@ image:
   path: /assets/img/logo/logo_llms_light.jpg
 ---
 
-> **Schedule**  
+## Overview
+
+The Oxford LLMs Programme is a five-day workshop that combines lectures, coding sessions, collaborative projects, and guest talks. Participants learn how large language models work, how to adapt them to new domains, how to evaluate them, and how to deploy them safely and fairly.
+
+## Daily Schedule  
 > **Where:** Every day from **09:00–17:00** in the **Large Lecture Room** (Butler Room as backup).  
-> **Food:** Fellows’ Dining Hall & SCR.
+> **Food:** Fellows’ Dining Hall & Senior Common Room.
 
 ### Monday 22 September — *Fundamentals*
 - **09:00–09:15** — Morning coffee and biscuits  
