@@ -5,46 +5,59 @@ date: 2025-07-05
 categories: [Programme]
 tags: [programme, oxllms 2025]
 pin: false
-
+image:
+  path: /assets/img/logo/logo_llms_light.jpg
 ---
 
-## Overview
+> **Schedule**  
+> **Where:** Every day from **09:00–17:00** in the **Large Lecture Room** (Butler Room as backup).  
+> **Food:** Fellows’ Dining Hall & SCR.
 
-The Oxford LLMs Programme is a five-day workshop that combines lectures, coding sessions, collaborative projects, and guest talks. Participants learn how large language models work, how to adapt them to new domains, how to evaluate them, and how to deploy them safely and fairly.
+### Monday 22 September — *Fundamentals*
+- **09:00–09:15** — Morning coffee and biscuits  
+- **09:15–10:45** — **Lecture:** Mikhail Burtsev — *Fundamentals of LLMs*  
+- **10:45–11:00** — Coffee and biscuits  
+- **11:00–12:30** — **Coding seminar:** Ilya Boytsov — *Fundamentals of LLMs*  
+- **12:30–14:00** — Lunch  
+- **14:00–15:45** — **Research:** Introduction to project & outline of activities  
+- **15:45–16:00** — Coffee break  
+- **16:00–17:00** — **Guest talk:** Ray Duch — *Synth Agents Experiments*  
+- **19:00–21:00+** — Social at a pub
 
-## Daily Structure
+### Tuesday 23 September — *LLM Evaluation*
+- **09:00–09:15** — Morning coffee and biscuits  
+- **09:15–10:45** — **Coding seminar:** Emeli Dral — *LLM Evaluation*  
+- **10:45–11:00** — Coffee and biscuits  
+- **11:00–12:30** — **Lecture:** Tatiana Shavrina — *LLM Evaluation*  
+- **12:30–14:00** — Lunch  
+- **14:00–15:45** — **Research**  
+- **15:45–16:00** — Coffee break  
+- **16:00–17:00** — **Guest talk (online):** Joan Timoneda — *Detecting Racism Types in Spanish*
 
-Each day follows the same four-part structure:
+### Wednesday 24 September — *AI Agents & LLM Fine-Tuning*
+- **09:00–09:15** — Morning coffee and biscuits  
+- **09:15–10:45** — **Lecture:** Grigory Sapunov — *AI Agents*  
+- **10:45–11:00** — Coffee and biscuits  
+- **11:00–12:30** — **Coding seminar:** Sergei Skvortsov — *LLM Fine-Tuning*  
+- **12:30–14:00** — Lunch  
+- **14:00–15:45** — **Guest talk:** Brandon Stewart (with Metrics & Models seminar series)  
+- **15:45–16:00** — Coffee break  
+- **16:00–17:00** — **Research**
 
-1. **Lecture (90 min):** Core concepts and methods  
-2. **Coding Session (90 min):** Hands-on exercises using Python and Jupyter notebooks  
-3. **Collaborative Research (120 min):** Small teams work on a real research question, aiming for a peer-review write-up  
-4. **Guest Talk (60 min):** A social scientist presents their LLM research and answers questions  
+### Thursday 25 September — *Research & Oxford Tour*
+- **09:00–09:15** — Morning coffee and biscuits  
+- **09:15–12:30** — **Research**  
+- **12:30–13:30** — Lunch  
+- **13:30–15:45** — **Oxford Tour** *(preliminary time, TBC)*  
+- **15:45–16:00** — Coffee break  
+- **16:00–17:00** — **Guest talk (online):** Kosuke Imai — *Causal Inference and LLMs*
 
-## Main Topics
-
-### 1) Foundations of LLMs  
-In this module, participants will explore **training objectives for language models**. They will dive into **transformer architecture**, examining how self-attention enables models to process and generate coherent text. Finally, the session covers **in context-learning and model reasoning**, demonstrating how large models can perform complex tasks without explicit fine-tuning.
-
-### 2) LLM Post-Training  
-This part focuses on **post-training methods**, such as continued pre-training, fine-tuning, and reinforcement learning to specialise models for target tasks. Participants will discuss **data preparation**, understanding how dataset quality impacts performance. The module concludes with an overview of frameworks for efficient model updates.
-
-### 3) Evaluating LLMs  
-Here, we examine **classic tests**, including Turing-style probes, to assess basic language understanding. Next, we cover **benchmarks for generalization and robustness**. The session ends with **metrics for real-world performance and reliability**, teaching how to measure model behavior on downstream tasks and in production scenarios.
-
-### 4) Safety and Fairness in LLMs  
-Participants will learn **bias detection and mitigation techniques**. We explore **alignment strategies** that steer models toward desired behaviors. The module wraps up with a discussion of **ethical and societal considerations**, highlighting best practices for responsible deployment.
-
-## What You Will Gain
-
-- A clear understanding of transformer-based LLMs  
-- Practical experience with main tools and libraries  
-- Hands-on research skills in computational social science  
-- Insight into current LLM applications in political science, sociology, history, economics, and related fields  
-
-## Preparation
-
-Participants should be ready to code in Python and have familiarity with basic NLP concepts. All materials, datasets, and example code will be provided ahead of time.
-
-> For anyone who needs a refresher on the basics, we also provide a short [self-study pack of readings and coding exercises](https://llmsforsocialscience.net/preliminaries/) to complete before the workshop. 
-{: .prompt-info }
+### Friday 26 September — *Research, Safety, Outro*
+- **09:00–09:15** — Morning coffee and biscuits  
+- **09:15–10:45** — **Lecture:** Denis Volk — *AI Safety*  
+- **10:45–11:00** — Coffee and biscuits  
+- **11:00–12:30** — **Research**  
+- **12:30–14:00** — Lunch  
+- **14:00–15:45** — **Research Presentations** by participants  
+- **15:45–16:00** — Coffee break  
+- **16:00–17:00** — **Outro talk:** Charles Rahal — *On Limits to Prediction*
