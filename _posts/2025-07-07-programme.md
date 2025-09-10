@@ -17,38 +17,38 @@ The Oxford LLMs Programme is a five-day workshop that combines lectures, coding 
 > **Where:** Every day from **09:00–17:00** in the **Large Lecture Room** (Butler Room as backup).  
 > **Food:** Fellows’ Dining Hall & Senior Common Room.
 
-### Monday 22 September — *Fundamentals*
+### Monday 22 September: *Fundamentals*
 - **09:00–09:15** — Morning coffee and biscuits  
-- **09:15–10:45** — **Lecture:** Mikhail Burtsev — *Fundamentals of LLMs*  
+- **09:15–10:45** — **Lecture:** Mikhail Burtsev: *Fundamentals of LLMs*  
 - **10:45–11:00** — Coffee and biscuits  
-- **11:00–12:30** — **Coding seminar:** Ilya Boytsov — *Fundamentals of LLMs*  
+- **11:00–12:30** — **Coding seminar:** Ilya Boytsov: *Fundamentals of LLMs*  
 - **12:30–14:00** — Lunch  
 - **14:00–15:45** — **Research:** Introduction to project & outline of activities  
 - **15:45–16:00** — Coffee break  
-- **16:00–17:00** — **Guest talk:** Ray Duch — *Synth Agents Experiments*  
+- **16:00–17:00** — **Guest talk:** Ray Duch: *Synthetic Agents for Benchmarking Experiments*  
 - **19:00–21:00+** — Social at a pub
 
-### Tuesday 23 September — *LLM Evaluation*
+### Tuesday 23 September: *LLM Evaluation*
 - **09:00–09:15** — Morning coffee and biscuits  
-- **09:15–10:45** — **Coding seminar:** Emeli Dral — *LLM Evaluation*  
+- **09:15–10:45** — **Coding seminar:** Emeli Dral: *LLM Evaluation*  
 - **10:45–11:00** — Coffee and biscuits  
-- **11:00–12:30** — **Lecture:** Tatiana Shavrina — *LLM Evaluation*  
+- **11:00–12:30** — **Lecture:** Tatiana Shavrina: *LLM Evaluation*  
 - **12:30–14:00** — Lunch  
 - **14:00–15:45** — **Research**  
 - **15:45–16:00** — Coffee break  
-- **16:00–17:00** — **Guest talk (online):** Joan Timoneda — *Detecting Racism Types in Spanish*
+- **16:00–17:00** — **Guest talk (online):** Joan Timoneda: *Detecting Racism Types in Spanish*
 
-### Wednesday 24 September — *AI Agents & LLM Fine-Tuning*
+### Wednesday 24 September: *AI Agents & LLM Fine-Tuning*
 - **09:00–09:15** — Morning coffee and biscuits  
-- **09:15–10:45** — **Lecture:** Grigory Sapunov — *AI Agents*  
+- **09:15–10:45** — **Lecture:** Grigory Sapunov: *AI Agents*  
 - **10:45–11:00** — Coffee and biscuits  
-- **11:00–12:30** — **Coding seminar:** Sergei Skvortsov — *LLM Fine-Tuning*  
+- **11:00–12:30** — **Coding seminar:** Sergei Skvortsov: *LLM Fine-Tuning*  
 - **12:30–14:00** — Lunch  
-- **14:00–15:45** — **Guest talk:** Brandon Stewart (with Metrics & Models seminar series)  
+- **14:00–15:45** — **Guest talk:** Brandon Stewart (with [Metrics & Models seminar series](https://metrics-and-models.github.io/))  
 - **15:45–16:00** — Coffee break  
 - **16:00–17:00** — **Research**
 
-### Thursday 25 September — *Research & Oxford Tour*
+### Thursday 25 September: *Research & Oxford Tour*
 - **09:00–09:15** — Morning coffee and biscuits  
 - **09:15–12:30** — **Research**  
 - **12:30–13:30** — Lunch  
@@ -56,9 +56,9 @@ The Oxford LLMs Programme is a five-day workshop that combines lectures, coding 
 - **15:45–16:00** — Coffee break  
 - **16:00–17:00** — **Guest talk (online):** Kosuke Imai — *Causal Inference and LLMs*
 
-### Friday 26 September — *Research, Safety, Outro*
+### Friday 26 September: *Research, Safety, Outro*
 - **09:00–09:15** — Morning coffee and biscuits  
-- **09:15–10:45** — **Lecture:** Denis Volk — *AI Safety*  
+- **09:15–10:45** — **Lecture:** Denis Volk: *AI Safety*  
 - **10:45–11:00** — Coffee and biscuits  
 - **11:00–12:30** — **Research**  
 - **12:30–14:00** — Lunch  
