@@ -9,7 +9,7 @@ pin: false
 
 <p>
   <img
-    src="/assets/img/logo/logo_llms_light.jpg"
+    src="/assets/img/logo/logo_llms_light_cropped.jpg"
     alt="LLMs Logo"
     style="display:block;margin:0 auto;max-width:300px;float:none !important;"
   >
