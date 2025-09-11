@@ -7,9 +7,10 @@ tags: [programme, oxllms 2025]
 pin: false
 ---
 
-<p align="center">
-  <img src="/assets/img/logo/logo_llms_light.jpg" alt="LLMs Logo" width="300">
+<p style="text-align: center;">
+  <img src="/assets/img/logo/logo_llms_light.jpg" alt="LLMs Logo" style="max-width:300px;">
 </p>
+
 
 ## Overview
 
