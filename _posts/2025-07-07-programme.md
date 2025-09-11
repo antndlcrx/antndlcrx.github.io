@@ -26,7 +26,7 @@ The Oxford LLMs Programme is a five-day workshop that combines lectures, coding 
 - **14:00–15:45** — **Research:** Introduction to project & outline of activities  
 - **15:45–16:00** — Coffee break  
 - **16:00–17:00** — **Guest talk:** Ray Duch: *Synthetic Agents for Benchmarking Experiments*  
-- **19:00–21:00+** — Social at a pub
+- **19:00–21:00** — Social 
 
 ### Tuesday 23 September: *LLM Evaluation*
 - **09:00–09:15** — Morning coffee and biscuits  
