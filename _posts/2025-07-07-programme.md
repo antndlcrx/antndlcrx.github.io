@@ -5,8 +5,6 @@ date: 2025-07-05
 categories: [Programme]
 tags: [programme, oxllms 2025]
 pin: false
-image:
-  path: /assets/img/logo/logo_llms_light.jpg
 ---
 
 ## Overview
