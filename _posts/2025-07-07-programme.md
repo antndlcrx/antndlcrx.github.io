@@ -54,7 +54,7 @@ The Oxford LLMs Programme is a five-day workshop that combines lectures, coding 
 - **12:30–13:30** — Lunch  
 - **13:30–15:45** — **Oxford Tour** *(preliminary time, TBC)*  
 - **15:45–16:00** — Coffee break  
-- **16:00–17:00** — **Guest talk (online):** Kosuke Imai: *Causal Inference and LLMs*
+- **16:00–17:00** — **Guest talk (online):** Kosuke Imai: [*GenAI-Powered Inference*](https://imai.fas.harvard.edu/research/GPI.html)
 
 ### Friday 26 September: *Research, Safety, Outro*
 - **09:00–09:15** — Morning coffee and biscuits  
@@ -64,4 +64,4 @@ The Oxford LLMs Programme is a five-day workshop that combines lectures, coding 
 - **12:30–14:00** — Lunch  
 - **14:00–15:45** — **Research Presentations** by participants  
 - **15:45–16:00** — Coffee break  
-- **16:00–17:00** — **Outro talk:** Charles Rahal: *On Limits to Prediction*
+- **16:00–17:00** — **Outro talk:** Charles Rahal: [*On the Unkowable Limits to Prediction*](https://www.nature.com/articles/s43588-025-00776-y)
