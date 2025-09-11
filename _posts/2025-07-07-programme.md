@@ -7,6 +7,10 @@ tags: [programme, oxllms 2025]
 pin: false
 ---
 
+<p align="center">
+  <img src="/assets/img/logo/logo_llms_light.jpg" alt="LLMs Logo" width="300">
+</p>
+
 ## Overview
 
 The Oxford LLMs Programme is a five-day workshop that combines lectures, coding sessions, collaborative projects, and guest talks. Participants learn how large language models work, how to adapt them to new domains, how to evaluate them, and how to deploy them safely and fairly.
