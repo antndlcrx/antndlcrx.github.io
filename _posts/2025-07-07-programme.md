@@ -52,9 +52,9 @@ The Oxford LLMs Programme is a five-day workshop that combines lectures, coding 
 - **10:45–11:00** — Coffee and biscuits  
 - **11:00–12:30** — **Coding seminar:** Sergei Skvortsov: *LLM Fine-Tuning*  
 - **12:30–14:00** — Lunch  
-- **14:00–15:45** — **Guest talk:** Brandon Stewart (with [Metrics & Models seminar series](https://metrics-and-models.github.io/))  
-- **15:45–16:00** — Coffee break  
-- **16:00–17:00** — **Research**
+- **14:00–15:00** — **Guest talk:** Brandon Stewart (with [Metrics & Models seminar series](https://metrics-and-models.github.io/))  
+- **15:00–15:30** — Coffee break  
+- **15:30–17:00** — **Research**
 
 ### Thursday 25 September: *Research & Oxford Tour*
 - **09:00–09:15** — Morning coffee and biscuits  
