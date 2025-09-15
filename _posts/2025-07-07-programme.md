@@ -58,9 +58,10 @@ The Oxford LLMs Programme is a five-day workshop that combines lectures, coding 
 
 ### Thursday 25 September: *Research & Oxford Tour*
 - **09:00–09:15** — Morning coffee and biscuits  
-- **09:15–12:30** — **Research**  
-- **12:30–13:30** — Lunch  
-- **13:30–15:45** — **Oxford Tour** *(preliminary time, TBC)*  
+- **09:15–10:30** — **Research**  
+- **10:30–13:00** — **Oxford Tour**  
+- **13:15–14:15** —  Lunch
+- **14:15-15:45** — **Research**
 - **15:45–16:00** — Coffee break  
 - **16:00–17:00** — **Guest talk (online):** Kosuke Imai: [*GenAI-Powered Inference*](https://imai.fas.harvard.edu/research/GPI.html)
 
