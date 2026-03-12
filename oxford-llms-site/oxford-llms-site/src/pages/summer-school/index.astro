@@ -1,0 +1,76 @@
+---
+import Base from '../../layouts/Base.astro';
+---
+
+<Base title="Summer School" description="Annual 5-day intensive on LLMs for social science at Nuffield College, Oxford.">
+  <div class="container">
+
+    <div class="page-header">
+      <p class="section-label">Summer School</p>
+      <h1 class="page-header__title">Oxford LLMs Summer School</h1>
+      <p class="page-header__desc">
+        An annual five-day intensive at Nuffield College combining lectures, coding sessions,
+        collaborative research, and guest talks. Now in its third year.
+      </p>
+    </div>
+
+    <!-- Year selector -->
+    <div class="grid-3 mt-6">
+      <a href="/summer-school/2025/" class="card card--accent-top card--pillar">
+        <span class="tag">Upcoming</span>
+        <h3 class="card__title" style="margin-top: var(--sp-3);">2025</h3>
+        <p class="card__text">
+          September 22–26, 2025. Applications open April 10.
+          Slightly more technical, with increased focus on coding and research projects.
+        </p>
+        <span class="card__link">Programme & details →</span>
+      </a>
+
+      <a href="/summer-school/2024/" class="card card--pillar">
+        <h3 class="card__title">2024</h3>
+        <p class="card__text">
+          30 participants from ~200 applications. Collaborative project on survey data
+          preprocessing for opinion prediction. GPU support from Ori Cloud.
+        </p>
+        <span class="card__link">Highlights report →</span>
+      </a>
+
+      <a href="/summer-school/2023/" class="card card--pillar">
+        <h3 class="card__title">2023</h3>
+        <p class="card__text">
+          The inaugural Oxford LLMs school. ~30 participants exploring transformer architectures,
+          in-context learning, and applications in political science and sociology.
+        </p>
+        <span class="card__link">Highlights report →</span>
+      </a>
+    </div>
+
+    <!-- What participants say / impact -->
+    <section>
+      <div class="prose">
+        <h2>From Participants to Co-Authors</h2>
+        <p>
+          The summer school is designed around a participant-to-co-author pipeline. Each cohort
+          collaborates on a research project during the week, and the strongest contributions
+          continue towards publication. This model has already produced real papers.
+        </p>
+      </div>
+    </section>
+
+  </div>
+</Base>
+
+<style>
+  .card--pillar {
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.15s ease, transform 0.15s ease;
+  }
+  .card--pillar:hover {
+    border-color: var(--accent-soft);
+    transform: translateY(-2px);
+  }
+  .card--pillar .card__text { flex: 1; }
+</style>

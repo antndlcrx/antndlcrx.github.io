@@ -1,0 +1,18 @@
+---
+/* Quiet partner acknowledgment — greyed text, no logos */
+const partners = [
+  'Nuffield College',
+  'University of Oxford',
+  'Ori Cloud',
+  'Qdrant',
+];
+---
+
+<div class="partners">
+  <p class="partners__label">Supported by</p>
+  <div class="partners__list">
+    {partners.map(name => (
+      <span class="partners__item">{name}</span>
+    ))}
+  </div>
+</div>
