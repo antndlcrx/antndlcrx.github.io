@@ -145,8 +145,8 @@
   --blue-5: #58BC96;
   --blue-6: #78D4B0;
   --blue-7: #9CE6C8;
-  --blue-8: #C0F0DC;
-  --blue-9: #E4FAF0;
+  --blue-8: #B3ECD4;
+  --blue-9: #D4F6E8;
 
   --bg:        #FAFDFB;
   --surface:   #F0F8F4;
@@ -172,8 +172,8 @@
   --blue-5: #848490;
   --blue-6: #A0A0AA;
   --blue-7: #B8B8C0;
-  --blue-8: #D4D4DA;
-  --blue-9: #EEEEEF;
+  --blue-8: #C8C8D0;
+  --blue-9: #E2E2E8;
 
   --bg:        #FAFAFB;
   --surface:   #F0F0F2;
@@ -198,7 +198,7 @@
 }
 
 html {
-  font-size: 16px;
+  font-size: 15px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   scroll-behavior: smooth;
@@ -665,6 +665,27 @@ section + section {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
+  position: relative;
+  overflow: hidden;
+}
+
+.stats::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(
+    to right,
+    var(--blue-1) 0%,
+    var(--blue-2) 20%,
+    var(--blue-3) 40%,
+    var(--blue-4) 65%,
+    var(--blue-5) 80%
+  );
+  border-top-left-radius: inherit;
+  border-top-right-radius: inherit;
 }
 
 .stat { text-align: center; }
@@ -981,6 +1002,7 @@ code {
   padding: 6px 8px 6px 10px;
   cursor: pointer;
   outline: none;
+  min-width: 120px;
   box-shadow: 0 0 0 0 rgba(45, 138, 191, 0);
   transition:
     border-color 0.15s ease,

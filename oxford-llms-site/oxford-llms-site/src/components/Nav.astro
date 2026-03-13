@@ -50,7 +50,7 @@ const links = [
           aria-expanded="false"
         >
           <span class="sr-only">Color theme</span>
-          <span id="theme-button-label" class="nav__theme-button-label">Blue Lagoon</span>
+          <span id="theme-button-label" class="nav__theme-button-label">Lagoon</span>
           <svg class="nav__theme-chevron" viewBox="0 0 16 16" aria-hidden="true">
             <path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
@@ -69,7 +69,7 @@ const links = [
             aria-selected="true"
           >
             <span class="nav__theme-swatch nav__theme-swatch--blue" aria-hidden="true"></span>
-            <span>Blue Lagoon</span>
+            <span>Lagoon</span>
           </button>
           <button
             class="nav__theme-option"
@@ -136,6 +136,15 @@ const links = [
     root.dataset.theme = value === 'blue' ? '' : value;
     if (value === 'blue') {
       delete root.dataset.theme;
+    }
+
+    // Persist to cookie so SSR can render the correct theme without a flash
+    try {
+      const encoded = encodeURIComponent(value);
+      const oneYear = 60 * 60 * 24 * 365;
+      document.cookie = `oxford-llms-theme=${encoded}; path=/; max-age=${oneYear}`;
+    } catch (e) {
+      // If cookies are disabled, we still have localStorage as a fallback.
     }
   }
 
