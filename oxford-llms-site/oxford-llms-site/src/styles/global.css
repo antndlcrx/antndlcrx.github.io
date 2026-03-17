@@ -977,6 +977,32 @@ code {
 .mb-6 { margin-bottom: var(--sp-6); }
 .mb-8 { margin-bottom: var(--sp-8); }
 
+/* Speaker layout helpers for people sections */
+.speaker {
+  display: block;
+  margin-top: var(--sp-7);
+  margin-bottom: var(--sp-3);
+}
+
+.speaker-photo {
+  float: right;
+  width: 170px;
+  max-width: 40%;
+  margin-left: var(--sp-4);
+  margin-bottom: var(--sp-4);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+}
+
+@media (max-width: 768px) {
+  .speaker-photo {
+    float: none;
+    display: block;
+    margin-left: 0;
+    max-width: 60%;
+  }
+}
+
 
 /* ============================================================
    NAV THEME MENU — custom dropdown with swatches
