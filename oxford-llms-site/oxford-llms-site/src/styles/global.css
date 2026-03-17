@@ -977,29 +977,77 @@ code {
 .mb-6 { margin-bottom: var(--sp-6); }
 .mb-8 { margin-bottom: var(--sp-8); }
 
-/* Speaker layout helpers for people sections */
+/* Speaker layout helpers for people sections - strict 2x2 grid */
 .speaker {
-  display: block;
-  margin-top: var(--sp-7);
-  margin-bottom: var(--sp-3);
+  display: grid;
+  grid-template-columns: 170px minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  column-gap: var(--sp-4);
+  row-gap: var(--sp-2);
+  margin-top: var(--sp-6);
+  margin-bottom: var(--sp-4);
 }
 
+/* Row 1: name (col 1), affiliation (col 2) */
+.speaker-name {
+  grid-column: 1 / 2;
+  grid-row: 1 / 2;
+  display: block;
+  margin: 0;
+  font-weight: 600;
+}
+
+.speaker-affil {
+  grid-column: 2 / 3;
+  grid-row: 1 / 2;
+  display: block;
+  margin: 0;
+}
+
+/* Row 2: image (col 1), text (col 2) */
 .speaker-photo {
-  float: right;
+  grid-column: 1 / 2;
+  grid-row: 2 / 3;
   width: 170px;
-  max-width: 40%;
-  margin-left: var(--sp-4);
-  margin-bottom: var(--sp-4);
+  max-width: 100%;
   border-radius: var(--radius-lg);
   border: 1px solid var(--border);
 }
 
+.speaker-bio {
+  grid-column: 2 / 3;
+  grid-row: 2 / 3;
+}
+
+.speaker-bio p {
+  margin: 0;
+}
+
 @media (max-width: 768px) {
+  .speaker {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto auto;
+  }
+
+  .speaker-name {
+    grid-column: 1 / 2;
+    grid-row: 1 / 2;
+  }
+
+  .speaker-affil {
+    grid-column: 1 / 2;
+    grid-row: 2 / 3;
+  }
+
   .speaker-photo {
-    float: none;
-    display: block;
-    margin-left: 0;
-    max-width: 60%;
+    grid-column: 1 / 2;
+    grid-row: 3 / 4;
+    width: 200px;
+  }
+
+  .speaker-bio {
+    grid-column: 1 / 2;
+    grid-row: 4 / 5;
   }
 }
 

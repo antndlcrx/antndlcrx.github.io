@@ -10,49 +10,54 @@ import Base from '../../layouts/Base.astro';
       <h1 class="page-header__title">Oxford LLMs Summer School</h1>
       <p class="page-header__desc">
         An annual five-day intensive at Nuffield College combining lectures, coding sessions,
-        collaborative research, and guest talks. Now in its third year.
+        collaborative research, and guest talks. Now entering its fourth year.
       </p>
     </div>
 
-    <!-- Year selector — same theme palette edges as main page pillars -->
-    <div class="grid-3 mt-6">
-      <a href="/summer-school/2026/" class="card card--accent-1 card--pillar">
-        <span class="tag">Upcoming</span>
-        <h3 class="card__title" style="margin-top: var(--sp-3);">2026</h3>
+    <section class="summer-school-feature">
+      <p class="section-label">Upcoming</p>
+      <a href="/summer-school/2026/" class="card card--accent-1 card--pillar summer-school-feature__card">
+        <h2 class="card__title summer-school-feature__title">Oxford LLMs Summer School 2026</h2>
         <p class="card__text">
-          July 13–17, 2026. Programme and speakers to be announced.
+          July 13-17, 2026 at Nuffield College, Oxford. A five-day intensive in lectures, coding,
+          and collaborative research. Programme and speakers to be announced.
         </p>
         <span class="card__link">Programme & details →</span>
       </a>
+    </section>
 
-      <a href="/summer-school/2025/" class="card card--accent-2 card--pillar">
-        <h3 class="card__title">2025</h3>
-        <p class="card__text">
-          Third annual workshop with 30 participants, a Kaggle-style prediction competition, and a
-          cohort of LLM lecturers and social-science speakers collaborating on a joint research
-          project.
-        </p>
-        <span class="card__link">Report & people →</span>
-      </a>
+    <section class="summer-school-archive">
+      <p class="section-label">Past Summer Schools</p>
+      <div class="grid-3">
+        <a href="/summer-school/2025/" class="card card--accent-2 card--pillar">
+          <h3 class="card__title">2025</h3>
+          <p class="card__text">
+            Third annual workshop with 30 participants, a Kaggle-style prediction competition, and
+            a cohort of LLM lecturers and social-science speakers collaborating on a joint research
+            project.
+          </p>
+          <span class="card__link">Highlights →</span>
+        </a>
 
-      <a href="/summer-school/2024/" class="card card--accent-3 card--pillar">
-        <h3 class="card__title">2024</h3>
-        <p class="card__text">
-          30 participants from ~200 applications, applied tutorials on RAG and evaluation, and a
-          cross-discipline line-up of NLP engineers and social scientists.
-        </p>
-        <span class="card__link">Report & people →</span>
-      </a>
+        <a href="/summer-school/2024/" class="card card--accent-3 card--pillar">
+          <h3 class="card__title">2024</h3>
+          <p class="card__text">
+            30 participants from ~200 applications, applied tutorials on RAG and evaluation, and a
+            cross-discipline line-up of NLP engineers and social scientists.
+          </p>
+          <span class="card__link">Highlights →</span>
+        </a>
 
-      <a href="/summer-school/2023/" class="card card--accent-5 card--pillar">
-        <h3 class="card__title">2023</h3>
-        <p class="card__text">
-          The inaugural Oxford LLMs school, convened by Elena Voita and Ilya Boytsov for a cohort
-          of ~30 early-career researchers exploring transformers and text-as-data.
-        </p>
-        <span class="card__link">Report & people →</span>
-      </a>
-    </div>
+        <a href="/summer-school/2023/" class="card card--accent-5 card--pillar">
+          <h3 class="card__title">2023</h3>
+          <p class="card__text">
+            The inaugural Oxford LLMs school, convened by Elena Voita and Ilya Boytsov for a cohort
+            of ~30 early-career researchers exploring transformers and text-as-data.
+          </p>
+          <span class="card__link">Highlights →</span>
+        </a>
+      </div>
+    </section>
 
     <!-- What participants say / impact -->
     <section>
@@ -70,6 +75,35 @@ import Base from '../../layouts/Base.astro';
 </Base>
 
 <style>
+  .summer-school-feature {
+    margin-top: var(--sp-6);
+  }
+  .summer-school-feature .section-label {
+    margin-bottom: var(--sp-3);
+  }
+  .summer-school-feature__card {
+    position: relative;
+    overflow: hidden;
+    gap: var(--sp-2);
+    padding: var(--sp-6);
+    border-top-color: transparent;
+  }
+  .summer-school-feature__card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--blue-1), var(--blue-3), var(--blue-5));
+  }
+  .summer-school-feature__title {
+    margin-top: 0;
+    font-size: clamp(1.25rem, 2vw, 1.5rem);
+  }
+  .summer-school-archive {
+    margin-top: var(--sp-5);
+  }
   .card--pillar {
     display: flex;
     flex-direction: column;
@@ -82,4 +116,9 @@ import Base from '../../layouts/Base.astro';
     transform: translateY(-2px);
   }
   .card--pillar .card__text { flex: 1; }
+  @media (max-width: 768px) {
+    .summer-school-feature__card {
+      padding: var(--sp-5);
+    }
+  }
 </style>
