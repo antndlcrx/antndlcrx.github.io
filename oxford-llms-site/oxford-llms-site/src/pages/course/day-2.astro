@@ -1,0 +1,130 @@
+---
+import CourseLayout from '../../layouts/CourseLayout.astro';
+
+const sections = [
+  { id: 'post-training', label: 'Post-Training' },
+  { id: 'prompting', label: 'Prompting & Reasoning' },
+  { id: 'evaluating', label: 'Evaluating & Choosing Models' },
+];
+---
+
+<CourseLayout
+  day={2}
+  title="From Models to Tools"
+  description="Post-training alignment, prompting strategies, and how to evaluate and choose the right model for your research."
+  sections={sections}
+>
+
+  <!-- ===== POST-TRAINING ===== -->
+  <section id="post-training">
+    <h2>Post-Training</h2>
+    <p>
+      A raw pretrained language model is a powerful next-token predictor, but it
+      is not yet a useful <em>assistant</em>. Post-training bridges this gap
+      through techniques that align the model's behavior with human preferences
+      and instructions.
+    </p>
+
+    <div class="definition-box">
+      <p class="definition-box__label">Definition</p>
+      <p class="definition-box__term">Supervised Fine-Tuning (SFT)</p>
+      <p>
+        Training a pretrained model on curated (instruction, response) pairs to
+        teach it the format and style of helpful, task-oriented responses. SFT
+        is typically the first step of post-training alignment.
+      </p>
+    </div>
+
+    <p>
+      After SFT, further alignment is achieved through reinforcement learning
+      from human feedback (RLHF) or its simpler alternative, Direct Preference
+      Optimization (DPO). These methods train the model to prefer outputs that
+      humans rate as more helpful, honest, and harmless.
+    </p>
+
+    <div class="key-takeaway">
+      <p class="key-takeaway__label">Key Takeaway</p>
+      <p>
+        Post-training is what turns a language model into a tool. Understanding
+        this pipeline (SFT → RLHF/DPO) helps explain model behavior: why models
+        sometimes refuse requests, why they hedge, and how alignment interacts
+        with the research tasks you ask them to perform.
+      </p>
+    </div>
+  </section>
+
+  <!-- ===== PROMPTING ===== -->
+  <section id="prompting">
+    <h2>Prompting &amp; Reasoning</h2>
+    <p>
+      How you frame a request to a language model dramatically affects the
+      quality of its output. Prompting has evolved from a practical trick to a
+      principled engineering discipline.
+    </p>
+
+    <p>
+      The progression from zero-shot to few-shot to chain-of-thought prompting
+      represents increasingly structured ways of eliciting model capabilities.
+      Structured outputs&mdash;asking the model to respond in JSON or follow a
+      specific schema&mdash;are critical for research pipelines that need
+      machine-parseable results.
+    </p>
+
+    <div class="stop-and-think">
+      <div class="stop-and-think__header">
+        <svg class="stop-and-think__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+          <line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+        <span class="stop-and-think__label">Stop and Think</span>
+      </div>
+      <p>
+        You're designing a prompt to classify political speeches as populist or
+        non-populist. Would you use zero-shot, few-shot, or chain-of-thought
+        prompting? What are the trade-offs?
+      </p>
+      <details>
+        <summary>Reveal</summary>
+        <div>
+          <p>
+            Few-shot with chain-of-thought is likely best. Zero-shot risks
+            inconsistent criteria; few-shot examples anchor the model's
+            understanding of your specific definition of populism; chain-of-thought
+            reasoning makes the classification rationale transparent and auditable.
+            The trade-off is token cost and latency per classification.
+          </p>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- ===== EVALUATING MODELS ===== -->
+  <section id="evaluating">
+    <h2>Evaluating &amp; Choosing Models</h2>
+    <p>
+      The landscape of available models is vast: open-weight vs. proprietary,
+      small vs. large, general-purpose vs. specialized. Choosing the right model
+      for a research task requires understanding benchmarks, cost-quality
+      trade-offs, and the strengths of different model families.
+    </p>
+
+    <p>
+      Standard benchmarks like MMLU, HumanEval, and LMSYS Chatbot Arena give
+      rough rankings, but research tasks often have idiosyncratic requirements
+      that benchmarks do not capture. We cover systematic approaches to model
+      evaluation for social science use cases.
+    </p>
+
+    <div class="key-takeaway">
+      <p class="key-takeaway__label">Key Takeaway</p>
+      <p>
+        No single model is best for everything. The right choice depends on your
+        task complexity, data sensitivity, budget, and need for reproducibility.
+        Open models offer transparency and control; closed APIs offer
+        convenience and often better performance on general tasks.
+      </p>
+    </div>
+  </section>
+
+</CourseLayout>

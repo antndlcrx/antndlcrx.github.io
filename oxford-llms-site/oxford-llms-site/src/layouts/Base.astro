@@ -20,22 +20,35 @@ const fullTitle = title === 'Oxford LLMs' ? title : `${title} | Oxford LLMs`;
   <meta name="description" content={description} />
   <title>{fullTitle}</title>
 
-  <script>
-    {`
-      (function() {
-        try {
-          var root = document.documentElement;
-          var stored = window.localStorage.getItem('oxford-llms-theme');
-          if (!stored || stored === 'blue') {
-            root.removeAttribute('data-theme');
-          } else {
-            root.setAttribute('data-theme', stored);
-          }
-        } catch (e) {
-          // If localStorage is blocked, just fall back to default theme.
+  <script is:inline>
+    (function() {
+      try {
+        var root = document.documentElement;
+        var stored = window.localStorage.getItem('oxford-llms-theme');
+        if (!stored || stored === 'blue') {
+          root.removeAttribute('data-theme');
+        } else {
+          root.setAttribute('data-theme', stored);
         }
-      })();
-    `}
+      } catch (e) {}
+    })();
+  </script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous" />
+  <script is:inline defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
+  <script is:inline defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+  <script is:inline>
+    document.addEventListener("DOMContentLoaded", function() {
+      if (typeof renderMathInElement === "function") {
+        renderMathInElement(document.body, {
+          delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "$", right: "$", display: false}
+          ],
+          throwOnError: false
+        });
+      }
+    });
   </script>
 
   <link rel="icon" type="image/svg+xml" href="/img/logo/logo_mark.svg" />

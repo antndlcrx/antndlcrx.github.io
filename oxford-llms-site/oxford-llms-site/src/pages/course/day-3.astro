@@ -1,0 +1,103 @@
+---
+import CourseLayout from '../../layouts/CourseLayout.astro';
+
+const sections = [
+  { id: 'fine-tuning', label: 'Fine-Tuning & Deployment' },
+  { id: 'classification', label: 'Text Classification & Validation' },
+];
+---
+
+<CourseLayout
+  day={3}
+  title="Deploying for Research"
+  description="Fine-tuning, serving, and building rigorous text classification pipelines with proper validation for social science research."
+  sections={sections}
+>
+
+  <!-- ===== FINE-TUNING ===== -->
+  <section id="fine-tuning">
+    <h2>Fine-Tuning &amp; Deployment</h2>
+    <p>
+      When prompting alone is insufficient&mdash;because your task is too
+      specialized, your budget is limited, or you need full control over the
+      model&mdash;fine-tuning lets you adapt a pretrained model to your specific
+      needs.
+    </p>
+
+    <div class="definition-box">
+      <p class="definition-box__label">Definition</p>
+      <p class="definition-box__term">LoRA (Low-Rank Adaptation)</p>
+      <p>
+        A parameter-efficient fine-tuning method that freezes the pretrained
+        weights and injects trainable low-rank matrices into each layer. This
+        reduces the number of trainable parameters by orders of magnitude while
+        achieving performance comparable to full fine-tuning.
+      </p>
+    </div>
+
+    <p>
+      We also cover serving fine-tuned models: using vLLM for efficient local
+      inference, working with API providers for batch processing, and the
+      practical considerations of deploying models for large-scale text
+      analysis.
+    </p>
+
+    <div class="key-takeaway">
+      <p class="key-takeaway__label">Key Takeaway</p>
+      <p>
+        LoRA makes fine-tuning accessible on consumer hardware. Combined with
+        efficient serving, this opens a path where social scientists can
+        customize models for their specific annotation tasks rather than
+        relying solely on general-purpose APIs.
+      </p>
+    </div>
+  </section>
+
+  <!-- ===== TEXT CLASSIFICATION ===== -->
+  <section id="classification">
+    <h2>Text Classification &amp; Validation</h2>
+    <p>
+      Text classification is perhaps the most common application of LLMs in
+      social science: sentiment analysis, topic labeling, stance detection,
+      framing analysis. But using LLMs as annotators introduces new challenges
+      around reliability and validity.
+    </p>
+
+    <p>
+      We build complete classification pipelines: from prompt design through
+      label aggregation to validation against human annotations. Key concepts
+      include inter-annotator agreement metrics, stratified validation sets,
+      and diagnosing systematic errors.
+    </p>
+
+    <div class="stop-and-think">
+      <div class="stop-and-think__header">
+        <svg class="stop-and-think__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+          <line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+        <span class="stop-and-think__label">Stop and Think</span>
+      </div>
+      <p>
+        You achieve 92% accuracy on your validation set using GPT-4 for
+        sentiment classification of political tweets. Is this good enough to
+        deploy for your full corpus of 500,000 tweets? What else would you check?
+      </p>
+      <details>
+        <summary>Reveal</summary>
+        <div>
+          <p>
+            Accuracy alone is insufficient. You should check: class balance in
+            the validation set and corpus, per-class precision and recall (is it
+            systematically miscategorizing one sentiment?), whether the
+            validation set is representative of the full corpus, temporal
+            stability, and cost at scale. A 92% accuracy with strong bias against
+            minority classes could introduce systematic measurement error.
+          </p>
+        </div>
+      </details>
+    </div>
+  </section>
+
+</CourseLayout>
