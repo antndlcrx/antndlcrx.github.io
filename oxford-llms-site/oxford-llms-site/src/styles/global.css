@@ -1744,3 +1744,259 @@ code {
   max-width: 520px;
 }
 
+/* ── Visual diagrams (inline SVG) ── */
+.visual-diagram {
+  margin: var(--sp-6) 0;
+  padding: var(--sp-5);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  text-align: center;
+  overflow-x: auto;
+}
+
+.visual-diagram svg {
+  display: inline-block;
+  max-width: 100%;
+  height: auto;
+}
+
+.visual-diagram__caption {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: var(--sp-3);
+  font-style: italic;
+  text-align: center;
+}
+
+/* ── Resource list ── */
+.resource-list {
+  list-style: none;
+  padding: 0;
+  margin: var(--sp-4) 0;
+}
+
+.resource-list li {
+  position: relative;
+  padding-left: var(--sp-5);
+  margin-bottom: var(--sp-3);
+  font-size: 0.875rem;
+  color: var(--text-sec);
+  line-height: 1.6;
+}
+
+.resource-list li::before {
+  content: "›";
+  position: absolute;
+  left: var(--sp-2);
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.resource-list a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.resource-list a:hover {
+  color: var(--accent-hover);
+}
+
+/* ── Subsection headings inside prose ── */
+.prose h3 {
+  font-family: var(--font-heading);
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-top: var(--sp-8);
+  margin-bottom: var(--sp-4);
+}
+
+/* ── Attention Explorer (interactive) ── */
+.attention-explorer {
+  margin: var(--sp-6) 0;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-5) var(--sp-5) var(--sp-4);
+  overflow-x: auto;
+}
+
+.attention-explorer__header {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-4);
+  flex-wrap: wrap;
+}
+
+.attention-explorer__label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+.attention-explorer__sentence-btns {
+  display: flex;
+  gap: var(--sp-2);
+  flex-wrap: wrap;
+}
+
+.attention-explorer__sentence-btn {
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  padding: var(--sp-1) var(--sp-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text-sec);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.attention-explorer__sentence-btn:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.attention-explorer__sentence-btn--active {
+  background: var(--accent-bg);
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.attention-explorer__tokens {
+  display: flex;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-2);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.attention-explorer__token {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.875rem;
+  padding: var(--sp-1) var(--sp-3);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+  position: relative;
+}
+
+.attention-explorer__token:hover {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+}
+
+.attention-explorer__token--active {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+  color: var(--accent);
+  font-weight: 700;
+  box-shadow: 0 0 0 2px var(--accent-bg);
+}
+
+.attention-explorer__query-label {
+  font-size: 0.625rem;
+  font-weight: 700;
+  color: var(--accent);
+  text-align: center;
+  margin-bottom: var(--sp-1);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.attention-explorer__bars {
+  display: flex;
+  gap: var(--sp-2);
+  align-items: flex-end;
+  justify-content: center;
+  height: 80px;
+  margin-bottom: var(--sp-1);
+  flex-wrap: wrap;
+}
+
+.attention-explorer__bar-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 40px;
+}
+
+.attention-explorer__bar {
+  width: 36px;
+  border-radius: 4px 4px 0 0;
+  background: var(--accent);
+  transition: height 0.3s ease, opacity 0.3s ease;
+  min-height: 2px;
+}
+
+.attention-explorer__bar-label {
+  font-size: 0.625rem;
+  color: var(--text-muted);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.attention-explorer__bar-word {
+  font-size: 0.6875rem;
+  color: var(--text-sec);
+  font-family: 'JetBrains Mono', monospace;
+  margin-top: 2px;
+}
+
+.attention-explorer__insight {
+  text-align: center;
+  font-size: 0.8125rem;
+  color: var(--text-sec);
+  margin-top: var(--sp-3);
+  min-height: 1.6em;
+  font-style: italic;
+}
+
+/* ── Multi-head heatmap ── */
+.multihead-viz {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--sp-4);
+  margin: var(--sp-6) 0;
+}
+
+@media (max-width: 720px) {
+  .multihead-viz {
+    grid-template-columns: 1fr;
+  }
+}
+
+.multihead-viz__head {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-3);
+  text-align: center;
+}
+
+.multihead-viz__title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: var(--sp-2);
+}
+
+.multihead-viz__desc {
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+  margin-top: var(--sp-2);
+  font-style: italic;
+}
+
