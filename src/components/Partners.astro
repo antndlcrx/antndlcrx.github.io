@@ -1,0 +1,25 @@
+---
+/* Quiet partner acknowledgment: greyed text, no logos */
+const partners = ['Nuffield College', 'University of Oxford'];
+
+const pastSponsors = ['Ori Cloud'];
+---
+
+<div class="partners">
+  <div class="partners__group">
+    <p class="partners__label">Supported by</p>
+    <div class="partners__list">
+      {partners.map((name) => (
+        <span class="partners__item">{name}</span>
+      ))}
+    </div>
+  </div>
+  <div class="partners__group partners__group--past">
+    <p class="partners__label">Past sponsors</p>
+    <div class="partners__list">
+      {pastSponsors.map((name) => (
+        <span class="partners__item">{name}</span>
+      ))}
+    </div>
+  </div>
+</div>

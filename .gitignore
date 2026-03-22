@@ -1,26 +1,30 @@
-# Bundler cache
+# Astro
+dist/
+.astro/
+
+# Dependencies
+node_modules/
+
+# Environment
+.env
+.env.*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.idea
+.vscode/
+!.vscode/settings.json
+!.vscode/extensions.json
+*.swp
+
+# Legacy Ruby/Jekyll (safe to keep if tooling remains locally)
 .bundle
 vendor
 Gemfile.lock
-
-# Jekyll cache
 .jekyll-cache
 .jekyll-metadata
 _site
-
-# RubyGems
 *.gem
-
-# NPM dependencies
-node_modules
-package-lock.json
-
-# IDE configurations
-.idea
-.vscode
-!.vscode/settings.json
-!.vscode/extensions.json
-
-# Misc
-_sass/dist
-assets/js/dist

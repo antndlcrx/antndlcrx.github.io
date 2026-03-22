@@ -1,61 +1,192 @@
-# Chirpy Starter
+# Oxford LLMs Website
 
-[![Gem Version](https://img.shields.io/gem/v/jekyll-theme-chirpy)][gem]&nbsp;
-[![GitHub license](https://img.shields.io/github/license/cotes2020/chirpy-starter.svg?color=blue)][mit]
+The website for [Oxford LLMs](https://llmsforsocialscience.net/) — research, teaching, and community for social scientists working with language models.
 
-When installing the [**Chirpy**][chirpy] theme through [RubyGems.org][gem], Jekyll can only read files in the folders
-`_data`, `_layouts`, `_includes`, `_sass` and `assets`, as well as a small part of options of the `_config.yml` file
-from the theme's gem. If you have ever installed this theme gem, you can use the command
-`bundle info --path jekyll-theme-chirpy` to locate these files.
+Built with [Astro](https://astro.build/). Hosted on GitHub Pages.
 
-The Jekyll team claims that this is to leave the ball in the user’s court, but this also results in users not being
-able to enjoy the out-of-the-box experience when using feature-rich themes.
+## Quick Start
 
-To fully use all the features of **Chirpy**, you need to copy the other critical files from the theme's gem to your
-Jekyll site. The following is a list of targets:
+### Prerequisites
 
-```shell
+You need **Node.js 18+** installed. Check with:
+
+```bash
+node --version    # should show v18.x or higher
+npm --version     # should show 9.x or higher
+```
+
+If you don't have Node.js, install it:
+
+- **macOS:** `brew install node`
+- **Or download from:** https://nodejs.org/ (pick the LTS version)
+
+### Setup (one time)
+
+```bash
+# Clone the repo (replace with your fork URL if different)
+git clone https://github.com/antndlcrx/antndlcrx.github.io.git
+cd antndlcrx.github.io
+
+# Install dependencies
+npm install
+```
+
+### Development (daily use)
+
+```bash
+# Start the dev server (like `bundle exec jekyll serve`)
+npm run dev
+
+# Site is now live at http://localhost:4321
+# It auto-refreshes when you save a file — no restart needed
+```
+
+### Build & Preview
+
+```bash
+# Build the production site (outputs to dist/)
+npm run build
+
+# Preview the built site locally
+npm run preview
+```
+
+### Deploy
+
+Deployment is automatic via GitHub Actions. Just push to `main`:
+
+```bash
+git add .
+git commit -m "your changes"
+git push
+```
+
+The site will be live in ~2 minutes. The workflow is in `.github/workflows/pages-deploy.yml`.
+
+**First-time GitHub Pages setup:** In your repo settings → Pages → Source, select "GitHub Actions" (not "Deploy from a branch").
+
+---
+
+## Project Structure
+
+```
 .
-├── _config.yml
-├── _plugins
-├── _tabs
-└── index.html
+├── public/              ← Static files (images, fonts). Copied as-is.
+│   └── img/
+│       └── logo/        ← Put logo files here
+├── src/
+│   ├── components/      ← Reusable pieces (nav, footer, etc.)
+│   │   ├── Nav.astro
+│   │   ├── Footer.astro
+│   │   └── Partners.astro
+│   ├── layouts/         ← Page wrappers (like Jekyll _layouts/)
+│   │   └── Base.astro
+│   ├── pages/           ← Each file = a URL (like Jekyll pages)
+│   │   ├── index.astro       → /
+│   │   ├── about.astro       → /about/
+│   │   ├── research.astro    → /research/
+│   │   ├── course.astro      → /course/
+│   │   ├── resources.astro   → /resources/
+│   │   ├── apply.astro       → /apply/
+│   │   └── summer-school/
+│   │       ├── index.astro   → /summer-school/
+│   │       ├── 2023.astro    → /summer-school/2023/
+│   │       ├── 2024.astro    → /summer-school/2024/
+│   │       └── 2025.astro    → /summer-school/2025/
+│   └── styles/
+│       └── global.css   ← All design tokens and styles
+├── astro.config.mjs     ← Site configuration
+├── package.json         ← Dependencies (like Gemfile)
+└── .github/workflows/
+    └── pages-deploy.yml ← Auto-deploy on push to main
 ```
 
-To save you time, and also in case you lose some files while copying, we extract those files/configurations of the
-latest version of the **Chirpy** theme and the [CD][CD] workflow to here, so that you can start writing in minutes.
+## How to Edit Content
 
-## Prerequisites
+### Editing a page
 
-Follow the instructions in the [Jekyll Docs](https://jekyllrb.com/docs/installation/) to complete the installation of
-the basic environment. [Git](https://git-scm.com/) also needs to be installed.
+Open any `.astro` file in `src/pages/`. The format is:
 
-## Installation
+```astro
+---
+// This top section is like Jekyll front matter
+import Base from '../layouts/Base.astro';
+---
 
-Sign in to GitHub and [**use this template**][use-template] to generate a brand new repository and name it
-`USERNAME.github.io`, where `USERNAME` represents your GitHub username.
-
-Then clone it to your local machine and run:
-
-```console
-$ bundle
+<!-- This section is HTML — same as you're used to -->
+<Base title="Page Title">
+  <div class="container container--content">
+    <div class="prose">
+      <h1>Your content here</h1>
+      <p>Just write HTML. The `prose` class handles typography.</p>
+    </div>
+  </div>
+</Base>
 ```
 
-## Usage
+**Key classes:**
+- `container` — centers content at max-width
+- `container--content` — narrower width for reading
+- `prose` — applies typography styles to headings, paragraphs, links, tables
+- `card` — styled content box
+- `grid-2`, `grid-3` — responsive grid layouts
+- `tag` — small label (like "UPCOMING", "COURSE")
+- `btn btn--primary` — styled button
 
-Please see the [theme's docs](https://github.com/cotes2020/jekyll-theme-chirpy#documentation).
+### Adding a new page
 
-## Contributing
+Create a new `.astro` file in `src/pages/`. The file path = the URL:
+- `src/pages/new-page.astro` → `/new-page/`
+- `src/pages/summer-school/2026.astro` → `/summer-school/2026/`
 
-The contents of this repository are automatically updated when new releases are made to the [main repository][chirpy].  
-If you have problems using it, or would like to participate in improving it, please go to the main repository for feedback!
+### Adding images
 
-## License
+1. Put the image in `public/img/` (any subfolder is fine)
+2. Reference it as `/img/your-image.jpg` in your HTML
 
-This work is published under [MIT][mit] License.
+### Adding the logo files
 
-[gem]: https://rubygems.org/gems/jekyll-theme-chirpy
-[chirpy]: https://github.com/cotes2020/jekyll-theme-chirpy/
-[use-template]: https://github.com/cotes2020/chirpy-starter/generate
-[CD]: https://en.wikipedia.org/wiki/Continuous_deployment
-[mit]: https://github.com/cotes2020/chirpy-starter/blob/master/LICENSE
+Copy your logo files into `public/img/logo/`:
+```
+public/img/logo/
+├── logo_llms_transp.png    ← used in nav, hero, footer
+├── logo_llms_dark.jpg      ← used for OG image / social sharing
+├── logo_llms_light.jpg     ← available for light contexts
+└── logo_llms_light_cropped.jpg
+```
+
+---
+
+## Astro vs Jekyll — Key Differences
+
+| Concept | Jekyll | Astro |
+|---------|--------|-------|
+| Start dev server | `bundle exec jekyll serve` | `npm run dev` |
+| Install dependencies | `bundle install` | `npm install` |
+| Page files | `.md` or `.html` in root | `.astro` in `src/pages/` |
+| Layouts | `_layouts/` | `src/layouts/` |
+| Includes/components | `_includes/` | `src/components/` |
+| Static files | root or `assets/` | `public/` |
+| Config | `_config.yml` | `astro.config.mjs` |
+| Template syntax | `{{ liquid }}` | `{javascript}` |
+| Build output | `_site/` | `dist/` |
+
+The biggest difference: instead of Liquid templates (`{{ page.title }}`), Astro uses JavaScript in the frontmatter section and JSX-like syntax in the HTML. But for basic pages, you mostly just write HTML inside the `<Base>` component.
+
+---
+
+## Phase 2 Features (post Apr 10)
+
+These are planned but not yet implemented:
+- [ ] Lecture videos (embed YouTube/Vimeo when ready ~Apr 3)
+- [ ] 2025 highlights report
+- [ ] Live application form
+- [ ] 2026 summer school speaker names
+- [ ] Interactive course content (KaTeX math, Three.js, slide decks)
+- [ ] Social media integration
+
+To add interactive React components (for the course page), install the React integration:
+```bash
+npx astro add react
+```
+Then you can create `.jsx` files in `src/components/` and use them inside `.astro` pages.

@@ -1,0 +1,69 @@
+---
+import Nav from '../components/Nav.astro';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = 'Research, teaching, and community for social scientists working with language models.' } = Astro.props;
+const fullTitle = title === 'Oxford LLMs' ? title : `${title} | Oxford LLMs`;
+
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content={description} />
+  <title>{fullTitle}</title>
+
+  <script is:inline>
+    (function() {
+      try {
+        var root = document.documentElement;
+        var stored = window.localStorage.getItem('oxford-llms-theme');
+        if (!stored || stored === 'blue') {
+          root.removeAttribute('data-theme');
+        } else {
+          root.setAttribute('data-theme', stored);
+        }
+      } catch (e) {}
+    })();
+  </script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous" />
+  <script is:inline defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
+  <script is:inline defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+  <script is:inline>
+    document.addEventListener("DOMContentLoaded", function() {
+      if (typeof renderMathInElement === "function") {
+        renderMathInElement(document.body, {
+          delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "$", right: "$", display: false}
+          ],
+          throwOnError: false
+        });
+      }
+    });
+  </script>
+
+  <link rel="icon" type="image/svg+xml" href="/img/logo/logo_mark.svg" />
+
+  <meta property="og:title" content={fullTitle} />
+  <meta property="og:description" content={description} />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="/img/logo/logo_llms_dark.jpg" />
+</head>
+<body>
+  <div class="page-wrapper">
+    <Nav />
+    <main>
+      <slot />
+    </main>
+  </div>
+</body>
+</html>

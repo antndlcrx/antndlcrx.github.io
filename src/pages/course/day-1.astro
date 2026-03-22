@@ -1,0 +1,1929 @@
+---
+import CourseLayout from '../../layouts/CourseLayout.astro';
+
+const sections = [
+  { id: 'embeddings', label: 'Representing Meaning' },
+  { id: 'tokenization', label: 'Tokenization' },
+  { id: 'contextual', label: 'From Static to Contextual' },
+  { id: 'language-modeling', label: 'Language Modeling' },
+  { id: 'transformers', label: 'The Transformer' },
+  { id: 'scaling', label: 'Scaling Laws' },
+  { id: 'social-science', label: 'Social Science Applications' },
+];
+
+/* LaTeX strings defined here so braces don't clash with JSX. */
+const math = {
+  embeddingDef: String.raw`A learned mapping $f: \mathcal{V} \to \mathbb{R}^d$ from a vocabulary $\mathcal{V}$ to a $d$-dimensional real vector space, where semantic and syntactic relationships between words are encoded as geometric relationships between their vectors.`,
+  cosine: String.raw`$$\text{cosine\_similarity}(\mathbf{a}, \mathbf{b}) = \frac{\mathbf{a} \cdot \mathbf{b}}{\|\mathbf{a}\| \cdot \|\mathbf{b}\|}$$`,
+  cosineCaption: String.raw`Result is the cosine of the angle between the two vectors: <strong>1.0</strong> = identical direction, <strong>0.0</strong> = orthogonal (no overlap), <strong>−1.0</strong> = opposite.`,
+  analogy: String.raw`$$\vec{v}_{\text{king}} - \vec{v}_{\text{man}} + \vec{v}_{\text{woman}} \approx \vec{v}_{\text{queen}}$$`,
+  bpeDef: String.raw`A tokenization strategy that splits text into units smaller than words but larger than characters. Starting from individual bytes or characters, BPE iteratively merges the most frequent adjacent pair until a target vocabulary size is reached.`,
+  contextualDef: String.raw`A representation where each token's vector depends on the entire surrounding sequence. The same word produces <em>different</em> vectors in different contexts, resolving ambiguity that static embeddings cannot.`,
+  chainRule: String.raw`$$P(x_1, x_2, \ldots, x_T) = \prod_{t=1}^{T} P(x_t \mid x_{\lt t})$$`,
+  chainCaption: String.raw`The joint probability of a sequence equals the product of each token's probability given all preceding tokens $x_{\lt t}$.`,
+  perplexity: String.raw`$$\text{PPL}(X) = \exp\!\left(-\frac{1}{T}\sum_{t=1}^{T} \log P(x_t \mid x_{\lt t})\right)$$`,
+  perplexityCaption: String.raw`Perplexity is the exponentiated average negative log-likelihood. Lower is better. A perplexity of $k$ means the model is, on average, as uncertain as choosing uniformly among $k$ options.`,
+  autoregressiveDef: String.raw`A model that generates a sequence one token at a time, left to right. At each step it predicts a probability distribution over the vocabulary for the next token, conditioned on all tokens generated so far.`,
+  attentionDef: String.raw`A mechanism where each position in a sequence computes a weighted sum over all positions. Each token produces three vectors: a <strong>Query</strong> (what am I looking for?), a <strong>Key</strong> (what do I contain?), and a <strong>Value</strong> (what information do I provide?). Attention weights are determined by the compatibility between Queries and Keys.`,
+  attention: String.raw`$$\text{Attention}(Q, K, V) = \text{softmax}\!\left(\frac{QK^\top}{\sqrt{d_k}}\right)V$$`,
+  attentionCaption: String.raw`Scaled dot-product attention. The $\sqrt{d_k}$ factor prevents dot products from growing too large in high dimensions, which would push softmax into regions with near-zero gradients.`,
+  scalingLaw: String.raw`$$L(X) \propto X^{-\alpha}$$`,
+  scalingCaption: String.raw`Loss scales as a power law with each of three variables: compute $C$, dataset size $D$, and model parameters $N$. Each follows the same functional form with different exponents $\alpha$.`,
+};
+---
+
+<CourseLayout
+  day={1}
+  title="Foundations"
+  description="From Embeddings to Transformers: how machines represent meaning as geometry, and how the architecture that changed everything actually works."
+  sections={sections}
+>
+
+  <!-- ===================================================================
+       SECTION 1: REPRESENTING MEANING
+       =================================================================== -->
+  <section id="embeddings">
+    <h2>Representing Meaning</h2>
+    <p>
+      Before a language model can do anything useful, it needs a way to
+      represent words as numbers. Not just any numbers: numbers that
+      capture <em>meaning</em>. This section traces the path from the simplest
+      text representations to the geometric spaces that power modern NLP.
+    </p>
+
+    <h3>Bag of Words: Counting What Appears</h3>
+    <p>
+      The simplest idea: <strong>count which words appear</strong>. A document
+      mentioning "economy," "inflation," and "growth" is probably about
+      economic policy. One mentioning "goal," "league," and "match" is
+      probably about sports.
+    </p>
+    <p>
+      This is called a <strong>bag-of-words</strong> (BoW) representation.
+      It throws away word order, grammar, and nuance, keeping only word
+      frequencies. Despite this, BoW has powered decades of productive social
+      science research: TF-IDF for document retrieval, topic models like LDA
+      and STM for discovering themes in large corpora, and dictionary methods
+      for measuring sentiment or policy focus.
+    </p>
+    <p>
+      But BoW has a hard ceiling. Every word is a separate dimension, equally
+      distant from every other word. "Cat" is as far from "dog" as from
+      "democracy." Two sentences about the same topic can look completely
+      different if they use different vocabulary.
+      <strong>BoW captures what words appear, but not what they mean.</strong>
+    </p>
+
+    <h3>Word Embeddings: Meaning as Geometry</h3>
+    <p>
+      The breakthrough idea
+      (<a href="https://arxiv.org/abs/1301.3781" target="_blank" rel="noopener">Mikolov et al., 2013</a>):
+      instead of treating every word as a separate symbol,
+      <strong>learn a dense vector for each word from its context</strong>.
+      Words that appear in similar contexts get similar vectors.
+    </p>
+    <p>
+      This is the <strong>distributional hypothesis</strong>: "you shall know
+      a word by the company it keeps" (Firth, 1957). A word that often appears
+      near "government," "legislation," and "vote" will end up with a vector
+      close to other political terms: even if they never co-occurred in
+      the same sentence.
+    </p>
+
+    <div class="definition-box">
+      <p class="definition-box__label">Definition</p>
+      <p class="definition-box__term">Word Embedding</p>
+      <p set:html={math.embeddingDef} />
+    </div>
+
+    <p>
+      Word2Vec learns embeddings by training a shallow neural network on a
+      simple task: given a word, predict its neighbours (Skip-gram), or given
+      the neighbours, predict the word (CBOW).
+      <a href="https://nlp.stanford.edu/projects/glove/" target="_blank" rel="noopener">GloVe</a>
+      (Pennington et al., 2014) achieves a similar result by factorising a
+      global word co-occurrence matrix. Both produce vectors where semantic
+      similarity corresponds to geometric proximity.
+    </p>
+
+    <!-- SVG: Embedding space cluster visualisation -->
+    <div class="visual-diagram">
+      <svg viewBox="0 0 520 340" width="520" height="340" xmlns="http://www.w3.org/2000/svg" style="font-family: Inter, system-ui, sans-serif; font-size: 11px;">
+        <!-- Politics cluster -->
+        <circle cx="80" cy="70" r="5" fill="#1E5A8A" opacity="0.85"/><text x="90" y="74" fill="#1E5A8A">government</text>
+        <circle cx="110" cy="50" r="5" fill="#1E5A8A" opacity="0.85"/><text x="120" y="54" fill="#1E5A8A">president</text>
+        <circle cx="65" cy="100" r="5" fill="#1E5A8A" opacity="0.85"/><text x="75" y="104" fill="#1E5A8A">election</text>
+        <circle cx="130" cy="85" r="5" fill="#1E5A8A" opacity="0.85"/><text x="140" y="89" fill="#1E5A8A">parliament</text>
+        <circle cx="95" cy="115" r="5" fill="#1E5A8A" opacity="0.85"/><text x="105" y="119" fill="#1E5A8A">democracy</text>
+        <!-- Economy cluster -->
+        <circle cx="330" cy="60" r="5" fill="#3BA3D4" opacity="0.85"/><text x="340" y="64" fill="#3BA3D4">economy</text>
+        <circle cx="360" cy="90" r="5" fill="#3BA3D4" opacity="0.85"/><text x="370" y="94" fill="#3BA3D4">inflation</text>
+        <circle cx="310" cy="95" r="5" fill="#3BA3D4" opacity="0.85"/><text x="320" y="99" fill="#3BA3D4">market</text>
+        <circle cx="345" cy="40" r="5" fill="#3BA3D4" opacity="0.85"/><text x="355" y="44" fill="#3BA3D4">fiscal</text>
+        <circle cx="380" cy="65" r="5" fill="#3BA3D4" opacity="0.85"/><text x="390" y="69" fill="#3BA3D4">budget</text>
+        <!-- Nature cluster -->
+        <circle cx="100" cy="250" r="5" fill="#2A9D8F" opacity="0.85"/><text x="110" y="254" fill="#2A9D8F">river</text>
+        <circle cx="70" cy="280" r="5" fill="#2A9D8F" opacity="0.85"/><text x="80" y="284" fill="#2A9D8F">mountain</text>
+        <circle cx="130" cy="275" r="5" fill="#2A9D8F" opacity="0.85"/><text x="140" y="279" fill="#2A9D8F">forest</text>
+        <circle cx="85" cy="305" r="5" fill="#2A9D8F" opacity="0.85"/><text x="95" y="309" fill="#2A9D8F">ocean</text>
+        <circle cx="55" cy="260" r="5" fill="#2A9D8F" opacity="0.85"/><text x="20" y="264" fill="#2A9D8F">tree</text>
+        <!-- Family cluster -->
+        <circle cx="370" cy="240" r="5" fill="#E07040" opacity="0.85"/><text x="380" y="244" fill="#E07040">family</text>
+        <circle cx="340" cy="265" r="5" fill="#E07040" opacity="0.85"/><text x="350" y="269" fill="#E07040">mother</text>
+        <circle cx="395" cy="270" r="5" fill="#E07040" opacity="0.85"/><text x="405" y="274" fill="#E07040">father</text>
+        <circle cx="360" cy="295" r="5" fill="#E07040" opacity="0.85"/><text x="370" y="299" fill="#E07040">child</text>
+        <circle cx="410" cy="245" r="5" fill="#E07040" opacity="0.85"/><text x="420" y="249" fill="#E07040">love</text>
+        <!-- Labels -->
+        <text x="60" y="25" fill="#1E5A8A" font-weight="700" font-size="12">Politics</text>
+        <text x="330" y="25" fill="#3BA3D4" font-weight="700" font-size="12">Economy</text>
+        <text x="60" y="230" fill="#2A9D8F" font-weight="700" font-size="12">Nature</text>
+        <text x="350" y="225" fill="#E07040" font-weight="700" font-size="12">Family</text>
+      </svg>
+      <p class="visual-diagram__caption">
+        Schematic illustration of word embeddings in 2D. In a trained embedding
+        space, words from the same domain cluster together, even though the model
+        was never told these categories exist. This structure emerges from word
+        co-occurrence patterns. (Layout is simplified for clarity; real
+        projections via PCA or t-SNE are noisier.)
+      </p>
+    </div>
+
+    <h3>Cosine Similarity: Measuring Closeness</h3>
+    <p>
+      How do we measure whether two word vectors are "close"? The standard
+      tool is <strong>cosine similarity</strong>: it measures the angle
+      between two vectors, ignoring their length.
+    </p>
+
+    <div class="formula-block">
+      <p set:html={math.cosine} />
+      <p class="formula-block__caption" set:html={math.cosineCaption} />
+    </div>
+
+    <!-- Interactive cosine similarity explorer -->
+    <div class="visual-diagram" id="cosine-explorer">
+      <svg id="cosine-svg" viewBox="0 0 480 400" width="480" height="400" xmlns="http://www.w3.org/2000/svg" style="font-family: var(--font-body, Inter, system-ui, sans-serif); font-size: 11px;">
+        <!-- Reference circle (drag radius) -->
+        <circle cx="240" cy="200" r="150" fill="none" style="stroke: var(--border-lt, #EAEEF4);" stroke-width="1" stroke-dasharray="4,4"/>
+        <!-- Axes through origin -->
+        <line x1="60" y1="200" x2="420" y2="200" style="stroke: var(--border, #E2E6EE);" stroke-width="1"/>
+        <line x1="240" y1="30" x2="240" y2="370" style="stroke: var(--border, #E2E6EE);" stroke-width="1"/>
+        <!-- Angle arc (updated by JS) -->
+        <path id="cos-arc" d="" fill="none" style="stroke: var(--text-muted, #6B7280);" stroke-width="1" stroke-dasharray="3,2"/>
+        <!-- Vector a (fixed): 18 deg above horizontal -->
+        <line id="cos-vec-a" x1="240" y1="200" x2="383" y2="154" style="stroke: var(--accent-dark, #1E5A8A);" stroke-width="2.5" marker-end="url(#cosArr1)"/>
+        <text id="cos-label-a" x="388" y="151" style="fill: var(--accent-dark, #1E5A8A);" font-weight="600" font-size="12">a</text>
+        <!-- Vector b (draggable): 55 deg above horizontal -->
+        <line id="cos-vec-b" x1="240" y1="200" x2="326" y2="77" style="stroke: var(--accent, #2D8ABF);" stroke-width="2.5" marker-end="url(#cosArr2)"/>
+        <text id="cos-label-b" x="331" y="74" style="fill: var(--accent, #2D8ABF);" font-weight="600" font-size="12">b</text>
+        <!-- Drag handle -->
+        <circle id="cos-handle" cx="326" cy="77" r="8" style="fill: var(--accent, #2D8ABF); stroke: var(--accent, #2D8ABF);" opacity="0.3" stroke-width="1.5" cursor="grab"/>
+        <!-- Result display -->
+        <text id="cos-value" x="240" y="382" text-anchor="middle" style="fill: var(--text, #0F1117);" font-weight="700" font-size="16">cos &theta; = 0.80</text>
+        <text id="cos-angle" x="240" y="396" text-anchor="middle" style="fill: var(--text-muted, #6B7280);" font-size="10">&theta; = 37&deg;</text>
+        <!-- Instruction -->
+        <text x="240" y="18" text-anchor="middle" style="fill: var(--text-dim, #9CA3AF);" font-size="9">Drag the handle to change the angle between vectors</text>
+        <defs>
+          <marker id="cosArr1" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" style="fill: var(--accent-dark, #1E5A8A)"/></marker>
+          <marker id="cosArr2" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" style="fill: var(--accent, #2D8ABF)"/></marker>
+        </defs>
+      </svg>
+      <p class="visual-diagram__caption">
+        Cosine similarity measures the angle between vectors, not their magnitude.
+        <strong>Drag vector b</strong> to see how the cosine value changes:
+        1.0 when aligned, 0.0 when orthogonal, &minus;1.0 when opposite.
+      </p>
+    </div>
+
+    <h3>Analogy Arithmetic</h3>
+    <p>
+      The most striking property of word embeddings: <strong>relationships
+      become directions</strong>. The direction from "man" to "king" captures
+      something like "royalty." Add that same direction to "woman," and you
+      land near "queen."
+    </p>
+
+    <div class="formula-block">
+      <p set:html={math.analogy} />
+      <p class="formula-block__caption">Vector arithmetic captures semantic relationships. The direction from "man" to "king" is approximately the same as the direction from "woman" to "queen."</p>
+    </div>
+
+    <p>
+      This works because the embedding space organises concepts along
+      roughly consistent axes. Gender is one direction. Geography is another
+      ("Paris &minus; France + Germany &asymp; Berlin"). Tense, plurality,
+      and many other relationships are encoded as well. That said,
+      <a href="https://aclanthology.org/2020.acl-main.647/" target="_blank" rel="noopener">subsequent work</a>
+      has shown that analogy results are sensitive to evaluation methodology
+      and less robust than the original papers suggested: the effect is
+      real, but noisier than the clean examples imply.
+    </p>
+
+    <h3>Semantic Projection: Reading Hidden Dimensions</h3>
+    <p>
+      A 100-dimensional vector seems abstract, but it encodes rich,
+      interpretable structure. The technique of <strong>semantic projection</strong>
+      reveals this: define a meaningful direction using pairs of anchor words,
+      then project other words onto that axis to see where they fall.
+    </p>
+    <p>
+      For example, a "gender" direction can be defined using anchors like
+      (man, woman), (he, she), (him, her). Projecting occupations onto this
+      axis reveals how strongly the training corpus associates each occupation
+      with gender.
+      <a href="https://www.science.org/doi/10.1126/science.aal4230" target="_blank" rel="noopener">Caliskan et al. (2017)</a>
+      showed that embeddings replicate a wide range of implicit biases
+      measured in humans: a finding with profound implications for social science.
+    </p>
+
+    <!-- Interactive semantic projection explorer -->
+    <div class="attention-explorer" id="proj-explorer">
+      <div class="attention-explorer__header">
+        <span class="attention-explorer__label">Dimension:</span>
+        <div class="attention-explorer__sentence-btns">
+          <button class="attention-explorer__sentence-btn attention-explorer__sentence-btn--active" data-proj="0">Gender Scale</button>
+          <button class="attention-explorer__sentence-btn" data-proj="1">Age Scale</button>
+          <button class="attention-explorer__sentence-btn" data-proj="2">Gender &times; Age</button>
+        </div>
+      </div>
+      <svg id="proj-svg" viewBox="0 0 520 420" xmlns="http://www.w3.org/2000/svg" style="font-family: var(--font-body, Inter, system-ui, sans-serif); font-size: 11px; width: 100%; max-width: 520px; display: block; margin: 0 auto;"></svg>
+      <p class="attention-explorer__insight" id="proj-insight">
+        Occupations projected onto a gender axis derived from GloVe embeddings.
+        The bias reflects patterns in the training corpus, not ground truth.
+      </p>
+    </div>
+
+    <div class="stop-and-think">
+      <div class="stop-and-think__header">
+        <svg class="stop-and-think__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+        <span class="stop-and-think__label">Stop and Think</span>
+      </div>
+      <p>
+        If word embeddings place semantically similar words near each other,
+        what happens to words with multiple meanings: like "bank"
+        (river bank vs. financial bank)? What limitation does this reveal
+        about static embeddings?
+      </p>
+      <details>
+        <summary>Reveal</summary>
+        <div>
+          <p>
+            Static embeddings assign a <strong>single vector</strong> per word,
+            regardless of context. "Bank" gets one representation that averages
+            across all its senses. This is a fundamental limitation that
+            contextual embeddings (produced by Transformers) address by
+            generating different representations for the same word depending
+            on surrounding context. We return to this in the
+            <a href="#contextual">From Static to Contextual</a> section.
+          </p>
+        </div>
+      </details>
+    </div>
+
+    <div class="course-note">
+      <svg class="course-note__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+      </svg>
+      <p>
+        <strong>In the notebook:</strong> Exercises 1–3 walk you through building
+        BoW vectors, implementing cosine similarity from scratch, testing word
+        analogies, and projecting occupations onto a gender axis.
+      </p>
+    </div>
+
+    <h3>Resources</h3>
+    <ul class="resource-list">
+      <li><a href="https://arxiv.org/abs/1301.3781" target="_blank" rel="noopener">Mikolov et al. (2013), <em>Efficient Estimation of Word Representations in Vector Space</em></a>: the foundational Word2Vec paper.</li>
+      <li><a href="https://nlp.stanford.edu/pubs/glove.pdf" target="_blank" rel="noopener">Pennington, Socher &amp; Manning (2014), <em>GloVe: Global Vectors for Word Representation</em></a>: combines global matrix factorisation with local context windows.</li>
+      <li><a href="https://lena-voita.github.io/nlp_course/word_embeddings.html" target="_blank" rel="noopener">Lena Voita: NLP Course: Word Embeddings</a>: an excellent in-depth explainer.</li>
+      <li><a href="https://projector.tensorflow.org" target="_blank" rel="noopener">TensorFlow Embedding Projector</a>: interactive 3D visualisation of embedding spaces.</li>
+      <li><a href="https://www.nature.com/articles/s41562-022-01316-8" target="_blank" rel="noopener">Grand et al. (2022), <em>Semantic Projection</em></a>: the method for mapping words onto interpretable semantic scales.</li>
+    </ul>
+  </section>
+
+  <!-- ===================================================================
+       SECTION 2: TOKENIZATION
+       =================================================================== -->
+  <section id="tokenization">
+    <h2>Tokenization</h2>
+    <p>
+      In the previous section, we talked about vectors for "words." But what
+      counts as a word? Models don't actually operate on words as we think
+      of them. Before text enters a model, it must be split into discrete
+      units the model can process. This step: tokenization: bridges
+      raw text and the embedding layer. The choice of tokenization strategy
+      has real consequences for what the model "sees" and how well it handles
+      different languages, numbers, and edge cases.
+    </p>
+
+    <h3>The Problem: Words Are Not Enough</h3>
+    <p>
+      A word-level vocabulary is appealing but impractical. English alone has
+      hundreds of thousands of words. Add misspellings, names, code, and
+      other languages, and the vocabulary explodes. Any word not in the
+      vocabulary becomes an unknown &lt;UNK&gt; token: invisible to
+      the model.
+    </p>
+    <p>
+      Character-level tokenization solves the unknown-word problem (any text
+      can be spelled out letter by letter) but creates sequences that are
+      extremely long and hard to learn from. The model must figure out that
+      "c-a-t" is a concept, from individual letters.
+    </p>
+    <p>
+      <strong>Subword tokenization</strong> is the compromise that modern LLMs
+      actually use. It keeps common words as single tokens ("the," "and") but
+      breaks rare words into smaller, reusable pieces ("unhappiness" &rarr;
+      "un" + "happiness" or "un" + "happi" + "ness").
+    </p>
+
+    <div class="definition-box">
+      <p class="definition-box__label">Definition</p>
+      <p class="definition-box__term">Byte-Pair Encoding (BPE)</p>
+      <p set:html={math.bpeDef} />
+    </div>
+
+    <h3>How BPE Works</h3>
+    <p>
+      BPE, introduced by
+      <a href="https://arxiv.org/abs/1508.07909" target="_blank" rel="noopener">Sennrich et al. (2016)</a>,
+      is elegantly simple. Start with individual characters. Count every
+      adjacent pair in the training corpus. Merge the most frequent pair into
+      a new token. Repeat until you reach the desired vocabulary size.
+    </p>
+
+    <!-- SVG: BPE step-by-step -->
+    <div class="visual-diagram">
+      <svg viewBox="0 0 500 225" width="500" height="225" xmlns="http://www.w3.org/2000/svg" style="font-family: var(--font-mono, 'JetBrains Mono', monospace); font-size: 13px;">
+        <!-- Step 0 -->
+        <text x="10" y="28" style="fill: var(--text-muted, #6B7280);" font-family="var(--font-body, Inter, sans-serif)" font-size="11" font-weight="600">Step 0: Characters:</text>
+        <g transform="translate(10,38)">
+          <rect x="0" y="0" width="28" height="26" rx="4" style="fill: var(--accent-bg, #EBF7FD); stroke: var(--accent, #2D8ABF);" stroke-width="1"/><text x="14" y="18" text-anchor="middle" style="fill: var(--blue-0, #1E3A5F);">l</text>
+          <rect x="32" y="0" width="28" height="26" rx="4" style="fill: var(--accent-bg, #EBF7FD); stroke: var(--accent, #2D8ABF);" stroke-width="1"/><text x="46" y="18" text-anchor="middle" style="fill: var(--blue-0, #1E3A5F);">o</text>
+          <rect x="64" y="0" width="28" height="26" rx="4" style="fill: var(--accent-bg, #EBF7FD); stroke: var(--accent, #2D8ABF);" stroke-width="1"/><text x="78" y="18" text-anchor="middle" style="fill: var(--blue-0, #1E3A5F);">w</text>
+          <rect x="96" y="0" width="28" height="26" rx="4" style="fill: var(--accent-bg, #EBF7FD); stroke: var(--accent, #2D8ABF);" stroke-width="1"/><text x="110" y="18" text-anchor="middle" style="fill: var(--blue-0, #1E3A5F);">e</text>
+          <rect x="128" y="0" width="28" height="26" rx="4" style="fill: var(--accent-bg, #EBF7FD); stroke: var(--accent, #2D8ABF);" stroke-width="1"/><text x="142" y="18" text-anchor="middle" style="fill: var(--blue-0, #1E3A5F);">s</text>
+          <rect x="160" y="0" width="28" height="26" rx="4" style="fill: var(--accent-bg, #EBF7FD); stroke: var(--accent, #2D8ABF);" stroke-width="1"/><text x="174" y="18" text-anchor="middle" style="fill: var(--blue-0, #1E3A5F);">t</text>
+        </g>
+        <!-- Step 1 -->
+        <text x="10" y="95" style="fill: var(--text-muted, #6B7280);" font-family="var(--font-body, Inter, sans-serif)" font-size="11" font-weight="600">Step 1: Merge "es" (most frequent pair in corpus):</text>
+        <g transform="translate(10,105)">
+          <rect x="0" y="0" width="28" height="26" rx="4" style="fill: var(--accent-bg, #EBF7FD); stroke: var(--accent, #2D8ABF);" stroke-width="1"/><text x="14" y="18" text-anchor="middle" style="fill: var(--blue-0, #1E3A5F);">l</text>
+          <rect x="32" y="0" width="28" height="26" rx="4" style="fill: var(--accent-bg, #EBF7FD); stroke: var(--accent, #2D8ABF);" stroke-width="1"/><text x="46" y="18" text-anchor="middle" style="fill: var(--blue-0, #1E3A5F);">o</text>
+          <rect x="64" y="0" width="28" height="26" rx="4" style="fill: var(--accent-bg, #EBF7FD); stroke: var(--accent, #2D8ABF);" stroke-width="1"/><text x="78" y="18" text-anchor="middle" style="fill: var(--blue-0, #1E3A5F);">w</text>
+          <rect x="96" y="0" width="42" height="26" rx="4" style="fill: var(--blue-9, #D5F5FD); stroke: var(--accent-hover, #3BA3D4);" stroke-width="1.5"/><text x="117" y="18" text-anchor="middle" style="fill: var(--blue-0, #1E3A5F);" font-weight="600">es</text>
+          <rect x="142" y="0" width="28" height="26" rx="4" style="fill: var(--accent-bg, #EBF7FD); stroke: var(--accent, #2D8ABF);" stroke-width="1"/><text x="156" y="18" text-anchor="middle" style="fill: var(--blue-0, #1E3A5F);">t</text>
+        </g>
+        <!-- Step 2 -->
+        <text x="10" y="162" style="fill: var(--text-muted, #6B7280);" font-family="var(--font-body, Inter, sans-serif)" font-size="11" font-weight="600">Step 2: Merge "est" (next most frequent pair):</text>
+        <g transform="translate(10,172)">
+          <rect x="0" y="0" width="28" height="26" rx="4" style="fill: var(--accent-bg, #EBF7FD); stroke: var(--accent, #2D8ABF);" stroke-width="1"/><text x="14" y="18" text-anchor="middle" style="fill: var(--blue-0, #1E3A5F);">l</text>
+          <rect x="32" y="0" width="28" height="26" rx="4" style="fill: var(--accent-bg, #EBF7FD); stroke: var(--accent, #2D8ABF);" stroke-width="1"/><text x="46" y="18" text-anchor="middle" style="fill: var(--blue-0, #1E3A5F);">o</text>
+          <rect x="64" y="0" width="28" height="26" rx="4" style="fill: var(--accent-bg, #EBF7FD); stroke: var(--accent, #2D8ABF);" stroke-width="1"/><text x="78" y="18" text-anchor="middle" style="fill: var(--blue-0, #1E3A5F);">w</text>
+          <rect x="96" y="0" width="50" height="26" rx="4" style="fill: var(--blue-8, #B0ECF9); stroke: var(--blue-2, #2272A8);" stroke-width="1.5"/><text x="121" y="18" text-anchor="middle" style="fill: var(--blue-0, #1E3A5F);" font-weight="700">est</text>
+        </g>
+        <!-- Arrow progression -->
+        <text x="270" y="60" style="fill: var(--text-muted, #6B7280);" font-family="var(--font-body, Inter, sans-serif)" font-size="11">6 tokens</text>
+        <text x="270" y="127" style="fill: var(--text-muted, #6B7280);" font-family="var(--font-body, Inter, sans-serif)" font-size="11">5 tokens</text>
+        <text x="270" y="194" style="fill: var(--text-muted, #6B7280);" font-family="var(--font-body, Inter, sans-serif)" font-size="11">4 tokens</text>
+        <text x="350" y="127" style="fill: var(--text-dim, #9CA3AF);" font-family="var(--font-body, Inter, sans-serif)" font-size="10">BPE repeats this</text>
+        <text x="350" y="141" style="fill: var(--text-dim, #9CA3AF);" font-family="var(--font-body, Inter, sans-serif)" font-size="10">until the vocabulary</text>
+        <text x="350" y="155" style="fill: var(--text-dim, #9CA3AF);" font-family="var(--font-body, Inter, sans-serif)" font-size="10">reaches its target size.</text>
+      </svg>
+      <p class="visual-diagram__caption">
+        BPE starts with individual characters and iteratively merges the most
+        frequent adjacent pair. Common words end up as single tokens; rare
+        words are composed of reusable subword pieces.
+      </p>
+    </div>
+
+    <h3>Why Tokenization Matters for Research</h3>
+    <p>
+      Tokenization is not just preprocessing. It fundamentally shapes what a
+      model "sees."
+    </p>
+    <p>
+      <strong>Multilingual inequality.</strong> Tokenizers are trained
+      predominantly on English text. The same sentence in Hindi, Arabic, or
+      Yoruba often requires two to ten times more tokens than in English. More
+      tokens means lower effective resolution, higher API costs, and faster
+      context-window exhaustion. When working with multilingual social science
+      data, always check how your text tokenizes.
+    </p>
+    <p>
+      <strong>Number fragmentation.</strong> Numbers are often split into
+      seemingly arbitrary pieces ("2024" &rarr; "202" + "4"). This is why
+      models struggle with arithmetic: they do not see "2024" as a
+      single number.
+    </p>
+    <p>
+      <strong>The "strawberry" problem.</strong> Ask a model "how many r's
+      in strawberry?" and it may answer incorrectly. The tokenizer splits
+      "strawberry" into subwords like "straw" + "berry": the model never
+      sees individual letters, so it cannot count them.
+    </p>
+
+    <div class="key-takeaway">
+      <p class="key-takeaway__label">Key Takeaway</p>
+      <p>
+        Tokenization is part of your measurement instrument. When you send text
+        to an LLM, the tokenizer decides how that text is represented.
+        Multilingual tokenizers often allocate fewer tokens to non-English text,
+        giving the model lower effective resolution for those languages.
+        Before running experiments, inspect your tokenization.
+      </p>
+    </div>
+
+    <div class="course-note">
+      <svg class="course-note__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+      </svg>
+      <p>
+        <strong>In the notebook:</strong> Section 3 lets you explore tokenization
+        hands-on: comparing how different models split the same text
+        and observing multilingual tokenization inequality directly.
+      </p>
+    </div>
+
+    <h3>Resources</h3>
+    <ul class="resource-list">
+      <li><a href="https://arxiv.org/abs/1508.07909" target="_blank" rel="noopener">Sennrich, Haddow &amp; Birch (2016), <em>Neural Machine Translation of Rare Words with Subword Units</em></a>: introduces BPE for NLP.</li>
+      <li><a href="https://tiktokenizer.vercel.app" target="_blank" rel="noopener">Tiktokenizer</a>: visualise how OpenAI's tokenizers split text in real time.</li>
+      <li><a href="https://huggingface.co/spaces/Xenova/the-tokenizer-playground" target="_blank" rel="noopener">Hugging Face Tokenizer Playground</a>: compare how different tokenizers split the same input.</li>
+      <li><a href="https://www.youtube.com/watch?v=zduSFxRajkE" target="_blank" rel="noopener">Andrej Karpathy: "Let's Build the GPT Tokenizer"</a>: a hands-on deep dive into BPE.</li>
+      <li><a href="https://huggingface.co/learn/nlp-course/en/chapter6/5" target="_blank" rel="noopener">HuggingFace NLP Course, Chapter 6</a>: thorough walkthrough of BPE and other subword algorithms.</li>
+      <li><a href="https://www.youtube.com/watch?v=wjZofJX0v4M" target="_blank" rel="noopener">3Blue1Brown: "But what is a GPT?"</a>: Chapter 5 covers tokenization with excellent visuals.</li>
+    </ul>
+  </section>
+
+  <!-- ===================================================================
+       SECTION 3: FROM STATIC TO CONTEXTUAL
+       =================================================================== -->
+  <section id="contextual">
+    <h2>From Static to Contextual</h2>
+    <p>
+      We now know how text is split into tokens, and that each token gets its
+      own embedding vector. But recall a limitation we flagged in the
+      <a href="#embeddings">first section</a>: static embeddings give each
+      word type a single vector. "Bank" gets one representation that averages
+      across all its senses: river bank, financial bank, blood bank.
+      Now we see how modern models solve it.
+    </p>
+
+    <h3>The Polysemy Problem</h3>
+    <p>
+      Consider these two sentences:
+    </p>
+    <ul>
+      <li>"I deposited money at the <strong>bank</strong>."</li>
+      <li>"We sat on the <strong>bank</strong> of the river."</li>
+    </ul>
+    <p>
+      With GloVe, both instances of "bank" get the exact same vector.
+      A model using static embeddings cannot distinguish the two meanings.
+      It must rely on other words in the sentence to disambiguate: but
+      the embedding itself carries no context.
+    </p>
+
+    <h3>Contextual Representations</h3>
+    <p>
+      A Transformer-based model builds a different representation for each
+      token at each position, informed by context. In encoder models like
+      BERT, each token attends to the full sequence in both directions. In
+      autoregressive (decoder-only) models like GPT, each token attends only
+      to preceding tokens. Either way, the same word "bank" produces a vector
+      close to "finance" and "account" in one sentence, and close to "river"
+      and "shore" in another.
+    </p>
+
+    <div class="definition-box">
+      <p class="definition-box__label">Definition</p>
+      <p class="definition-box__term">Contextual Embedding</p>
+      <p set:html={math.contextualDef} />
+    </div>
+
+    <p>
+      This shift: from one vector per word type to one vector per word
+      <em>token in context</em>: is what makes modern language models so
+      powerful. The representations carry far more information because they
+      incorporate the available context (the full sequence in encoder models,
+      or the preceding context in autoregressive models).
+    </p>
+
+    <div class="stop-and-think">
+      <div class="stop-and-think__header">
+        <svg class="stop-and-think__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+        <span class="stop-and-think__label">Stop and Think</span>
+      </div>
+      <p>
+        If contextual embeddings produce different vectors for the same word
+        in different contexts, what mechanism allows the model to "mix in"
+        information from surrounding words? (Hint: we cover this in detail in
+        the <a href="#transformers">Transformer</a> section.)
+      </p>
+      <details>
+        <summary>Reveal</summary>
+        <div>
+          <p>
+            <strong>Self-attention.</strong> Each token computes a weighted sum
+            over all other tokens in the sequence. The weights are learned,
+            so the model decides which surrounding words are most relevant for
+            building each token's representation. A token like "bank" attends
+            heavily to "deposited" and "money" in one context, and to "river"
+            and "sat" in another: producing very different output vectors.
+          </p>
+        </div>
+      </details>
+    </div>
+
+    <h3>Why This Matters for the Rest of the Course</h3>
+    <p>
+      Contextual embeddings are the foundation for everything that follows.
+      When you <strong>classify text</strong> (Day 3), you use the model's
+      contextual representation of the input. When you build a
+      <strong>retrieval-augmented generation (RAG)</strong> pipeline (Day 4),
+      embeddings power the retrieval step: and contextual embeddings
+      produce much better search results than static ones. When you
+      <strong>prompt a model</strong> (Day 2), you are writing input that
+      the model will process through layers of contextual attention. Understanding
+      how context shapes representations helps you write better prompts and
+      debug unexpected behaviour.
+    </p>
+
+    <div class="key-takeaway">
+      <p class="key-takeaway__label">Key Takeaway</p>
+      <p>
+        Static embeddings: one vector per word, context-blind.
+        Contextual embeddings: one vector per word <em>in its specific context</em>,
+        produced by reading the full sequence through layers of self-attention.
+        This is the leap that makes modern language models work.
+      </p>
+    </div>
+  </section>
+
+  <!-- ===================================================================
+       SECTION 4: LANGUAGE MODELING
+       =================================================================== -->
+  <section id="language-modeling">
+    <h2>Language Modeling</h2>
+    <p>
+      Contextual embeddings don't appear from nowhere: they are produced
+      by a model trained on a specific objective. At its core, a language
+      model learns a probability distribution over sequences of tokens. The
+      dominant paradigm for modern LLMs is <strong>autoregressive language
+      modeling</strong>: predict the next token given all previous tokens.
+      This objective sounds simple. Its consequences are profound.
+    </p>
+
+    <div class="definition-box">
+      <p class="definition-box__label">Definition</p>
+      <p class="definition-box__term">Autoregressive Language Model</p>
+      <p set:html={math.autoregressiveDef} />
+    </div>
+
+    <h3>The Chain Rule of Probability</h3>
+    <p>
+      Any joint probability over a sequence can be decomposed into a product
+      of conditional probabilities. This is not an approximation: it is
+      an exact identity from probability theory:
+    </p>
+
+    <div class="formula-block">
+      <p set:html={math.chainRule} />
+      <p class="formula-block__caption" set:html={math.chainCaption} />
+    </div>
+
+    <p>
+      In plain language: the probability of a whole sentence equals the
+      probability of the first word, times the probability of the second word
+      given the first, times the probability of the third given the first
+      two, and so on. An autoregressive language model learns each of these
+      conditional distributions.
+    </p>
+
+    <h3>Why Next-Token Prediction Is So Powerful</h3>
+    <p>
+      Consider what it takes to predict the next word accurately across
+      diverse text. To predict the word after "The capital of France is,"
+      the model must learn patterns that function like factual recall. To
+      predict the next word in a Python function, it must capture
+      regularities that mirror syntactic knowledge. To continue a logical
+      argument, it must develop internal representations that approximate
+      reasoning.
+    </p>
+    <p>
+      The prediction objective is simple, but <em>solving it well</em> on
+      internet-scale data requires the model to build sophisticated internal
+      representations of grammar, semantics, facts, and reasoning patterns.
+      These representations then transfer to downstream tasks: summarisation,
+      translation, question answering, and more.
+    </p>
+
+    <!-- SVG: Next-token prediction -->
+    <div class="visual-diagram">
+      <svg viewBox="0 0 520 170" width="520" height="170" xmlns="http://www.w3.org/2000/svg" style="font-family: var(--font-body, Inter, system-ui, sans-serif); font-size: 12px;">
+        <!-- Input tokens -->
+        <rect x="10" y="70" width="50" height="30" rx="5" style="fill: var(--accent-bg, #EBF7FD); stroke: var(--accent, #2D8ABF);"/><text x="35" y="90" text-anchor="middle" style="fill: var(--blue-0, #1E3A5F);" font-size="11">The</text>
+        <rect x="68" y="70" width="55" height="30" rx="5" style="fill: var(--accent-bg, #EBF7FD); stroke: var(--accent, #2D8ABF);"/><text x="95" y="90" text-anchor="middle" style="fill: var(--blue-0, #1E3A5F);" font-size="11">cat</text>
+        <rect x="131" y="70" width="50" height="30" rx="5" style="fill: var(--accent-bg, #EBF7FD); stroke: var(--accent, #2D8ABF);"/><text x="156" y="90" text-anchor="middle" style="fill: var(--blue-0, #1E3A5F);" font-size="11">sat</text>
+        <rect x="189" y="70" width="45" height="30" rx="5" style="fill: var(--accent-bg, #EBF7FD); stroke: var(--accent, #2D8ABF);"/><text x="211" y="90" text-anchor="middle" style="fill: var(--blue-0, #1E3A5F);" font-size="11">on</text>
+        <rect x="242" y="70" width="50" height="30" rx="5" style="fill: var(--accent-bg, #EBF7FD); stroke: var(--accent, #2D8ABF);"/><text x="267" y="90" text-anchor="middle" style="fill: var(--blue-0, #1E3A5F);" font-size="11">the</text>
+        <!-- Arrow -->
+        <text x="310" y="90" style="fill: var(--text-muted, #6B7280);" font-size="18">&rarr;</text>
+        <!-- Prediction box -->
+        <rect x="340" y="60" width="165" height="90" rx="8" style="fill: var(--blue-9, #D5F5FD); stroke: var(--accent-dark, #1E5A8A);" stroke-width="1.5"/>
+        <text x="422" y="80" text-anchor="middle" style="fill: var(--accent-dark, #1E5A8A);" font-weight="600" font-size="11">Next token?</text>
+        <text x="355" y="100" style="fill: var(--text-sec, #3D4455);" font-size="11">mat</text>  <rect x="395" y="89" width="80" height="10" rx="3" style="fill: var(--accent-hover, #3BA3D4);" opacity="0.8"/><text x="480" y="99" style="fill: var(--text-muted, #6B7280);" font-size="10">42%</text>
+        <text x="355" y="118" style="fill: var(--text-sec, #3D4455);" font-size="11">table</text><rect x="395" y="107" width="45" height="10" rx="3" style="fill: var(--accent-hover, #3BA3D4);" opacity="0.5"/><text x="445" y="117" style="fill: var(--text-muted, #6B7280);" font-size="10">18%</text>
+        <text x="355" y="136" style="fill: var(--text-sec, #3D4455);" font-size="11">floor</text><rect x="395" y="125" width="30" height="10" rx="3" style="fill: var(--accent-hover, #3BA3D4);" opacity="0.4"/><text x="430" y="135" style="fill: var(--text-muted, #6B7280);" font-size="10">12%</text>
+        <!-- Label -->
+        <text x="175" y="55" text-anchor="middle" style="fill: var(--text-muted, #6B7280);" font-size="10">Input sequence</text>
+        <text x="422" y="55" text-anchor="middle" style="fill: var(--accent-dark, #1E5A8A);" font-size="10">Probability distribution</text>
+      </svg>
+      <p class="visual-diagram__caption">
+        An autoregressive model takes a sequence of tokens and outputs a
+        probability distribution over the vocabulary for the next token.
+        During generation, it samples from this distribution, appends the
+        chosen token, and repeats.
+      </p>
+    </div>
+
+    <h3>Perplexity: Measuring Model Quality</h3>
+    <p>
+      How do we know whether one language model is better than another?
+      The standard metric is <strong>perplexity</strong>: it measures how
+      "surprised" the model is by a held-out test set. Lower perplexity means
+      the model assigns higher probability to the actual text: it
+      predicts more accurately.
+    </p>
+
+    <div class="formula-block">
+      <p set:html={math.perplexity} />
+      <p class="formula-block__caption" set:html={math.perplexityCaption} />
+    </div>
+
+    <p>
+      Intuitively, a perplexity of 20 means the model is, on average, as
+      uncertain about the next token as if it were choosing uniformly among
+      20 options. A perfect model that always predicts the right token would
+      have perplexity 1.
+    </p>
+
+    <div class="stop-and-think">
+      <div class="stop-and-think__header">
+        <svg class="stop-and-think__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+        <span class="stop-and-think__label">Stop and Think</span>
+      </div>
+      <p>
+        A model trained only to predict the next word can summarise documents,
+        answer questions, translate between languages, and write code. Why
+        would next-token prediction produce such general capabilities?
+      </p>
+      <details>
+        <summary>Reveal</summary>
+        <div>
+          <p>
+            To predict the next token accurately across diverse text, the model
+            must build internal representations of syntax, semantics, factual
+            knowledge, reasoning patterns, and more. The prediction objective
+            is simple, but solving it well on internet-scale data requires
+            sophisticated internal representations that transfer to downstream
+            tasks. In a sense, next-token prediction is a
+            <strong>universal learning signal</strong>: any pattern in
+            text that helps prediction can, in principle, be learned.
+          </p>
+        </div>
+      </details>
+    </div>
+
+    <div class="course-note">
+      <svg class="course-note__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+      </svg>
+      <p>
+        <strong>In the notebook:</strong> Section 5 lets you generate text
+        from a real language model, experiment with temperature and sampling
+        strategies, and compute perplexity on different texts.
+      </p>
+    </div>
+
+    <h3>Resources</h3>
+    <ul class="resource-list">
+      <li><a href="https://lena-voita.github.io/nlp_course/language_modeling.html" target="_blank" rel="noopener">Lena Voita: NLP Course: Language Modeling</a>: clear, visual introduction to language modeling concepts.</li>
+      <li><a href="https://huggingface.co/docs/transformers/en/perplexity" target="_blank" rel="noopener">HuggingFace: Perplexity of Fixed-Length Models</a>: technical details on computing perplexity.</li>
+      <li><a href="https://cdn.openai.com/research-covers/language-unsupervised/language_understanding_paper.pdf" target="_blank" rel="noopener">Radford et al. (2018), <em>Improving Language Understanding by Generative Pre-Training</em></a>: GPT-1: demonstrating that generative pre-training transfers to downstream tasks.</li>
+      <li><a href="https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf" target="_blank" rel="noopener">Radford et al. (2019), <em>Language Models are Unsupervised Multitask Learners</em></a>: GPT-2: scaling up and the emergence of zero-shot capabilities.</li>
+    </ul>
+  </section>
+
+  <!-- ===================================================================
+       SECTION 5: THE TRANSFORMER
+       =================================================================== -->
+  <section id="transformers">
+    <h2>The Transformer</h2>
+    <p>
+      The Transformer architecture
+      (<a href="https://arxiv.org/abs/1706.03762" target="_blank" rel="noopener">Vaswani et al., 2017</a>)
+      is the engine behind every modern large language model. Its key innovation
+      is <strong>self-attention</strong>: a mechanism that lets each token
+      attend to every other token in the sequence, learning which parts of
+      the context matter most for each prediction.
+    </p>
+
+    <h3>Before Transformers: The Sequential Bottleneck</h3>
+    <p>
+      Earlier models (RNNs, LSTMs) processed tokens one at a time, left to
+      right. Each token's representation depended on the previous hidden
+      state, creating a chain. This had two problems:
+    </p>
+    <ul>
+      <li><strong>Speed:</strong> Sequential processing cannot be parallelised across tokens. Training was slow.</li>
+      <li><strong>Long-range dependencies:</strong> Information from early tokens had to survive through many steps of the chain to influence later tokens. In practice, it often degraded or was lost.</li>
+    </ul>
+    <p>
+      The Transformer solved both problems by replacing recurrence with
+      attention. Every token can directly attend to every other token,
+      regardless of distance. And all positions are processed simultaneously.
+    </p>
+
+    <h3>Self-Attention: The Core Mechanism</h3>
+    <p>
+      Self-attention works by having each token "ask a question" of every
+      other token and collect relevant information. This happens through
+      three learned projections:
+    </p>
+    <ul>
+      <li><strong>Query (Q):</strong> "What am I looking for?"</li>
+      <li><strong>Key (K):</strong> "What do I contain?"</li>
+      <li><strong>Value (V):</strong> "What information should I provide if I'm relevant?"</li>
+    </ul>
+    <p>
+      Each token's input embedding is multiplied by three separate weight
+      matrices to produce its Q, K, and V vectors. Then, for each token,
+      we compute the dot product of its Query with every Key. High dot
+      products mean high relevance. These scores are scaled and passed through
+      softmax to become weights (summing to 1). Finally, the weighted sum
+      of Values gives the token's new, context-enriched representation.
+    </p>
+
+    <div class="definition-box">
+      <p class="definition-box__label">Definition</p>
+      <p class="definition-box__term">Self-Attention</p>
+      <p set:html={math.attentionDef} />
+    </div>
+
+    <div class="formula-block">
+      <p set:html={math.attention} />
+      <p class="formula-block__caption" set:html={math.attentionCaption} />
+    </div>
+
+    <!-- Interactive attention explorer -->
+    <div class="attention-explorer" id="attn-explorer">
+      <div class="attention-explorer__header">
+        <span class="attention-explorer__label">Context:</span>
+        <div class="attention-explorer__sentence-btns">
+          <button class="attention-explorer__sentence-btn attention-explorer__sentence-btn--active" data-sentence="0">I sat by the river bank</button>
+          <button class="attention-explorer__sentence-btn" data-sentence="1">I went to the bank to deposit money</button>
+        </div>
+      </div>
+      <p class="attention-explorer__query-label">Click a token to see what it attends to (Query &rarr; Keys)</p>
+      <div class="attention-explorer__tokens" id="attn-tokens"></div>
+      <div class="attention-explorer__bars" id="attn-bars"></div>
+      <p class="attention-explorer__insight" id="attn-insight"></p>
+    </div>
+    <p class="visual-diagram__caption" style="margin-top: var(--sp-2); text-align: center;">
+      Click each token to see its attention pattern. Then switch sentences
+      and click <strong>"bank"</strong> again: notice how the attention
+      shifts entirely from "river" to "deposit" and "money."
+      (Attention weights are illustrative, not extracted from a specific model.)
+    </p>
+
+    <h3>Multi-Head Attention</h3>
+    <p>
+      A single attention head can only capture one type of relationship at a
+      time. <strong>Multi-head attention</strong> runs several attention
+      heads in parallel, each with its own Q, K, V weight matrices. Different
+      heads learn to attend to different things: one head might track
+      syntactic dependencies (subject–verb agreement), another might track
+      coreference ("she" &rarr; "Marie"), and another might capture semantic
+      relationships. Their outputs are concatenated and projected back to
+      the original dimension.
+    </p>
+
+    <!-- Multi-head attention heatmaps -->
+    <div class="multihead-viz">
+      <!-- Head 1: Syntactic -->
+      <div class="multihead-viz__head">
+        <p class="multihead-viz__title" style="color: #2D8ABF;">Head 1: Syntactic</p>
+        <svg viewBox="0 0 180 180" width="180" height="180" xmlns="http://www.w3.org/2000/svg" style="font-family: 'JetBrains Mono', monospace; font-size: 9px;">
+          <g transform="translate(36,36)">
+            <text x="-4" y="-8" text-anchor="end" fill="#6B7280" font-size="7">Query &darr;</text>
+            <text x="60" y="-18" text-anchor="middle" fill="#6B7280" font-size="7">Key &rarr;</text>
+            <!-- Column headers -->
+            <text x="12" y="-4" text-anchor="middle" fill="#3D4455">I</text>
+            <text x="36" y="-4" text-anchor="middle" fill="#3D4455">sat</text>
+            <text x="60" y="-4" text-anchor="middle" fill="#3D4455">by</text>
+            <text x="84" y="-4" text-anchor="middle" fill="#3D4455">the</text>
+            <text x="108" y="-4" text-anchor="middle" fill="#3D4455">river</text>
+            <text x="132" y="-4" text-anchor="middle" fill="#3D4455">bank</text>
+            <!-- Row headers -->
+            <text x="-4" y="16" text-anchor="end" fill="#3D4455">I</text>
+            <text x="-4" y="40" text-anchor="end" fill="#3D4455">sat</text>
+            <text x="-4" y="64" text-anchor="end" fill="#3D4455">by</text>
+            <text x="-4" y="88" text-anchor="end" fill="#3D4455">the</text>
+            <text x="-4" y="112" text-anchor="end" fill="#3D4455">river</text>
+            <text x="-4" y="136" text-anchor="end" fill="#3D4455">bank</text>
+            <!-- Row: I -->
+            <rect x="0" y="4" width="22" height="22" rx="2" fill="#2D8ABF" opacity="0.50"/>
+            <rect x="24" y="4" width="22" height="22" rx="2" fill="#2D8ABF" opacity="0.35"/>
+            <rect x="48" y="4" width="22" height="22" rx="2" fill="#2D8ABF" opacity="0.05"/>
+            <rect x="72" y="4" width="22" height="22" rx="2" fill="#2D8ABF" opacity="0.03"/>
+            <rect x="96" y="4" width="22" height="22" rx="2" fill="#2D8ABF" opacity="0.04"/>
+            <rect x="120" y="4" width="22" height="22" rx="2" fill="#2D8ABF" opacity="0.03"/>
+            <!-- Row: sat -->
+            <rect x="0" y="28" width="22" height="22" rx="2" fill="#2D8ABF" opacity="0.55"/>
+            <rect x="24" y="28" width="22" height="22" rx="2" fill="#2D8ABF" opacity="0.20"/>
+            <rect x="48" y="28" width="22" height="22" rx="2" fill="#2D8ABF" opacity="0.08"/>
+            <rect x="72" y="28" width="22" height="22" rx="2" fill="#2D8ABF" opacity="0.05"/>
+            <rect x="96" y="28" width="22" height="22" rx="2" fill="#2D8ABF" opacity="0.07"/>
+            <rect x="120" y="28" width="22" height="22" rx="2" fill="#2D8ABF" opacity="0.05"/>
+            <!-- Row: by -->
+            <rect x="0" y="52" width="22" height="22" rx="2" fill="#2D8ABF" opacity="0.05"/>
+            <rect x="24" y="52" width="22" height="22" rx="2" fill="#2D8ABF" opacity="0.50"/>
+            <rect x="48" y="52" width="22" height="22" rx="2" fill="#2D8ABF" opacity="0.15"/>
+            <rect x="72" y="52" width="22" height="22" rx="2" fill="#2D8ABF" opacity="0.10"/>
+            <rect x="96" y="52" width="22" height="22" rx="2" fill="#2D8ABF" opacity="0.10"/>
+            <rect x="120" y="52" width="22" height="22" rx="2" fill="#2D8ABF" opacity="0.10"/>
+            <!-- Row: the -->
+            <rect x="0" y="76" width="22" height="22" rx="2" fill="#2D8ABF" opacity="0.03"/>
+            <rect x="24" y="76" width="22" height="22" rx="2" fill="#2D8ABF" opacity="0.04"/>
+            <rect x="48" y="76" width="22" height="22" rx="2" fill="#2D8ABF" opacity="0.05"/>
+            <rect x="72" y="76" width="22" height="22" rx="2" fill="#2D8ABF" opacity="0.15"/>
+            <rect x="96" y="76" width="22" height="22" rx="2" fill="#2D8ABF" opacity="0.55"/>
+            <rect x="120" y="76" width="22" height="22" rx="2" fill="#2D8ABF" opacity="0.18"/>
+            <!-- Row: river -->
+            <rect x="0" y="100" width="22" height="22" rx="2" fill="#2D8ABF" opacity="0.03"/>
+            <rect x="24" y="100" width="22" height="22" rx="2" fill="#2D8ABF" opacity="0.05"/>
+            <rect x="48" y="100" width="22" height="22" rx="2" fill="#2D8ABF" opacity="0.05"/>
+            <rect x="72" y="100" width="22" height="22" rx="2" fill="#2D8ABF" opacity="0.40"/>
+            <rect x="96" y="100" width="22" height="22" rx="2" fill="#2D8ABF" opacity="0.15"/>
+            <rect x="120" y="100" width="22" height="22" rx="2" fill="#2D8ABF" opacity="0.32"/>
+            <!-- Row: bank -->
+            <rect x="0" y="124" width="22" height="22" rx="2" fill="#2D8ABF" opacity="0.03"/>
+            <rect x="24" y="124" width="22" height="22" rx="2" fill="#2D8ABF" opacity="0.05"/>
+            <rect x="48" y="124" width="22" height="22" rx="2" fill="#2D8ABF" opacity="0.04"/>
+            <rect x="72" y="124" width="22" height="22" rx="2" fill="#2D8ABF" opacity="0.45"/>
+            <rect x="96" y="124" width="22" height="22" rx="2" fill="#2D8ABF" opacity="0.30"/>
+            <rect x="120" y="124" width="22" height="22" rx="2" fill="#2D8ABF" opacity="0.13"/>
+          </g>
+        </svg>
+        <p class="multihead-viz__desc">"sat" &rarr; "I" (subject&ndash;verb), "the" &rarr; "river" (determiner&ndash;noun)</p>
+      </div>
+
+      <!-- Head 2: Semantic -->
+      <div class="multihead-viz__head">
+        <p class="multihead-viz__title" style="color: #e07040;">Head 2: Semantic</p>
+        <svg viewBox="0 0 180 180" width="180" height="180" xmlns="http://www.w3.org/2000/svg" style="font-family: 'JetBrains Mono', monospace; font-size: 9px;">
+          <g transform="translate(36,36)">
+            <text x="-4" y="-8" text-anchor="end" fill="#6B7280" font-size="7">Query &darr;</text>
+            <text x="60" y="-18" text-anchor="middle" fill="#6B7280" font-size="7">Key &rarr;</text>
+            <text x="12" y="-4" text-anchor="middle" fill="#3D4455">I</text>
+            <text x="36" y="-4" text-anchor="middle" fill="#3D4455">sat</text>
+            <text x="60" y="-4" text-anchor="middle" fill="#3D4455">by</text>
+            <text x="84" y="-4" text-anchor="middle" fill="#3D4455">the</text>
+            <text x="108" y="-4" text-anchor="middle" fill="#3D4455">river</text>
+            <text x="132" y="-4" text-anchor="middle" fill="#3D4455">bank</text>
+            <text x="-4" y="16" text-anchor="end" fill="#3D4455">I</text>
+            <text x="-4" y="40" text-anchor="end" fill="#3D4455">sat</text>
+            <text x="-4" y="64" text-anchor="end" fill="#3D4455">by</text>
+            <text x="-4" y="88" text-anchor="end" fill="#3D4455">the</text>
+            <text x="-4" y="112" text-anchor="end" fill="#3D4455">river</text>
+            <text x="-4" y="136" text-anchor="end" fill="#3D4455">bank</text>
+            <!-- Row: I -->
+            <rect x="0" y="4" width="22" height="22" rx="2" fill="#e07040" opacity="0.15"/>
+            <rect x="24" y="4" width="22" height="22" rx="2" fill="#e07040" opacity="0.20"/>
+            <rect x="48" y="4" width="22" height="22" rx="2" fill="#e07040" opacity="0.10"/>
+            <rect x="72" y="4" width="22" height="22" rx="2" fill="#e07040" opacity="0.05"/>
+            <rect x="96" y="4" width="22" height="22" rx="2" fill="#e07040" opacity="0.10"/>
+            <rect x="120" y="4" width="22" height="22" rx="2" fill="#e07040" opacity="0.40"/>
+            <!-- Row: sat -->
+            <rect x="0" y="28" width="22" height="22" rx="2" fill="#e07040" opacity="0.10"/>
+            <rect x="24" y="28" width="22" height="22" rx="2" fill="#e07040" opacity="0.10"/>
+            <rect x="48" y="28" width="22" height="22" rx="2" fill="#e07040" opacity="0.20"/>
+            <rect x="72" y="28" width="22" height="22" rx="2" fill="#e07040" opacity="0.05"/>
+            <rect x="96" y="28" width="22" height="22" rx="2" fill="#e07040" opacity="0.15"/>
+            <rect x="120" y="28" width="22" height="22" rx="2" fill="#e07040" opacity="0.40"/>
+            <!-- Row: by -->
+            <rect x="0" y="52" width="22" height="22" rx="2" fill="#e07040" opacity="0.05"/>
+            <rect x="24" y="52" width="22" height="22" rx="2" fill="#e07040" opacity="0.15"/>
+            <rect x="48" y="52" width="22" height="22" rx="2" fill="#e07040" opacity="0.10"/>
+            <rect x="72" y="52" width="22" height="22" rx="2" fill="#e07040" opacity="0.05"/>
+            <rect x="96" y="52" width="22" height="22" rx="2" fill="#e07040" opacity="0.40"/>
+            <rect x="120" y="52" width="22" height="22" rx="2" fill="#e07040" opacity="0.25"/>
+            <!-- Row: the -->
+            <rect x="0" y="76" width="22" height="22" rx="2" fill="#e07040" opacity="0.03"/>
+            <rect x="24" y="76" width="22" height="22" rx="2" fill="#e07040" opacity="0.05"/>
+            <rect x="48" y="76" width="22" height="22" rx="2" fill="#e07040" opacity="0.10"/>
+            <rect x="72" y="76" width="22" height="22" rx="2" fill="#e07040" opacity="0.07"/>
+            <rect x="96" y="76" width="22" height="22" rx="2" fill="#e07040" opacity="0.40"/>
+            <rect x="120" y="76" width="22" height="22" rx="2" fill="#e07040" opacity="0.35"/>
+            <!-- Row: river -->
+            <rect x="0" y="100" width="22" height="22" rx="2" fill="#e07040" opacity="0.05"/>
+            <rect x="24" y="100" width="22" height="22" rx="2" fill="#e07040" opacity="0.10"/>
+            <rect x="48" y="100" width="22" height="22" rx="2" fill="#e07040" opacity="0.08"/>
+            <rect x="72" y="100" width="22" height="22" rx="2" fill="#e07040" opacity="0.05"/>
+            <rect x="96" y="100" width="22" height="22" rx="2" fill="#e07040" opacity="0.17"/>
+            <rect x="120" y="100" width="22" height="22" rx="2" fill="#e07040" opacity="0.55"/>
+            <!-- Row: bank -->
+            <rect x="0" y="124" width="22" height="22" rx="2" fill="#e07040" opacity="0.05"/>
+            <rect x="24" y="124" width="22" height="22" rx="2" fill="#e07040" opacity="0.08"/>
+            <rect x="48" y="124" width="22" height="22" rx="2" fill="#e07040" opacity="0.05"/>
+            <rect x="72" y="124" width="22" height="22" rx="2" fill="#e07040" opacity="0.05"/>
+            <rect x="96" y="124" width="22" height="22" rx="2" fill="#e07040" opacity="0.60"/>
+            <rect x="120" y="124" width="22" height="22" rx="2" fill="#e07040" opacity="0.17"/>
+          </g>
+        </svg>
+        <p class="multihead-viz__desc">"bank" &rarr; "river" (meaning), "sat" &rarr; "bank" (location)</p>
+      </div>
+
+      <!-- Head 3: Positional -->
+      <div class="multihead-viz__head">
+        <p class="multihead-viz__title" style="color: #2A9D8F;">Head 3: Positional</p>
+        <svg viewBox="0 0 180 180" width="180" height="180" xmlns="http://www.w3.org/2000/svg" style="font-family: 'JetBrains Mono', monospace; font-size: 9px;">
+          <g transform="translate(36,36)">
+            <text x="-4" y="-8" text-anchor="end" fill="#6B7280" font-size="7">Query &darr;</text>
+            <text x="60" y="-18" text-anchor="middle" fill="#6B7280" font-size="7">Key &rarr;</text>
+            <text x="12" y="-4" text-anchor="middle" fill="#3D4455">I</text>
+            <text x="36" y="-4" text-anchor="middle" fill="#3D4455">sat</text>
+            <text x="60" y="-4" text-anchor="middle" fill="#3D4455">by</text>
+            <text x="84" y="-4" text-anchor="middle" fill="#3D4455">the</text>
+            <text x="108" y="-4" text-anchor="middle" fill="#3D4455">river</text>
+            <text x="132" y="-4" text-anchor="middle" fill="#3D4455">bank</text>
+            <text x="-4" y="16" text-anchor="end" fill="#3D4455">I</text>
+            <text x="-4" y="40" text-anchor="end" fill="#3D4455">sat</text>
+            <text x="-4" y="64" text-anchor="end" fill="#3D4455">by</text>
+            <text x="-4" y="88" text-anchor="end" fill="#3D4455">the</text>
+            <text x="-4" y="112" text-anchor="end" fill="#3D4455">river</text>
+            <text x="-4" y="136" text-anchor="end" fill="#3D4455">bank</text>
+            <!-- Row: I attends to self + next -->
+            <rect x="0" y="4" width="22" height="22" rx="2" fill="#2A9D8F" opacity="0.50"/>
+            <rect x="24" y="4" width="22" height="22" rx="2" fill="#2A9D8F" opacity="0.35"/>
+            <rect x="48" y="4" width="22" height="22" rx="2" fill="#2A9D8F" opacity="0.08"/>
+            <rect x="72" y="4" width="22" height="22" rx="2" fill="#2A9D8F" opacity="0.03"/>
+            <rect x="96" y="4" width="22" height="22" rx="2" fill="#2A9D8F" opacity="0.02"/>
+            <rect x="120" y="4" width="22" height="22" rx="2" fill="#2A9D8F" opacity="0.02"/>
+            <!-- Row: sat -->
+            <rect x="0" y="28" width="22" height="22" rx="2" fill="#2A9D8F" opacity="0.30"/>
+            <rect x="24" y="28" width="22" height="22" rx="2" fill="#2A9D8F" opacity="0.35"/>
+            <rect x="48" y="28" width="22" height="22" rx="2" fill="#2A9D8F" opacity="0.25"/>
+            <rect x="72" y="28" width="22" height="22" rx="2" fill="#2A9D8F" opacity="0.05"/>
+            <rect x="96" y="28" width="22" height="22" rx="2" fill="#2A9D8F" opacity="0.03"/>
+            <rect x="120" y="28" width="22" height="22" rx="2" fill="#2A9D8F" opacity="0.02"/>
+            <!-- Row: by -->
+            <rect x="0" y="52" width="22" height="22" rx="2" fill="#2A9D8F" opacity="0.08"/>
+            <rect x="24" y="52" width="22" height="22" rx="2" fill="#2A9D8F" opacity="0.30"/>
+            <rect x="48" y="52" width="22" height="22" rx="2" fill="#2A9D8F" opacity="0.30"/>
+            <rect x="72" y="52" width="22" height="22" rx="2" fill="#2A9D8F" opacity="0.25"/>
+            <rect x="96" y="52" width="22" height="22" rx="2" fill="#2A9D8F" opacity="0.05"/>
+            <rect x="120" y="52" width="22" height="22" rx="2" fill="#2A9D8F" opacity="0.02"/>
+            <!-- Row: the -->
+            <rect x="0" y="76" width="22" height="22" rx="2" fill="#2A9D8F" opacity="0.02"/>
+            <rect x="24" y="76" width="22" height="22" rx="2" fill="#2A9D8F" opacity="0.08"/>
+            <rect x="48" y="76" width="22" height="22" rx="2" fill="#2A9D8F" opacity="0.28"/>
+            <rect x="72" y="76" width="22" height="22" rx="2" fill="#2A9D8F" opacity="0.30"/>
+            <rect x="96" y="76" width="22" height="22" rx="2" fill="#2A9D8F" opacity="0.27"/>
+            <rect x="120" y="76" width="22" height="22" rx="2" fill="#2A9D8F" opacity="0.05"/>
+            <!-- Row: river -->
+            <rect x="0" y="100" width="22" height="22" rx="2" fill="#2A9D8F" opacity="0.02"/>
+            <rect x="24" y="100" width="22" height="22" rx="2" fill="#2A9D8F" opacity="0.03"/>
+            <rect x="48" y="100" width="22" height="22" rx="2" fill="#2A9D8F" opacity="0.08"/>
+            <rect x="72" y="100" width="22" height="22" rx="2" fill="#2A9D8F" opacity="0.28"/>
+            <rect x="96" y="100" width="22" height="22" rx="2" fill="#2A9D8F" opacity="0.32"/>
+            <rect x="120" y="100" width="22" height="22" rx="2" fill="#2A9D8F" opacity="0.27"/>
+            <!-- Row: bank -->
+            <rect x="0" y="124" width="22" height="22" rx="2" fill="#2A9D8F" opacity="0.02"/>
+            <rect x="24" y="124" width="22" height="22" rx="2" fill="#2A9D8F" opacity="0.02"/>
+            <rect x="48" y="124" width="22" height="22" rx="2" fill="#2A9D8F" opacity="0.05"/>
+            <rect x="72" y="124" width="22" height="22" rx="2" fill="#2A9D8F" opacity="0.10"/>
+            <rect x="96" y="124" width="22" height="22" rx="2" fill="#2A9D8F" opacity="0.35"/>
+            <rect x="120" y="124" width="22" height="22" rx="2" fill="#2A9D8F" opacity="0.46"/>
+          </g>
+        </svg>
+        <p class="multihead-viz__desc">Each token attends most to its immediate neighbours</p>
+      </div>
+    </div>
+    <p class="visual-diagram__caption" style="text-align: center;">
+      Illustrative attention patterns for three hypothetical heads in the same layer,
+      processing "I sat by the river bank." Each head captures a different type of
+      relationship: syntactic structure, semantic meaning, or local position.
+      The model combines all heads to build a rich, multi-faceted representation.
+    </p>
+
+    <h3>The Full Transformer Block</h3>
+    <p>
+      A Transformer block combines self-attention with a few other components:
+    </p>
+
+    <!-- SVG: Transformer block diagram -->
+    <div class="visual-diagram">
+      <svg viewBox="0 0 300 340" width="300" height="340" xmlns="http://www.w3.org/2000/svg" style="font-family: var(--font-body, Inter, system-ui, sans-serif); font-size: 11px;">
+        <!-- Input -->
+        <rect x="75" y="5" width="150" height="30" rx="6" style="fill: var(--accent-bg, #EBF7FD); stroke: var(--accent, #2D8ABF);"/><text x="150" y="25" text-anchor="middle" style="fill: var(--blue-0, #1E3A5F);" font-weight="600">Input Embeddings</text>
+        <line x1="150" y1="35" x2="150" y2="55" style="stroke: var(--text-dim, #9CA3AF);" stroke-width="1.5" marker-end="url(#arrGray)"/>
+        <!-- Multi-head attention -->
+        <rect x="50" y="55" width="200" height="35" rx="6" style="fill: var(--blue-9, #D5F5FD); stroke: var(--blue-2, #2272A8);" stroke-width="1.5"/><text x="150" y="77" text-anchor="middle" style="fill: var(--blue-0, #1E3A5F);" font-weight="600">Multi-Head Attention</text>
+        <line x1="150" y1="90" x2="150" y2="105" style="stroke: var(--text-dim, #9CA3AF);" stroke-width="1.5" marker-end="url(#arrGray)"/>
+        <!-- Add & Norm 1 -->
+        <rect x="75" y="105" width="150" height="28" rx="6" style="fill: var(--surface, #F2F4F8); stroke: var(--border, #E2E6EE);"/><text x="150" y="123" text-anchor="middle" style="fill: var(--text-muted, #6B7280);">Add &amp; Layer Norm</text>
+        <!-- Residual arrow 1 -->
+        <path d="M 40,42 L 40,119 L 75,119" fill="none" style="stroke: var(--accent-hover, #3BA3D4);" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arrBlue)"/>
+        <text x="15" y="80" style="fill: var(--accent-hover, #3BA3D4);" font-size="9" transform="rotate(-90, 15, 80)">residual</text>
+        <line x1="150" y1="133" x2="150" y2="150" style="stroke: var(--text-dim, #9CA3AF);" stroke-width="1.5" marker-end="url(#arrGray)"/>
+        <!-- Feed-forward -->
+        <rect x="50" y="150" width="200" height="35" rx="6" style="fill: var(--blue-8, #B0ECF9); stroke: var(--blue-1, #1E5A8A);" stroke-width="1.5"/><text x="150" y="172" text-anchor="middle" style="fill: var(--blue-0, #1E3A5F);" font-weight="600">Feed-Forward Network</text>
+        <line x1="150" y1="185" x2="150" y2="200" style="stroke: var(--text-dim, #9CA3AF);" stroke-width="1.5" marker-end="url(#arrGray)"/>
+        <!-- Add & Norm 2 -->
+        <rect x="75" y="200" width="150" height="28" rx="6" style="fill: var(--surface, #F2F4F8); stroke: var(--border, #E2E6EE);"/><text x="150" y="218" text-anchor="middle" style="fill: var(--text-muted, #6B7280);">Add &amp; Layer Norm</text>
+        <!-- Residual arrow 2 -->
+        <path d="M 260,140 L 260,214 L 225,214" fill="none" style="stroke: var(--accent-hover, #3BA3D4);" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arrBlue2)"/>
+        <text x="278" y="175" style="fill: var(--accent-hover, #3BA3D4);" font-size="9" transform="rotate(90, 278, 175)">residual</text>
+        <line x1="150" y1="228" x2="150" y2="248" style="stroke: var(--text-dim, #9CA3AF);" stroke-width="1.5" marker-end="url(#arrGray)"/>
+        <!-- Output -->
+        <rect x="75" y="248" width="150" height="30" rx="6" style="fill: var(--accent-bg, #EBF7FD); stroke: var(--accent, #2D8ABF);"/><text x="150" y="268" text-anchor="middle" style="fill: var(--blue-0, #1E3A5F);" font-weight="600">Output Embeddings</text>
+        <!-- Stack note -->
+        <text x="150" y="305" text-anchor="middle" style="fill: var(--text-dim, #9CA3AF);" font-size="10">Repeat N times (e.g. 96 layers in GPT-3)</text>
+        <text x="150" y="320" text-anchor="middle" style="fill: var(--text-dim, #9CA3AF);" font-size="10">to form the full Transformer.</text>
+        <defs>
+          <marker id="arrGray" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" style="fill: var(--text-dim, #9CA3AF)"/></marker>
+          <marker id="arrBlue" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" style="fill: var(--accent-hover, #3BA3D4)"/></marker>
+          <marker id="arrBlue2" markerWidth="8" markerHeight="6" refX="0" refY="3" orient="auto"><path d="M8,0 L0,3 L8,6" style="fill: var(--accent-hover, #3BA3D4)"/></marker>
+        </defs>
+      </svg>
+      <p class="visual-diagram__caption">
+        One Transformer block. Input flows through multi-head attention, then
+        through a feed-forward network. Residual connections (dashed lines)
+        add the input back to the output at each stage, and layer
+        normalisation stabilises training. A full model stacks many such blocks.
+      </p>
+    </div>
+
+    <p>
+      <a href="https://arxiv.org/abs/1512.03385" target="_blank" rel="noopener"><strong>Residual connections</strong></a>
+      (<a href="https://arxiv.org/abs/1512.03385" target="_blank" rel="noopener">He et al., 2016</a>)
+      add each sub-layer's input directly
+      to its output. This lets gradients flow through the network without
+      degrading, enabling very deep stacks (GPT-3 uses 96 layers).
+      <a href="https://arxiv.org/abs/1607.06450" target="_blank" rel="noopener"><strong>Layer normalisation</strong></a>
+      (<a href="https://arxiv.org/abs/1607.06450" target="_blank" rel="noopener">Ba, Kiros &amp; Hinton, 2016</a>)
+      stabilises the scale of activations at each layer.
+    </p>
+
+    <h3>Positional Encodings</h3>
+    <p>
+      Self-attention processes all tokens in parallel: there is nothing
+      in the mechanism that distinguishes position 1 from position 100.
+      Without help, "dog bites man" and "man bites dog" would produce
+      identical representations.
+    </p>
+    <p>
+      <strong>Positional encodings</strong> solve this by adding position
+      information to each token's embedding before it enters the attention
+      layers. The original Transformer used sinusoidal functions of the
+      position. Modern models often use learned positional embeddings or
+      <a href="https://arxiv.org/abs/2104.09864" target="_blank" rel="noopener">rotary position encodings (RoPE)</a>
+      (<a href="https://arxiv.org/abs/2104.09864" target="_blank" rel="noopener">Su et al., 2021</a>),
+      which generalise better to long sequences.
+    </p>
+
+    <div class="stop-and-think">
+      <div class="stop-and-think__header">
+        <svg class="stop-and-think__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+        <span class="stop-and-think__label">Stop and Think</span>
+      </div>
+      <p>
+        Why do we divide the dot product by &radic;<span style="text-decoration: overline;">d<sub>k</sub></span>
+        in the attention formula? What would happen without this scaling?
+      </p>
+      <details>
+        <summary>Reveal</summary>
+        <div>
+          <p>
+            When the dimension <em>d<sub>k</sub></em> is large, the dot products
+            of Q and K vectors tend to grow large in magnitude. Large inputs
+            to softmax push the output into regions where the gradient is
+            extremely small (near 0 or 1), making learning very slow. Dividing
+            by &radic;<span style="text-decoration: overline;">d<sub>k</sub></span>
+            keeps the variance of the dot products at roughly 1, ensuring that
+            softmax operates in a useful range. This is a simple but critical
+            engineering detail.
+          </p>
+        </div>
+      </details>
+    </div>
+
+    <div class="key-takeaway">
+      <p class="key-takeaway__label">Key Takeaway</p>
+      <p>
+        The Transformer replaced sequential processing with parallel attention.
+        Every token can attend to every other token directly, regardless of
+        distance. This architectural choice is why LLMs could scale to billions
+        of parameters trained on trillions of tokens: the foundation of
+        their remarkable capabilities.
+      </p>
+    </div>
+
+    <div class="course-note">
+      <svg class="course-note__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+      </svg>
+      <p>
+        <strong>In the notebook:</strong> Section 4 walks you through
+        self-attention by hand. You assign attention weights manually,
+        then compare your intuitions against the model's actual attention
+        patterns.
+      </p>
+    </div>
+
+    <h3>Resources</h3>
+    <ul class="resource-list">
+      <li><a href="https://arxiv.org/abs/1706.03762" target="_blank" rel="noopener">Vaswani et al. (2017), <em>Attention Is All You Need</em></a>: the paper that introduced the Transformer architecture.</li>
+      <li><a href="https://jalammar.github.io/illustrated-transformer/" target="_blank" rel="noopener">Jay Alammar: The Illustrated Transformer</a>: the canonical visual walkthrough of the architecture.</li>
+      <li><a href="https://www.youtube.com/watch?v=eMlx5fFNoYc" target="_blank" rel="noopener">3Blue1Brown: "Attention in Transformers, Visually Explained"</a>: intuitive geometric explanation of attention.</li>
+      <li><a href="https://bbycroft.net/llm" target="_blank" rel="noopener">Brendan Bycroft's LLM Visualization</a>: interactive 3D walkthrough of an entire Transformer.</li>
+      <li><a href="https://poloclub.github.io/transformer-explainer/" target="_blank" rel="noopener">Transformer Explainer (Polo Club of Data Science)</a>: interactive visual explanation of how Transformers work.</li>
+      <li><a href="https://jalammar.github.io/illustrated-gpt2/" target="_blank" rel="noopener">Jay Alammar: The Illustrated GPT-2</a>: how the decoder-only Transformer works in practice.</li>
+      <li><a href="https://transformer-circuits.pub/2022/in-context-learning-and-induction-heads/index.html" target="_blank" rel="noopener">Anthropic: In-context Learning and Induction Heads (2022)</a>: a mechanistic view of how Transformers learn.</li>
+      <li><a href="https://arxiv.org/abs/1512.03385" target="_blank" rel="noopener">He et al. (2016), <em>Deep Residual Learning for Image Recognition</em></a>: introduced skip/residual connections that enable training of very deep networks.</li>
+      <li><a href="https://arxiv.org/abs/1607.06450" target="_blank" rel="noopener">Ba, Kiros &amp; Hinton (2016), <em>Layer Normalization</em></a>: the normalisation variant used in Transformers (applied per-sample, not per-batch).</li>
+      <li><a href="https://arxiv.org/abs/2104.09864" target="_blank" rel="noopener">Su et al. (2021), <em>RoFormer: Enhanced Transformer with Rotary Position Embedding</em></a>: the positional encoding used in most modern LLMs (Llama, Mistral, etc.).</li>
+    </ul>
+  </section>
+
+  <!-- ===================================================================
+       SECTION 6: SCALING LAWS
+       =================================================================== -->
+  <section id="scaling">
+    <h2>Scaling Laws</h2>
+    <p>
+      Now that we understand the Transformer architecture, a natural question
+      arises: what happens when we make it bigger? One of the most
+      consequential discoveries in modern AI: language model performance
+      improves <em>predictably</em> as you increase compute,
+      data, or model size. Across a wide range of scales, the relationship
+      follows smooth power-law curves: a remarkably strong empirical
+      regularity. This insight transformed AI development from
+      experimentation into engineering.
+    </p>
+
+    <h3>Three Power Laws</h3>
+    <p>
+      <a href="https://arxiv.org/abs/2001.08361" target="_blank" rel="noopener">Kaplan et al. (2020)</a>
+      showed that test loss follows the same functional form against three
+      independent variables: total compute, dataset size, and number of
+      model parameters. On a log-log plot, each relationship is a straight
+      line.
+    </p>
+
+    <div class="formula-block">
+      <p set:html={math.scalingLaw} />
+      <p class="formula-block__caption" set:html={math.scalingCaption} />
+    </div>
+
+    <p>
+      Kaplan et al. modelled each variable's contribution separately.
+      Double the compute, and loss drops by a predictable factor. Double the
+      data, same pattern. Double the parameters, same again. The exponents
+      differ, but the power-law form holds across model families and
+      training setups. (We will see shortly that the variables are not
+      truly independent: how you balance model size and data matters.)
+    </p>
+
+    <!-- Three-panel scaling law visualization -->
+    <div class="multihead-viz">
+      <!-- Panel 1: Compute -->
+      <div class="multihead-viz__head">
+        <p class="multihead-viz__title" style="color: #3BA3D4;">Compute</p>
+        <svg viewBox="0 0 180 160" width="180" height="160" xmlns="http://www.w3.org/2000/svg" style="font-family: Inter, system-ui, sans-serif; font-size: 9px;">
+          <!-- Axes -->
+          <line x1="36" y1="130" x2="170" y2="130" stroke="#999" stroke-width="1"/>
+          <line x1="36" y1="130" x2="36" y2="10" stroke="#999" stroke-width="1"/>
+          <!-- Y-axis: high loss at TOP, low at BOTTOM -->
+          <text x="30" y="18" text-anchor="end" fill="#6B7280" font-size="7">3.4</text>
+          <text x="30" y="48" text-anchor="end" fill="#6B7280" font-size="7">3.0</text>
+          <text x="30" y="78" text-anchor="end" fill="#6B7280" font-size="7">2.6</text>
+          <text x="30" y="108" text-anchor="end" fill="#6B7280" font-size="7">2.2</text>
+          <text x="30" y="134" text-anchor="end" fill="#6B7280" font-size="7">1.8</text>
+          <!-- X-axis labels -->
+          <text x="36" y="144" text-anchor="start" fill="#6B7280" font-size="7">10</text>
+          <text x="80" y="144" text-anchor="middle" fill="#6B7280" font-size="7">10&#179;</text>
+          <text x="125" y="144" text-anchor="middle" fill="#6B7280" font-size="7">10&#8310;</text>
+          <text x="166" y="144" text-anchor="end" fill="#6B7280" font-size="7">10&#8313;</text>
+          <text x="103" y="158" text-anchor="middle" fill="#6B7280" font-size="8" font-weight="600">PF-days</text>
+          <text x="8" y="70" text-anchor="middle" fill="#6B7280" font-size="8" font-weight="600" transform="rotate(-90, 8, 70)">Test Loss</text>
+          <!-- Grid -->
+          <line x1="36" y1="48" x2="170" y2="48" stroke="#f0f0f0" stroke-width="0.5"/>
+          <line x1="36" y1="78" x2="170" y2="78" stroke="#f0f0f0" stroke-width="0.5"/>
+          <line x1="36" y1="108" x2="170" y2="108" stroke="#f0f0f0" stroke-width="0.5"/>
+          <!-- Straight line on log-log axes (power law) -->
+          <path d="M 40,18 L 58,32 L 75,46 L 92,60 L 108,76 L 125,90 L 142,102 L 165,118" fill="none" stroke="#3BA3D4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- Data points -->
+          <circle cx="40" cy="18" r="2.5" fill="#3BA3D4"/>
+          <circle cx="58" cy="32" r="2.5" fill="#3BA3D4"/>
+          <circle cx="75" cy="46" r="2.5" fill="#3BA3D4"/>
+          <circle cx="92" cy="60" r="2.5" fill="#3BA3D4"/>
+          <circle cx="108" cy="76" r="2.5" fill="#3BA3D4"/>
+          <circle cx="125" cy="90" r="2.5" fill="#3BA3D4"/>
+          <circle cx="142" cy="102" r="2.5" fill="#3BA3D4"/>
+          <circle cx="165" cy="118" r="2.5" fill="#3BA3D4"/>
+        </svg>
+      </div>
+
+      <!-- Panel 2: Dataset Size -->
+      <div class="multihead-viz__head">
+        <p class="multihead-viz__title" style="color: #e07040;">Dataset Size</p>
+        <svg viewBox="0 0 180 160" width="180" height="160" xmlns="http://www.w3.org/2000/svg" style="font-family: Inter, system-ui, sans-serif; font-size: 9px;">
+          <line x1="36" y1="130" x2="170" y2="130" stroke="#999" stroke-width="1"/>
+          <line x1="36" y1="130" x2="36" y2="10" stroke="#999" stroke-width="1"/>
+          <text x="30" y="18" text-anchor="end" fill="#6B7280" font-size="7">3.4</text>
+          <text x="30" y="48" text-anchor="end" fill="#6B7280" font-size="7">3.0</text>
+          <text x="30" y="78" text-anchor="end" fill="#6B7280" font-size="7">2.6</text>
+          <text x="30" y="108" text-anchor="end" fill="#6B7280" font-size="7">2.2</text>
+          <text x="30" y="134" text-anchor="end" fill="#6B7280" font-size="7">1.8</text>
+          <text x="36" y="144" text-anchor="start" fill="#6B7280" font-size="7">1M</text>
+          <text x="80" y="144" text-anchor="middle" fill="#6B7280" font-size="7">100M</text>
+          <text x="125" y="144" text-anchor="middle" fill="#6B7280" font-size="7">10B</text>
+          <text x="166" y="144" text-anchor="end" fill="#6B7280" font-size="7">1T</text>
+          <text x="103" y="158" text-anchor="middle" fill="#6B7280" font-size="8" font-weight="600">Tokens</text>
+          <text x="8" y="70" text-anchor="middle" fill="#6B7280" font-size="8" font-weight="600" transform="rotate(-90, 8, 70)">Test Loss</text>
+          <line x1="36" y1="48" x2="170" y2="48" stroke="#f0f0f0" stroke-width="0.5"/>
+          <line x1="36" y1="78" x2="170" y2="78" stroke="#f0f0f0" stroke-width="0.5"/>
+          <line x1="36" y1="108" x2="170" y2="108" stroke="#f0f0f0" stroke-width="0.5"/>
+          <!-- Straight line on log-log axes (power law, different exponent) -->
+          <path d="M 40,15 L 55,24 L 72,38 L 90,54 L 108,72 L 125,88 L 145,105 L 165,120" fill="none" stroke="#e07040" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="40" cy="15" r="2.5" fill="#e07040"/>
+          <circle cx="55" cy="24" r="2.5" fill="#e07040"/>
+          <circle cx="72" cy="38" r="2.5" fill="#e07040"/>
+          <circle cx="90" cy="54" r="2.5" fill="#e07040"/>
+          <circle cx="108" cy="72" r="2.5" fill="#e07040"/>
+          <circle cx="125" cy="88" r="2.5" fill="#e07040"/>
+          <circle cx="145" cy="105" r="2.5" fill="#e07040"/>
+          <circle cx="165" cy="120" r="2.5" fill="#e07040"/>
+        </svg>
+      </div>
+
+      <!-- Panel 3: Parameters -->
+      <div class="multihead-viz__head">
+        <p class="multihead-viz__title" style="color: #2A9D8F;">Parameters</p>
+        <svg viewBox="0 0 180 160" width="180" height="160" xmlns="http://www.w3.org/2000/svg" style="font-family: Inter, system-ui, sans-serif; font-size: 9px;">
+          <line x1="36" y1="130" x2="170" y2="130" stroke="#999" stroke-width="1"/>
+          <line x1="36" y1="130" x2="36" y2="10" stroke="#999" stroke-width="1"/>
+          <text x="30" y="18" text-anchor="end" fill="#6B7280" font-size="7">3.4</text>
+          <text x="30" y="48" text-anchor="end" fill="#6B7280" font-size="7">3.0</text>
+          <text x="30" y="78" text-anchor="end" fill="#6B7280" font-size="7">2.6</text>
+          <text x="30" y="108" text-anchor="end" fill="#6B7280" font-size="7">2.2</text>
+          <text x="30" y="134" text-anchor="end" fill="#6B7280" font-size="7">1.8</text>
+          <text x="36" y="144" text-anchor="start" fill="#6B7280" font-size="7">10M</text>
+          <text x="80" y="144" text-anchor="middle" fill="#6B7280" font-size="7">100M</text>
+          <text x="125" y="144" text-anchor="middle" fill="#6B7280" font-size="7">10B</text>
+          <text x="166" y="144" text-anchor="end" fill="#6B7280" font-size="7">1T</text>
+          <text x="103" y="158" text-anchor="middle" fill="#6B7280" font-size="8" font-weight="600">Parameters</text>
+          <text x="8" y="70" text-anchor="middle" fill="#6B7280" font-size="8" font-weight="600" transform="rotate(-90, 8, 70)">Test Loss</text>
+          <line x1="36" y1="48" x2="170" y2="48" stroke="#f0f0f0" stroke-width="0.5"/>
+          <line x1="36" y1="78" x2="170" y2="78" stroke="#f0f0f0" stroke-width="0.5"/>
+          <line x1="36" y1="108" x2="170" y2="108" stroke="#f0f0f0" stroke-width="0.5"/>
+          <!-- Straight line on log-log axes (power law, different exponent) -->
+          <path d="M 40,20 L 58,36 L 78,54 L 95,68 L 112,82 L 130,96 L 148,110 L 165,122" fill="none" stroke="#2A9D8F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="40" cy="20" r="2.5" fill="#2A9D8F"/>
+          <circle cx="58" cy="36" r="2.5" fill="#2A9D8F"/>
+          <circle cx="78" cy="54" r="2.5" fill="#2A9D8F"/>
+          <circle cx="95" cy="68" r="2.5" fill="#2A9D8F"/>
+          <circle cx="112" cy="82" r="2.5" fill="#2A9D8F"/>
+          <circle cx="130" cy="96" r="2.5" fill="#2A9D8F"/>
+          <circle cx="148" cy="110" r="2.5" fill="#2A9D8F"/>
+          <circle cx="165" cy="122" r="2.5" fill="#2A9D8F"/>
+        </svg>
+      </div>
+    </div>
+    <p class="visual-diagram__caption" style="text-align: center;">
+      Test loss as a function of compute, dataset size, and model parameters
+      (log-log scale). Each relationship follows a smooth power law : 
+      a straight line on log-log axes. Adapted from Kaplan et al. (2020).
+    </p>
+
+    <h3>Why This Matters: Forecasting Performance</h3>
+    <p>
+      Power laws are not just descriptive. They are <strong>predictive</strong>.
+      Train a few small models, measure their loss, fit the curve, and
+      extrapolate to any target scale. Before spending hundreds of millions
+      of dollars on a training run, a lab can estimate the result.
+    </p>
+    <p>
+      This is how frontier models get planned. GPT-4, Claude, and Gemini
+      were not shots in the dark. Their developers trained smaller pilot
+      models, verified the scaling curve, and then committed compute at the
+      predicted optimal point. Scaling laws turned AI development from
+      guesswork into engineering.
+    </p>
+    <p>
+      For researchers using these models, the implications are direct.
+      Understanding scaling explains why a 70B model handles nuanced
+      political text better than a 7B model, why API costs differ by
+      orders of magnitude, and why model choice is a research design
+      decision: not just a technical one.
+    </p>
+
+    <h3>Implications for Model Development</h3>
+    <p>
+      Scaling laws drove the race from GPT-2 (1.5B) to GPT-3 (175B) to
+      frontier models with hundreds of billions of dense parameters: or,
+      in mixture-of-experts architectures, over a trillion total. Each generation
+      validated the power-law prediction: more scale, better loss.
+    </p>
+    <p>
+      But power laws have diminishing returns. Each 10&times; increase in
+      compute yields a <em>smaller</em> absolute improvement. The first
+      doubling is dramatic; the tenth is marginal. Combined with rising
+      costs of compute, energy, and data, pure scale hits practical limits.
+    </p>
+    <p>
+      <a href="https://arxiv.org/abs/2203.15556" target="_blank" rel="noopener">Hoffmann et al. (2022)</a>
+      showed that most early large models were <em>undertrained</em>: balancing
+      model size and training data matters as much as raw scale. This insight
+      reshaped how training budgets are allocated.
+    </p>
+    <p>
+      These constraints are pushing the field toward complementary strategies:
+      better data curation, improved architectures, reasoning-focused
+      training (reinforcement learning from human feedback), and a
+      fundamentally different approach: <strong>test-time compute
+      scaling</strong>: spending more compute at inference rather than
+      training.
+    </p>
+
+    <div class="course-note">
+      <svg class="course-note__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+      </svg>
+      <p>
+        <strong>Coming in Day 2:</strong> We explore
+        <strong>test-time compute scaling</strong>: using prompting
+        strategies like chain-of-thought reasoning to extract more capability
+        at inference. This represents a fundamental shift: instead of only
+        scaling <em>training</em>, we can also scale <em>thinking</em>.
+      </p>
+    </div>
+
+    <div class="stop-and-think">
+      <div class="stop-and-think__header">
+        <svg class="stop-and-think__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+        <span class="stop-and-think__label">Stop and Think</span>
+      </div>
+      <p>
+        If scaling laws have diminishing returns, what strategies beyond
+        raw scale might improve model performance? Think about the full
+        pipeline: data, architecture, training objective, and inference.
+      </p>
+      <details>
+        <summary>Reveal</summary>
+        <div>
+          <p>
+            Several complementary approaches are being explored.
+            <strong>Data curation</strong>: higher-quality, deduplicated, and
+            domain-specific training data yields more per token.
+            <strong>Architecture improvements</strong>: mixture-of-experts,
+            longer contexts, and more efficient attention variants.
+            <strong>Training objectives</strong>: reinforcement learning from
+            human feedback (RLHF), constitutional AI, and reasoning-focused
+            training. <strong>Test-time compute</strong>: chain-of-thought
+            prompting, self-consistency, and tree search let models "think
+            longer" at inference: a form of scaling that does not require
+            retraining.
+          </p>
+        </div>
+      </details>
+    </div>
+
+    <div class="key-takeaway">
+      <p class="key-takeaway__label">Key Takeaway</p>
+      <p>
+        Scaling laws are both an explanation of the field's trajectory and a
+        practical tool for forecasting. They tell us <em>why</em> larger
+        models are better, <em>how much</em> better they will be, and
+        <em>when</em> pure scaling hits diminishing returns. For social
+        scientists, this means model choice is not arbitrary: it is
+        a design decision with predictable consequences for task performance,
+        cost, and capability.
+      </p>
+    </div>
+
+    <h3>Resources</h3>
+    <ul class="resource-list">
+      <li><a href="https://arxiv.org/abs/2001.08361" target="_blank" rel="noopener">Kaplan et al. (2020), <em>Scaling Laws for Neural Language Models</em></a>: quantified the power-law relationships between compute, data, parameters, and loss. The paper that turned scaling into a predictive science.</li>
+      <li><a href="https://arxiv.org/abs/2203.15556" target="_blank" rel="noopener">Hoffmann et al. (2022), <em>Training Compute-Optimal Large Language Models</em></a>: showed that optimal scaling requires balancing model size and training data. Essential reading for understanding modern training decisions.</li>
+    </ul>
+  </section>
+
+  <!-- ===================================================================
+       SECTION 7: SOCIAL SCIENCE APPLICATIONS
+       =================================================================== -->
+  <section id="social-science">
+    <h2>Social Science Applications</h2>
+    <p>
+      The foundational concepts in this module are not just theoretical.
+      They have direct, substantive applications in social science research.
+      This section highlights key papers that demonstrate how word embeddings,
+      language models, and the Transformer architecture open new research
+      possibilities: and introduce new methodological challenges.
+    </p>
+
+    <h3>Bias Detection in Word Embeddings</h3>
+    <p>
+      The semantic projection technique we saw earlier has a powerful
+      application: <strong>measuring societal biases in language</strong>.
+      Because embeddings are trained on human-generated text, they absorb
+      the biases present in that text.
+    </p>
+
+    <div class="course-note">
+      <svg class="course-note__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+      </svg>
+      <p>
+        <strong>Caliskan, Bryson &amp; Narayanan (2017),</strong>
+        <a href="https://www.science.org/doi/10.1126/science.aal4230" target="_blank" rel="noopener"><em>Semantics derived automatically from language corpora contain human-like biases.</em></a>
+        Science. Demonstrated that word embeddings replicate a wide range
+        of implicit biases measured in humans via the Implicit Association
+        Test (IAT): including
+        associations between European-American names and pleasant words, and
+        between African-American names and unpleasant words. This paper
+        established that embedding geometry is a lens for studying culture.
+      </p>
+    </div>
+
+    <div class="course-note">
+      <svg class="course-note__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+      </svg>
+      <p>
+        <strong>Garg, Schiebinger, Jurafsky &amp; Zou (2018),</strong>
+        <a href="https://www.pnas.org/doi/10.1073/pnas.1720347115" target="_blank" rel="noopener"><em>Word Embeddings Quantify 100 Years of Gender and Ethnic Stereotypes.</em></a>
+        PNAS. By training embeddings on text from each decade of the 20th
+        century, they tracked how gender and ethnic stereotypes in American
+        English evolved over time: a computational history of bias that
+        aligns with known social changes.
+      </p>
+    </div>
+
+    <h3>Cultural Analysis Through Geometry</h3>
+
+    <div class="course-note">
+      <svg class="course-note__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+      </svg>
+      <p>
+        <strong>Kozlowski, Taddy &amp; Evans (2019),</strong>
+        <a href="https://journals.sagepub.com/doi/10.1177/0003122419877135" target="_blank" rel="noopener"><em>The Geometry of Culture: Analyzing the Meanings of Class through Word Embeddings.</em></a>
+        American Sociological Review. Established a framework for using vector
+        space geometry to map cultural dimensions. They showed that the
+        concepts of social class, affluence, and education are encoded as
+        directions in embedding space, and that projecting words onto these
+        axes reveals the cultural associations that texts carry. This approach
+        transforms embeddings from a technical tool into a method for
+        computational cultural analysis.
+      </p>
+    </div>
+
+    <h3>Open Science and Reproducibility</h3>
+
+    <div class="course-note">
+      <svg class="course-note__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+      </svg>
+      <p>
+        <strong>Spirling (2023),</strong>
+        <a href="https://www.nature.com/articles/s43588-023-00534-8" target="_blank" rel="noopener"><em>Why open-source generative AI models are an ethical imperative for social science.</em></a>
+        Nature Computational Science. Argues that transparency, reproducibility,
+        and data control require access to open-source models. When a model
+        is a black box controlled by a company, researchers cannot fully
+        understand or verify their instrument. This paper connects the
+        architectural foundations we have studied: pre-training data,
+        model weights, tokenization: to fundamental questions of
+        scientific integrity.
+      </p>
+    </div>
+
+    <h3>Broader Impact</h3>
+
+    <div class="course-note">
+      <svg class="course-note__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+      </svg>
+      <p>
+        <strong>Bail (2024),</strong>
+        <a href="https://www.pnas.org/doi/10.1073/pnas.2314021121" target="_blank" rel="noopener"><em>Can Generative AI Improve Social Science?</em></a>
+        PNAS. A balanced assessment of the potential benefits and pitfalls of
+        integrating LLMs into social science workflows. Emphasises valid
+        measurement, reproducibility, and the distinction between tasks where
+        LLMs augment human researchers and tasks where they might introduce
+        systematic error. A good frame for thinking about everything you
+        will learn in the rest of this course.
+      </p>
+    </div>
+
+    <div class="key-takeaway">
+      <p class="key-takeaway__label">Key Takeaway</p>
+      <p>
+        The foundations covered in this module: embeddings, tokenization,
+        language modeling, attention, and scaling: are not just technical
+        prerequisites. They are the building blocks of a new research
+        methodology. Understanding how models represent and process language
+        is essential for using them responsibly as instruments of social
+        science inquiry. The subsequent modules build directly on these
+        foundations: prompting (Day 2) works because of next-token prediction,
+        classification and RAG (Days 3–4) rely on contextual embeddings, and
+        model selection (Day 2–3) requires understanding the scaling tradeoffs
+        introduced here.
+      </p>
+    </div>
+  </section>
+
+</CourseLayout>
+
+<script is:inline>
+(function() {
+  var sentences = [
+    {
+      tokens: ["I", "sat", "by", "the", "river", "bank"],
+      weights: [
+        [0.38, 0.28, 0.10, 0.08, 0.10, 0.06],
+        [0.32, 0.12, 0.10, 0.05, 0.11, 0.30],
+        [0.05, 0.22, 0.13, 0.22, 0.28, 0.10],
+        [0.03, 0.05, 0.10, 0.12, 0.50, 0.20],
+        [0.04, 0.08, 0.10, 0.13, 0.18, 0.47],
+        [0.05, 0.10, 0.08, 0.07, 0.50, 0.20]
+      ],
+      insights: [
+        "\"I\" attends to itself and the verb \"sat\": establishing the subject.",
+        "\"sat\" attends to its subject \"I\" and the destination \"bank\": connecting actor to location.",
+        "\"by\" attends to the nearby nouns \"the\" and \"river\": preposition links to its object.",
+        "\"the\" attends strongly to \"river\": the determiner knows which noun it modifies.",
+        "\"river\" attends strongly to \"bank\": the model links these semantically related words.",
+        "\"bank\" attends strongly to \"river\": context resolves this as a river bank, not a financial one."
+      ]
+    },
+    {
+      tokens: ["I", "went", "to", "the", "bank", "to", "deposit", "money"],
+      weights: [
+        [0.35, 0.30, 0.05, 0.05, 0.05, 0.04, 0.10, 0.06],
+        [0.25, 0.12, 0.10, 0.05, 0.12, 0.06, 0.16, 0.14],
+        [0.05, 0.12, 0.08, 0.12, 0.38, 0.05, 0.10, 0.10],
+        [0.03, 0.05, 0.05, 0.10, 0.52, 0.05, 0.10, 0.10],
+        [0.05, 0.08, 0.04, 0.05, 0.10, 0.05, 0.33, 0.30],
+        [0.04, 0.06, 0.05, 0.04, 0.08, 0.05, 0.45, 0.23],
+        [0.05, 0.10, 0.05, 0.04, 0.28, 0.05, 0.10, 0.33],
+        [0.06, 0.08, 0.05, 0.04, 0.32, 0.05, 0.28, 0.12]
+      ],
+      insights: [
+        "\"I\" attends to itself and \"went\": the subject anchors to its verb.",
+        "\"went\" spreads attention across purpose words: \"deposit\" and \"money.\"",
+        "\"to\" attends strongly to \"bank\": the preposition links to its destination.",
+        "\"the\" attends strongly to \"bank\": the determiner locks onto its noun.",
+        "\"bank\" attends to \"deposit\" and \"money\": context resolves this as a financial bank.",
+        "\"to\" (second) attends strongly to \"deposit\": this preposition links to the action.",
+        "\"deposit\" attends to \"money\" and \"bank\": the verb connects to its object and location.",
+        "\"money\" attends to \"bank\" and \"deposit\": the object connects to action and place."
+      ]
+    }
+  ];
+
+  var currentSentence = 0;
+  var currentToken = -1;
+  var maxBarHeight = 70;
+
+  var explorer = document.getElementById("attn-explorer");
+  if (!explorer) return;
+
+  var tokensEl = document.getElementById("attn-tokens");
+  var barsEl = document.getElementById("attn-bars");
+  var insightEl = document.getElementById("attn-insight");
+  var sentBtns = explorer.querySelectorAll(".attention-explorer__sentence-btn");
+
+  function renderTokens() {
+    var s = sentences[currentSentence];
+    tokensEl.innerHTML = "";
+    for (var i = 0; i < s.tokens.length; i++) {
+      var btn = document.createElement("button");
+      btn.className = "attention-explorer__token";
+      btn.textContent = s.tokens[i];
+      btn.setAttribute("data-idx", String(i));
+      if (i === currentToken) {
+        btn.classList.add("attention-explorer__token--active");
+      }
+      btn.addEventListener("click", (function(idx) {
+        return function() { selectToken(idx); };
+      })(i));
+      tokensEl.appendChild(btn);
+    }
+  }
+
+  function renderBars() {
+    var s = sentences[currentSentence];
+    barsEl.innerHTML = "";
+    if (currentToken < 0) {
+      insightEl.textContent = "Click any token above to explore its attention pattern.";
+      return;
+    }
+    var w = s.weights[currentToken];
+    for (var i = 0; i < w.length; i++) {
+      var group = document.createElement("div");
+      group.className = "attention-explorer__bar-group";
+
+      var bar = document.createElement("div");
+      bar.className = "attention-explorer__bar";
+      bar.style.height = Math.max(2, w[i] * maxBarHeight) + "px";
+      bar.style.opacity = String(0.3 + w[i] * 0.7);
+
+      var label = document.createElement("span");
+      label.className = "attention-explorer__bar-label";
+      label.textContent = w[i].toFixed(2);
+
+      var word = document.createElement("span");
+      word.className = "attention-explorer__bar-word";
+      word.textContent = s.tokens[i];
+
+      group.appendChild(bar);
+      group.appendChild(label);
+      group.appendChild(word);
+      barsEl.appendChild(group);
+    }
+    insightEl.textContent = s.insights[currentToken];
+  }
+
+  function selectToken(idx) {
+    currentToken = idx;
+    renderTokens();
+    renderBars();
+  }
+
+  function selectSentence(idx) {
+    currentSentence = idx;
+    var s = sentences[currentSentence];
+    var bankIdx = s.tokens.indexOf("bank");
+    currentToken = bankIdx >= 0 ? bankIdx : 0;
+    sentBtns.forEach(function(btn, i) {
+      btn.classList.toggle("attention-explorer__sentence-btn--active", i === idx);
+    });
+    renderTokens();
+    renderBars();
+  }
+
+  sentBtns.forEach(function(btn, i) {
+    btn.addEventListener("click", function() { selectSentence(i); });
+  });
+
+  var s0 = sentences[0];
+  currentToken = s0.tokens.indexOf("bank");
+  renderTokens();
+  renderBars();
+})();
+</script>
+
+<script is:inline>
+(function() {
+  var svg = document.getElementById("cosine-svg");
+  if (!svg) return;
+
+  var handle = document.getElementById("cos-handle");
+  var vecB   = document.getElementById("cos-vec-b");
+  var labelB = document.getElementById("cos-label-b");
+  var arc    = document.getElementById("cos-arc");
+  var valTxt = document.getElementById("cos-value");
+  var angTxt = document.getElementById("cos-angle");
+
+  var ox = 240, oy = 200;
+  var ax = 383, ay = 154;
+  var bx = 326, by = 77;
+  var radius = 150;
+  var dragging = false;
+
+  function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+  function update() {
+    var dx = bx - ox, dy = by - oy;
+    var len = Math.sqrt(dx * dx + dy * dy);
+    if (len < 10) return;
+
+    var nx = dx / len * radius;
+    var ny = dy / len * radius;
+    var ex = ox + nx, ey = oy + ny;
+
+    vecB.setAttribute("x2", ex);
+    vecB.setAttribute("y2", ey);
+    labelB.setAttribute("x", ex + 5);
+    labelB.setAttribute("y", ey - 3);
+    handle.setAttribute("cx", ex);
+    handle.setAttribute("cy", ey);
+    bx = ex; by = ey;
+
+    var adx = ax - ox, ady = ay - oy;
+    var alen = Math.sqrt(adx * adx + ady * ady);
+    var dot = (adx * nx + ady * ny) / (alen * radius);
+    dot = clamp(dot, -1, 1);
+
+    var angleA = Math.atan2(-(ay - oy), ax - ox);
+    var angleB = Math.atan2(-ny, nx);
+    var angleDeg = Math.acos(dot) * 180 / Math.PI;
+
+    var arcR = 40;
+    var sA = Math.min(angleA, angleB);
+    var eA = Math.max(angleA, angleB);
+    if (eA - sA > Math.PI) { var tmp = sA; sA = eA; eA = tmp + 2 * Math.PI; }
+    var sx = ox + arcR * Math.cos(sA);
+    var sy = oy - arcR * Math.sin(sA);
+    var ex2 = ox + arcR * Math.cos(eA);
+    var ey2 = oy - arcR * Math.sin(eA);
+    var largeArc = (eA - sA) > Math.PI ? 1 : 0;
+    arc.setAttribute("d", "M " + sx + "," + sy + " A " + arcR + "," + arcR + " 0 " + largeArc + ",0 " + ex2 + "," + ey2);
+
+    valTxt.textContent = "cos \u03B8 = " + dot.toFixed(2);
+    angTxt.textContent = "\u03B8 = " + Math.round(angleDeg) + "\u00B0";
+  }
+
+  function svgPoint(e) {
+    var pt = svg.createSVGPoint();
+    var touch = e.touches ? e.touches[0] : e;
+    pt.x = touch.clientX;
+    pt.y = touch.clientY;
+    var ctm = svg.getScreenCTM().inverse();
+    return pt.matrixTransform(ctm);
+  }
+
+  function onStart(e) {
+    e.preventDefault();
+    dragging = true;
+    handle.style.cursor = "grabbing";
+  }
+  function onMove(e) {
+    if (!dragging) return;
+    e.preventDefault();
+    var p = svgPoint(e);
+    bx = p.x; by = p.y;
+    update();
+  }
+  function onEnd() {
+    dragging = false;
+    handle.style.cursor = "grab";
+  }
+
+  handle.addEventListener("mousedown", onStart);
+  handle.addEventListener("touchstart", onStart, {passive: false});
+  document.addEventListener("mousemove", onMove);
+  document.addEventListener("touchmove", onMove, {passive: false});
+  document.addEventListener("mouseup", onEnd);
+  document.addEventListener("touchend", onEnd);
+
+  update();
+})();
+</script>
+
+<script is:inline>
+(function() {
+  var svg = document.getElementById("proj-svg");
+  var insight = document.getElementById("proj-insight");
+  var explorer = document.getElementById("proj-explorer");
+  if (!svg || !explorer) return;
+
+  var words = [
+    { w: "programmer",    g: -0.75, a: -0.25 },
+    { w: "engineer",      g: -0.65, a:  0.10 },
+    { w: "soldier",       g: -0.55, a: -0.35 },
+    { w: "pilot",         g: -0.45, a:  0.30 },
+    { w: "scientist",     g: -0.35, a:  0.35 },
+    { w: "professor",     g: -0.20, a:  0.55 },
+    { w: "doctor",        g: -0.15, a:  0.25 },
+    { w: "therapist",     g:  0.15, a:  0.30 },
+    { w: "librarian",     g:  0.25, a:  0.40 },
+    { w: "teacher",       g:  0.30, a: -0.05 },
+    { w: "dancer",        g:  0.40, a: -0.45 },
+    { w: "secretary",     g:  0.55, a: -0.15 },
+    { w: "nurse",         g:  0.65, a: -0.10 },
+    { w: "receptionist",  g:  0.70, a: -0.20 }
+  ];
+
+  var insights = [
+    "Occupations projected onto a gender axis derived from GloVe embeddings. The bias reflects patterns in the training corpus, not ground truth.",
+    "The same occupations projected onto an age axis (young \u2194 old). Embeddings encode many cultural dimensions simultaneously.",
+    "Two dimensions at once. Each dot is an occupation positioned by its gender and age associations in the embedding space."
+  ];
+
+  var panel = 0;
+
+  function drawBars(dim, leftLabel, rightLabel) {
+    var sorted = words.slice().sort(function(a, b) { return a[dim] - b[dim]; });
+    var cx = 310, top = 30, rowH = 26;
+    var maxW = 160;
+    var h = top + sorted.length * rowH + 40;
+    svg.setAttribute("viewBox", "0 0 520 " + h);
+    var s = "";
+
+    s += '<line x1="' + cx + '" y1="' + (top - 10) + '" x2="' + cx + '" y2="' + (top + sorted.length * rowH) + '" style="stroke: var(--border, #E2E6EE);" stroke-width="1"/>';
+    var axisY = top + sorted.length * rowH + 18;
+    s += '<line x1="' + (cx - maxW - 10) + '" y1="' + (axisY - 16) + '" x2="' + (cx + maxW + 10) + '" y2="' + (axisY - 16) + '" style="stroke: var(--border, #E2E6EE);" stroke-width="1"/>';
+    s += '<text x="' + (cx - maxW - 10) + '" y="' + axisY + '" style="fill: var(--accent-dark, #1E5A8A);" font-weight="600" font-size="11">' + leftLabel + '</text>';
+    s += '<text x="' + (cx + maxW + 10) + '" y="' + axisY + '" text-anchor="end" style="fill: var(--accent, #2D8ABF);" font-weight="600" font-size="11">' + rightLabel + '</text>';
+
+    for (var i = 0; i < sorted.length; i++) {
+      var v = sorted[i][dim];
+      var y = top + i * rowH;
+      var bw = Math.abs(v) * maxW;
+      var bx = v < 0 ? cx - bw : cx;
+      var op = 0.4 + Math.abs(v) * 0.5;
+      var colorVar = v < 0 ? "var(--accent-dark, #1E5A8A)" : "var(--accent, #2D8ABF)";
+      s += '<rect x="' + bx + '" y="' + y + '" width="' + bw + '" height="' + (rowH - 6) + '" rx="3" style="fill: ' + colorVar + ';" opacity="' + op.toFixed(2) + '"/>';
+      var tx, ta;
+      if (v < 0) { tx = bx - 6; ta = "end"; }
+      else { tx = bx + bw + 6; ta = "start"; }
+      s += '<text x="' + tx + '" y="' + (y + rowH / 2 + 1) + '" text-anchor="' + ta + '" style="fill: var(--text-sec, #3D4455);" font-size="11">' + sorted[i].w + '</text>';
+    }
+    svg.innerHTML = s;
+  }
+
+  function drawScatter() {
+    var pad = 60, w = 520, h = 440;
+    var plotL = pad + 20, plotR = w - pad;
+    var plotT = pad - 10, plotB = h - pad;
+    var plotW = plotR - plotL, plotH = plotB - plotT;
+    var cx = plotL + plotW / 2, cy = plotT + plotH / 2;
+    svg.setAttribute("viewBox", "0 0 " + w + " " + h);
+    var s = "";
+
+    s += '<rect x="' + plotL + '" y="' + plotT + '" width="' + plotW + '" height="' + plotH + '" rx="4" style="fill: var(--surface, #F2F4F8); stroke: var(--border, #E2E6EE);"/>';
+    s += '<line x1="' + cx + '" y1="' + plotT + '" x2="' + cx + '" y2="' + plotB + '" style="stroke: var(--border-lt, #EAEEF4);" stroke-width="1" stroke-dasharray="4,3"/>';
+    s += '<line x1="' + plotL + '" y1="' + cy + '" x2="' + plotR + '" y2="' + cy + '" style="stroke: var(--border-lt, #EAEEF4);" stroke-width="1" stroke-dasharray="4,3"/>';
+
+    s += '<text x="' + cx + '" y="' + (plotB + 32) + '" text-anchor="middle" style="fill: var(--text-muted, #6B7280);" font-weight="600" font-size="10">Gender Scale</text>';
+    s += '<text x="' + plotL + '" y="' + (plotB + 18) + '" style="fill: var(--accent-dark, #1E5A8A);" font-size="9">\u2190 male</text>';
+    s += '<text x="' + plotR + '" y="' + (plotB + 18) + '" text-anchor="end" style="fill: var(--accent, #2D8ABF);" font-size="9">female \u2192</text>';
+
+    s += '<text x="' + (plotL - 30) + '" y="' + cy + '" text-anchor="middle" style="fill: var(--text-muted, #6B7280);" font-weight="600" font-size="10" transform="rotate(-90,' + (plotL - 30) + ',' + cy + ')">Age Scale</text>';
+    s += '<text x="' + (plotL - 14) + '" y="' + (plotT + 10) + '" style="fill: var(--accent, #2D8ABF);" font-size="9">old \u2191</text>';
+    s += '<text x="' + (plotL - 14) + '" y="' + (plotB - 2) + '" style="fill: var(--accent-dark, #1E5A8A);" font-size="9">young \u2193</text>';
+
+    var labels = [];
+    for (var i = 0; i < words.length; i++) {
+      var d = words[i];
+      var px = cx + d.g * (plotW / 2) * 0.85;
+      var py = cy - d.a * (plotH / 2) * 0.85;
+      s += '<circle cx="' + px + '" cy="' + py + '" r="4" style="fill: var(--accent, #2D8ABF);" opacity="0.85"/>';
+      var anchor = d.g > 0.3 ? "start" : d.g < -0.3 ? "end" : "middle";
+      var lx = anchor === "start" ? px + 7 : anchor === "end" ? px - 7 : px;
+      var ly = py - 8;
+      labels.push({ x: lx, y: ly, a: anchor, t: d.w });
+    }
+
+    for (var k = 0; k < labels.length; k++) {
+      for (var j = 0; j < k; j++) {
+        if (Math.abs(labels[k].x - labels[j].x) < 45 && Math.abs(labels[k].y - labels[j].y) < 11) {
+          labels[k].y = labels[k].y > labels[j].y ? labels[j].y + 12 : labels[j].y - 12;
+        }
+      }
+    }
+
+    for (var m = 0; m < labels.length; m++) {
+      var lb = labels[m];
+      s += '<text x="' + lb.x + '" y="' + lb.y + '" text-anchor="' + lb.a + '" style="fill: var(--text-sec, #3D4455);" font-size="9">' + lb.t + '</text>';
+    }
+    svg.innerHTML = s;
+  }
+
+  function render() {
+    if (panel === 0) drawBars("g", "\u2190 male", "female \u2192");
+    else if (panel === 1) drawBars("a", "\u2190 young", "old \u2192");
+    else drawScatter();
+    insight.textContent = insights[panel];
+  }
+
+  var btns = explorer.querySelectorAll(".attention-explorer__sentence-btn");
+  btns.forEach(function(btn, i) {
+    btn.addEventListener("click", function() {
+      btns.forEach(function(b, j) {
+        b.classList.toggle("attention-explorer__sentence-btn--active", j === i);
+      });
+      panel = i;
+      render();
+    });
+  });
+
+  render();
+})();
+</script>

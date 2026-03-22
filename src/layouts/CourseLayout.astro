@@ -1,0 +1,110 @@
+---
+import Base from './Base.astro';
+
+interface Section {
+  id: string;
+  label: string;
+}
+
+interface Props {
+  day: number;
+  title: string;
+  description: string;
+  sections: Section[];
+}
+
+const { day, title, description, sections } = Astro.props;
+
+const modules = [
+  { day: 1, title: 'Foundations', slug: 'day-1' },
+  { day: 2, title: 'From Models to Tools', slug: 'day-2' },
+  { day: 3, title: 'Deploying for Research', slug: 'day-3' },
+  { day: 4, title: 'Social Science Applications', slug: 'day-4' },
+  { day: 5, title: 'Agentic Workflows', slug: 'day-5' },
+];
+
+const currentIndex = modules.findIndex(m => m.day === day);
+const prev = currentIndex > 0 ? modules[currentIndex - 1] : null;
+const next = currentIndex < modules.length - 1 ? modules[currentIndex + 1] : null;
+---
+
+<Base title={`Day ${day}: ${title}`} description={description}>
+  <div class="course-page">
+
+    <aside class="course-sidebar">
+      <button class="course-sidebar__toggle" id="sidebar-toggle" aria-expanded="false">
+        Course Modules ▾
+      </button>
+      <p class="course-sidebar__label">Modules</p>
+      <ul class="course-sidebar__list" id="sidebar-list">
+        {modules.map(m => (
+          <li class="course-sidebar__module">
+            <a
+              href={`/course/${m.slug}/`}
+              class:list={[
+                'course-sidebar__module-link',
+                { 'course-sidebar__module-link--active': m.day === day }
+              ]}
+            >
+              {m.day}. {m.title}
+            </a>
+            {m.day === day && sections.length > 0 && (
+              <ul class="course-sidebar__sections">
+                {sections.map(s => (
+                  <li>
+                    <a href={`#${s.id}`} class="course-sidebar__section-link">{s.label}</a>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </li>
+        ))}
+      </ul>
+    </aside>
+
+    <div class="course-content">
+      <nav class="course-breadcrumb" aria-label="Breadcrumb">
+        <a href="/course/">Course</a>
+        <span class="course-breadcrumb__sep" aria-hidden="true">/</span>
+        <span>Day {day}: {title}</span>
+      </nav>
+
+      <header class="course-header">
+        <p class="course-header__day">Module {day} of 5</p>
+        <h1 class="course-header__title">{title}</h1>
+        <p class="course-header__desc">{description}</p>
+      </header>
+
+      <div class="prose">
+        <slot />
+      </div>
+
+      <nav class="course-nav" aria-label="Module navigation">
+        {prev && (
+          <a href={`/course/${prev.slug}/`} class="course-nav__link course-nav__link--prev">
+            <span class="course-nav__dir">← Previous</span>
+            <span class="course-nav__title">Day {prev.day}: {prev.title}</span>
+          </a>
+        )}
+        {next && (
+          <a href={`/course/${next.slug}/`} class="course-nav__link course-nav__link--next">
+            <span class="course-nav__dir">Next →</span>
+            <span class="course-nav__title">Day {next.day}: {next.title}</span>
+          </a>
+        )}
+      </nav>
+    </div>
+
+  </div>
+</Base>
+
+<script>
+  const toggle = document.getElementById('sidebar-toggle');
+  const list = document.getElementById('sidebar-list');
+  if (toggle && list) {
+    toggle.addEventListener('click', () => {
+      const open = list.classList.toggle('course-sidebar__list--open');
+      toggle.setAttribute('aria-expanded', String(open));
+    });
+  }
+</script>

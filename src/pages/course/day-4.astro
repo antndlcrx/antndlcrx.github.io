@@ -1,0 +1,108 @@
+---
+import CourseLayout from '../../layouts/CourseLayout.astro';
+
+const sections = [
+  { id: 'rag', label: 'Information Extraction & RAG' },
+  { id: 'simulated-agents', label: 'LLMs as Simulated Agents' },
+];
+---
+
+<CourseLayout
+  day={4}
+  title="Social Science Applications"
+  description="RAG pipelines for large corpora and using LLMs as simulated agents to study human behavior: applications at the frontier of computational social science."
+  sections={sections}
+>
+
+  <!-- ===== RAG ===== -->
+  <section id="rag">
+    <h2>Information Extraction, Summarization &amp; RAG</h2>
+    <p>
+      Many social science datasets are too large for a single LLM context
+      window, or require grounding in specific documents. Retrieval-Augmented
+      Generation (RAG) addresses this by combining a retrieval system with an
+      LLM, allowing it to find and reason over relevant passages from large
+      corpora.
+    </p>
+
+    <div class="definition-box">
+      <p class="definition-box__label">Definition</p>
+      <p class="definition-box__term">Retrieval-Augmented Generation (RAG)</p>
+      <p>
+        A framework that augments an LLM's generation with retrieved context
+        from an external knowledge base. The pipeline typically involves:
+        document chunking → embedding and indexing → query-time retrieval →
+        context-augmented generation.
+      </p>
+    </div>
+
+    <p>
+      We cover the full RAG pipeline: chunking strategies, embedding models for
+      retrieval, vector stores, and evaluating RAG output quality. The emphasis
+      is on building pipelines that are reliable enough for research use, where
+      faithfulness to source documents is paramount.
+    </p>
+
+    <div class="key-takeaway">
+      <p class="key-takeaway__label">Key Takeaway</p>
+      <p>
+        RAG lets you scale LLM-based analysis to corpora of any size while
+        maintaining source grounding. But retrieval quality is the bottleneck:
+        if the retriever misses relevant passages or returns irrelevant ones,
+        the generator will produce plausible-sounding but unfaithful output.
+      </p>
+    </div>
+  </section>
+
+  <!-- ===== SIMULATED AGENTS ===== -->
+  <section id="simulated-agents">
+    <h2>LLMs as Simulated Agents</h2>
+    <p>
+      A provocative line of research uses LLMs as stand-ins for human
+      respondents: what Argyle et al. (2023) call "silicon sampling." Can
+      we prompt an LLM to simulate how a 65-year-old conservative voter in
+      rural Ohio would respond to a survey? And if so, when should we trust
+      the results?
+    </p>
+
+    <p>
+      This module examines the <em>Homo silicus</em> paradigm: its theoretical
+      motivation, empirical validation studies, failure modes, and ethical
+      considerations. We explore both the promise (cheap, fast, controllable
+      simulated populations) and the risks (systematic biases, lack of
+      genuine lived experience).
+    </p>
+
+    <div class="stop-and-think">
+      <div class="stop-and-think__header">
+        <svg class="stop-and-think__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+          <line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+        <span class="stop-and-think__label">Stop and Think</span>
+      </div>
+      <p>
+        Under what conditions might simulating survey responses with an LLM be
+        a valid complement to traditional surveys? Under what conditions
+        would it be misleading or even harmful?
+      </p>
+      <details>
+        <summary>Reveal</summary>
+        <div>
+          <p>
+            Simulation may be valid for exploring hypotheses, pilot-testing
+            survey instruments, or studying well-documented populations where
+            the model's training data includes representative perspectives. It
+            becomes misleading when used as a substitute for data from
+            underrepresented populations (the model has less to draw on),
+            when the simulated responses are presented as genuine data, or
+            when the research question depends on authentic lived experience
+            rather than stereotypical patterns.
+          </p>
+        </div>
+      </details>
+    </div>
+  </section>
+
+</CourseLayout>
