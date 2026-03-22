@@ -311,27 +311,6 @@ small, .text-sm { font-size: 0.8125rem; }
   background-color: var(--bg);
 }
 
-/*
-  FOOTER GRADIENT — the page ends with a smooth pour into
-  the deepest blue, but most of the depth is compressed
-  into the last few pixels. Footer text sits in the still-light
-  upper region.
-*/
-.footer-gradient {
-  background: linear-gradient(
-    to bottom,
-    var(--bg) 0%,
-    var(--blue-9) 40%,
-    var(--blue-8) 75%,
-    var(--blue-6) 92%,
-    var(--blue-4) 97%,
-    var(--blue-2) 99%,
-    var(--blue-0) 100%
-  );
-  padding-bottom: 5px;
-}
-
-
 /* ============================================================
    LAYOUT
    ============================================================ */
@@ -724,24 +703,51 @@ section + section {
    ============================================================ */
 
 .partners {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
   padding: var(--sp-6) 0;
+  width: 100%;
 }
 
+.partners__group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 100%;
+}
+
+.partners__group--past {
+  margin-top: var(--sp-6);
+}
+
+/* Override global p { max-width } shrink-wrap; center the block (otherwise it sits left) */
+/* Letter-spacing: pad left so uppercase labels look visually centered */
 .partners__label {
   font-size: 0.625rem;
   color: var(--text-dim);
   text-transform: uppercase;
   letter-spacing: 0.2em;
+  padding-left: 0.2em;
   margin-bottom: var(--sp-4);
+  margin-top: 0;
+  max-width: max-content;
+  width: max-content;
+  text-align: center;
+  align-self: center;
+  margin-inline: auto;
 }
 
 .partners__list {
   display: flex;
   justify-content: center;
-  gap: var(--sp-8);
   align-items: center;
   flex-wrap: wrap;
+  gap: var(--sp-8);
+  width: 100%;
+  max-width: 100%;
 }
 
 .partners__item {
@@ -751,8 +757,32 @@ section + section {
 
 
 /* ============================================================
-   FOOTER — sits inside the footer-gradient div
+   FOOTER
    ============================================================ */
+
+/* Home: gradient rule matches .stats::before; bar uses page background for contrast */
+.footer-rule {
+  display: block;
+  height: 3px;
+  margin: 0;
+  border: none;
+  background: linear-gradient(
+    to right,
+    var(--blue-1) 0%,
+    var(--blue-2) 20%,
+    var(--blue-3) 40%,
+    var(--blue-4) 65%,
+    var(--blue-5) 80%
+  );
+}
+
+.footer--home {
+  background: var(--bg);
+}
+
+.footer--home .footer__logo {
+  opacity: 0.55;
+}
 
 .footer {
   padding: var(--sp-6) 0 var(--sp-5);

@@ -24,7 +24,7 @@ const math = {
   perplexity: String.raw`$$\text{PPL}(X) = \exp\!\left(-\frac{1}{T}\sum_{t=1}^{T} \log P(x_t \mid x_{\lt t})\right)$$`,
   perplexityCaption: String.raw`Perplexity is the exponentiated average negative log-likelihood. Lower is better. A perplexity of $k$ means the model is, on average, as uncertain as choosing uniformly among $k$ options.`,
   autoregressiveDef: String.raw`A model that generates a sequence one token at a time, left to right. At each step it predicts a probability distribution over the vocabulary for the next token, conditioned on all tokens generated so far.`,
-  attentionDef: String.raw`A mechanism where each position in a sequence computes a weighted sum over all positions. Each token produces three vectors — a <strong>Query</strong> (what am I looking for?), a <strong>Key</strong> (what do I contain?), and a <strong>Value</strong> (what information do I provide?). Attention weights are determined by the compatibility between Queries and Keys.`,
+  attentionDef: String.raw`A mechanism where each position in a sequence computes a weighted sum over all positions. Each token produces three vectors: a <strong>Query</strong> (what am I looking for?), a <strong>Key</strong> (what do I contain?), and a <strong>Value</strong> (what information do I provide?). Attention weights are determined by the compatibility between Queries and Keys.`,
   attention: String.raw`$$\text{Attention}(Q, K, V) = \text{softmax}\!\left(\frac{QK^\top}{\sqrt{d_k}}\right)V$$`,
   attentionCaption: String.raw`Scaled dot-product attention. The $\sqrt{d_k}$ factor prevents dot products from growing too large in high dimensions, which would push softmax into regions with near-zero gradients.`,
   scalingLaw: String.raw`$$L(X) \propto X^{-\alpha}$$`,
@@ -35,18 +35,18 @@ const math = {
 <CourseLayout
   day={1}
   title="Foundations"
-  description="From Embeddings to Transformers — how machines represent meaning as geometry, and how the architecture that changed everything actually works."
+  description="From Embeddings to Transformers: how machines represent meaning as geometry, and how the architecture that changed everything actually works."
   sections={sections}
 >
 
   <!-- ===================================================================
-       SECTION 1 — REPRESENTING MEANING
+       SECTION 1: REPRESENTING MEANING
        =================================================================== -->
   <section id="embeddings">
     <h2>Representing Meaning</h2>
     <p>
       Before a language model can do anything useful, it needs a way to
-      represent words as numbers. Not just any numbers&mdash;numbers that
+      represent words as numbers. Not just any numbers: numbers that
       capture <em>meaning</em>. This section traces the path from the simplest
       text representations to the geometric spaces that power modern NLP.
     </p>
@@ -86,7 +86,7 @@ const math = {
       This is the <strong>distributional hypothesis</strong>: "you shall know
       a word by the company it keeps" (Firth, 1957). A word that often appears
       near "government," "legislation," and "vote" will end up with a vector
-      close to other political terms&mdash;even if they never co-occurred in
+      close to other political terms: even if they never co-occurred in
       the same sentence.
     </p>
 
@@ -215,7 +215,7 @@ const math = {
       and many other relationships are encoded as well. That said,
       <a href="https://aclanthology.org/2020.acl-main.647/" target="_blank" rel="noopener">subsequent work</a>
       has shown that analogy results are sensitive to evaluation methodology
-      and less robust than the original papers suggested&mdash;the effect is
+      and less robust than the original papers suggested: the effect is
       real, but noisier than the clean examples imply.
     </p>
 
@@ -233,7 +233,7 @@ const math = {
       with gender.
       <a href="https://www.science.org/doi/10.1126/science.aal4230" target="_blank" rel="noopener">Caliskan et al. (2017)</a>
       showed that embeddings replicate a wide range of implicit biases
-      measured in humans&mdash;a finding with profound implications for social science.
+      measured in humans: a finding with profound implications for social science.
     </p>
 
     <!-- Interactive semantic projection explorer -->
@@ -262,7 +262,7 @@ const math = {
       </div>
       <p>
         If word embeddings place semantically similar words near each other,
-        what happens to words with multiple meanings&mdash;like "bank"
+        what happens to words with multiple meanings: like "bank"
         (river bank vs. financial bank)? What limitation does this reveal
         about static embeddings?
       </p>
@@ -295,16 +295,16 @@ const math = {
 
     <h3>Resources</h3>
     <ul class="resource-list">
-      <li><a href="https://arxiv.org/abs/1301.3781" target="_blank" rel="noopener">Mikolov et al. (2013), <em>Efficient Estimation of Word Representations in Vector Space</em></a> &mdash; the foundational Word2Vec paper.</li>
-      <li><a href="https://nlp.stanford.edu/pubs/glove.pdf" target="_blank" rel="noopener">Pennington, Socher &amp; Manning (2014), <em>GloVe: Global Vectors for Word Representation</em></a> &mdash; combines global matrix factorisation with local context windows.</li>
-      <li><a href="https://lena-voita.github.io/nlp_course/word_embeddings.html" target="_blank" rel="noopener">Lena Voita: NLP Course &mdash; Word Embeddings</a> &mdash; an excellent in-depth explainer.</li>
-      <li><a href="https://projector.tensorflow.org" target="_blank" rel="noopener">TensorFlow Embedding Projector</a> &mdash; interactive 3D visualisation of embedding spaces.</li>
-      <li><a href="https://www.nature.com/articles/s41562-022-01316-8" target="_blank" rel="noopener">Grand et al. (2022), <em>Semantic Projection</em></a> &mdash; the method for mapping words onto interpretable semantic scales.</li>
+      <li><a href="https://arxiv.org/abs/1301.3781" target="_blank" rel="noopener">Mikolov et al. (2013), <em>Efficient Estimation of Word Representations in Vector Space</em></a>: the foundational Word2Vec paper.</li>
+      <li><a href="https://nlp.stanford.edu/pubs/glove.pdf" target="_blank" rel="noopener">Pennington, Socher &amp; Manning (2014), <em>GloVe: Global Vectors for Word Representation</em></a>: combines global matrix factorisation with local context windows.</li>
+      <li><a href="https://lena-voita.github.io/nlp_course/word_embeddings.html" target="_blank" rel="noopener">Lena Voita: NLP Course: Word Embeddings</a>: an excellent in-depth explainer.</li>
+      <li><a href="https://projector.tensorflow.org" target="_blank" rel="noopener">TensorFlow Embedding Projector</a>: interactive 3D visualisation of embedding spaces.</li>
+      <li><a href="https://www.nature.com/articles/s41562-022-01316-8" target="_blank" rel="noopener">Grand et al. (2022), <em>Semantic Projection</em></a>: the method for mapping words onto interpretable semantic scales.</li>
     </ul>
   </section>
 
   <!-- ===================================================================
-       SECTION 2 — TOKENIZATION
+       SECTION 2: TOKENIZATION
        =================================================================== -->
   <section id="tokenization">
     <h2>Tokenization</h2>
@@ -312,7 +312,7 @@ const math = {
       In the previous section, we talked about vectors for "words." But what
       counts as a word? Models don't actually operate on words as we think
       of them. Before text enters a model, it must be split into discrete
-      units the model can process. This step&mdash;tokenization&mdash;bridges
+      units the model can process. This step: tokenization: bridges
       raw text and the embedding layer. The choice of tokenization strategy
       has real consequences for what the model "sees" and how well it handles
       different languages, numbers, and edge cases.
@@ -323,7 +323,7 @@ const math = {
       A word-level vocabulary is appealing but impractical. English alone has
       hundreds of thousands of words. Add misspellings, names, code, and
       other languages, and the vocabulary explodes. Any word not in the
-      vocabulary becomes an unknown &lt;UNK&gt; token&mdash;invisible to
+      vocabulary becomes an unknown &lt;UNK&gt; token: invisible to
       the model.
     </p>
     <p>
@@ -358,7 +358,7 @@ const math = {
     <div class="visual-diagram">
       <svg viewBox="0 0 500 225" width="500" height="225" xmlns="http://www.w3.org/2000/svg" style="font-family: var(--font-mono, 'JetBrains Mono', monospace); font-size: 13px;">
         <!-- Step 0 -->
-        <text x="10" y="28" style="fill: var(--text-muted, #6B7280);" font-family="var(--font-body, Inter, sans-serif)" font-size="11" font-weight="600">Step 0 &mdash; Characters:</text>
+        <text x="10" y="28" style="fill: var(--text-muted, #6B7280);" font-family="var(--font-body, Inter, sans-serif)" font-size="11" font-weight="600">Step 0: Characters:</text>
         <g transform="translate(10,38)">
           <rect x="0" y="0" width="28" height="26" rx="4" style="fill: var(--accent-bg, #EBF7FD); stroke: var(--accent, #2D8ABF);" stroke-width="1"/><text x="14" y="18" text-anchor="middle" style="fill: var(--blue-0, #1E3A5F);">l</text>
           <rect x="32" y="0" width="28" height="26" rx="4" style="fill: var(--accent-bg, #EBF7FD); stroke: var(--accent, #2D8ABF);" stroke-width="1"/><text x="46" y="18" text-anchor="middle" style="fill: var(--blue-0, #1E3A5F);">o</text>
@@ -368,7 +368,7 @@ const math = {
           <rect x="160" y="0" width="28" height="26" rx="4" style="fill: var(--accent-bg, #EBF7FD); stroke: var(--accent, #2D8ABF);" stroke-width="1"/><text x="174" y="18" text-anchor="middle" style="fill: var(--blue-0, #1E3A5F);">t</text>
         </g>
         <!-- Step 1 -->
-        <text x="10" y="95" style="fill: var(--text-muted, #6B7280);" font-family="var(--font-body, Inter, sans-serif)" font-size="11" font-weight="600">Step 1 &mdash; Merge "es" (most frequent pair in corpus):</text>
+        <text x="10" y="95" style="fill: var(--text-muted, #6B7280);" font-family="var(--font-body, Inter, sans-serif)" font-size="11" font-weight="600">Step 1: Merge "es" (most frequent pair in corpus):</text>
         <g transform="translate(10,105)">
           <rect x="0" y="0" width="28" height="26" rx="4" style="fill: var(--accent-bg, #EBF7FD); stroke: var(--accent, #2D8ABF);" stroke-width="1"/><text x="14" y="18" text-anchor="middle" style="fill: var(--blue-0, #1E3A5F);">l</text>
           <rect x="32" y="0" width="28" height="26" rx="4" style="fill: var(--accent-bg, #EBF7FD); stroke: var(--accent, #2D8ABF);" stroke-width="1"/><text x="46" y="18" text-anchor="middle" style="fill: var(--blue-0, #1E3A5F);">o</text>
@@ -377,7 +377,7 @@ const math = {
           <rect x="142" y="0" width="28" height="26" rx="4" style="fill: var(--accent-bg, #EBF7FD); stroke: var(--accent, #2D8ABF);" stroke-width="1"/><text x="156" y="18" text-anchor="middle" style="fill: var(--blue-0, #1E3A5F);">t</text>
         </g>
         <!-- Step 2 -->
-        <text x="10" y="162" style="fill: var(--text-muted, #6B7280);" font-family="var(--font-body, Inter, sans-serif)" font-size="11" font-weight="600">Step 2 &mdash; Merge "est" (next most frequent pair):</text>
+        <text x="10" y="162" style="fill: var(--text-muted, #6B7280);" font-family="var(--font-body, Inter, sans-serif)" font-size="11" font-weight="600">Step 2: Merge "est" (next most frequent pair):</text>
         <g transform="translate(10,172)">
           <rect x="0" y="0" width="28" height="26" rx="4" style="fill: var(--accent-bg, #EBF7FD); stroke: var(--accent, #2D8ABF);" stroke-width="1"/><text x="14" y="18" text-anchor="middle" style="fill: var(--blue-0, #1E3A5F);">l</text>
           <rect x="32" y="0" width="28" height="26" rx="4" style="fill: var(--accent-bg, #EBF7FD); stroke: var(--accent, #2D8ABF);" stroke-width="1"/><text x="46" y="18" text-anchor="middle" style="fill: var(--blue-0, #1E3A5F);">o</text>
@@ -415,13 +415,13 @@ const math = {
     <p>
       <strong>Number fragmentation.</strong> Numbers are often split into
       seemingly arbitrary pieces ("2024" &rarr; "202" + "4"). This is why
-      models struggle with arithmetic&mdash;they do not see "2024" as a
+      models struggle with arithmetic: they do not see "2024" as a
       single number.
     </p>
     <p>
       <strong>The "strawberry" problem.</strong> Ask a model "how many r's
       in strawberry?" and it may answer incorrectly. The tokenizer splits
-      "strawberry" into subwords like "straw" + "berry"&mdash;the model never
+      "strawberry" into subwords like "straw" + "berry": the model never
       sees individual letters, so it cannot count them.
     </p>
 
@@ -442,24 +442,24 @@ const math = {
       </svg>
       <p>
         <strong>In the notebook:</strong> Section 3 lets you explore tokenization
-        hands-on&mdash;comparing how different models split the same text
+        hands-on: comparing how different models split the same text
         and observing multilingual tokenization inequality directly.
       </p>
     </div>
 
     <h3>Resources</h3>
     <ul class="resource-list">
-      <li><a href="https://arxiv.org/abs/1508.07909" target="_blank" rel="noopener">Sennrich, Haddow &amp; Birch (2016), <em>Neural Machine Translation of Rare Words with Subword Units</em></a> &mdash; introduces BPE for NLP.</li>
-      <li><a href="https://tiktokenizer.vercel.app" target="_blank" rel="noopener">Tiktokenizer</a> &mdash; visualise how OpenAI's tokenizers split text in real time.</li>
-      <li><a href="https://huggingface.co/spaces/Xenova/the-tokenizer-playground" target="_blank" rel="noopener">Hugging Face Tokenizer Playground</a> &mdash; compare how different tokenizers split the same input.</li>
-      <li><a href="https://www.youtube.com/watch?v=zduSFxRajkE" target="_blank" rel="noopener">Andrej Karpathy: "Let's Build the GPT Tokenizer"</a> &mdash; a hands-on deep dive into BPE.</li>
-      <li><a href="https://huggingface.co/learn/nlp-course/en/chapter6/5" target="_blank" rel="noopener">HuggingFace NLP Course, Chapter 6</a> &mdash; thorough walkthrough of BPE and other subword algorithms.</li>
-      <li><a href="https://www.youtube.com/watch?v=wjZofJX0v4M" target="_blank" rel="noopener">3Blue1Brown: "But what is a GPT?"</a> &mdash; Chapter 5 covers tokenization with excellent visuals.</li>
+      <li><a href="https://arxiv.org/abs/1508.07909" target="_blank" rel="noopener">Sennrich, Haddow &amp; Birch (2016), <em>Neural Machine Translation of Rare Words with Subword Units</em></a>: introduces BPE for NLP.</li>
+      <li><a href="https://tiktokenizer.vercel.app" target="_blank" rel="noopener">Tiktokenizer</a>: visualise how OpenAI's tokenizers split text in real time.</li>
+      <li><a href="https://huggingface.co/spaces/Xenova/the-tokenizer-playground" target="_blank" rel="noopener">Hugging Face Tokenizer Playground</a>: compare how different tokenizers split the same input.</li>
+      <li><a href="https://www.youtube.com/watch?v=zduSFxRajkE" target="_blank" rel="noopener">Andrej Karpathy: "Let's Build the GPT Tokenizer"</a>: a hands-on deep dive into BPE.</li>
+      <li><a href="https://huggingface.co/learn/nlp-course/en/chapter6/5" target="_blank" rel="noopener">HuggingFace NLP Course, Chapter 6</a>: thorough walkthrough of BPE and other subword algorithms.</li>
+      <li><a href="https://www.youtube.com/watch?v=wjZofJX0v4M" target="_blank" rel="noopener">3Blue1Brown: "But what is a GPT?"</a>: Chapter 5 covers tokenization with excellent visuals.</li>
     </ul>
   </section>
 
   <!-- ===================================================================
-       SECTION 3 — FROM STATIC TO CONTEXTUAL
+       SECTION 3: FROM STATIC TO CONTEXTUAL
        =================================================================== -->
   <section id="contextual">
     <h2>From Static to Contextual</h2>
@@ -468,7 +468,7 @@ const math = {
       own embedding vector. But recall a limitation we flagged in the
       <a href="#embeddings">first section</a>: static embeddings give each
       word type a single vector. "Bank" gets one representation that averages
-      across all its senses&mdash;river bank, financial bank, blood bank.
+      across all its senses: river bank, financial bank, blood bank.
       Now we see how modern models solve it.
     </p>
 
@@ -483,7 +483,7 @@ const math = {
     <p>
       With GloVe, both instances of "bank" get the exact same vector.
       A model using static embeddings cannot distinguish the two meanings.
-      It must rely on other words in the sentence to disambiguate&mdash;but
+      It must rely on other words in the sentence to disambiguate: but
       the embedding itself carries no context.
     </p>
 
@@ -505,8 +505,8 @@ const math = {
     </div>
 
     <p>
-      This shift&mdash;from one vector per word type to one vector per word
-      <em>token in context</em>&mdash;is what makes modern language models so
+      This shift: from one vector per word type to one vector per word
+      <em>token in context</em>: is what makes modern language models so
       powerful. The representations carry far more information because they
       incorporate the available context (the full sequence in encoder models,
       or the preceding context in autoregressive models).
@@ -534,7 +534,7 @@ const math = {
             so the model decides which surrounding words are most relevant for
             building each token's representation. A token like "bank" attends
             heavily to "deposited" and "money" in one context, and to "river"
-            and "sat" in another&mdash;producing very different output vectors.
+            and "sat" in another: producing very different output vectors.
           </p>
         </div>
       </details>
@@ -546,7 +546,7 @@ const math = {
       When you <strong>classify text</strong> (Day 3), you use the model's
       contextual representation of the input. When you build a
       <strong>retrieval-augmented generation (RAG)</strong> pipeline (Day 4),
-      embeddings power the retrieval step&mdash;and contextual embeddings
+      embeddings power the retrieval step: and contextual embeddings
       produce much better search results than static ones. When you
       <strong>prompt a model</strong> (Day 2), you are writing input that
       the model will process through layers of contextual attention. Understanding
@@ -566,12 +566,12 @@ const math = {
   </section>
 
   <!-- ===================================================================
-       SECTION 4 — LANGUAGE MODELING
+       SECTION 4: LANGUAGE MODELING
        =================================================================== -->
   <section id="language-modeling">
     <h2>Language Modeling</h2>
     <p>
-      Contextual embeddings don't appear from nowhere&mdash;they are produced
+      Contextual embeddings don't appear from nowhere: they are produced
       by a model trained on a specific objective. At its core, a language
       model learns a probability distribution over sequences of tokens. The
       dominant paradigm for modern LLMs is <strong>autoregressive language
@@ -588,7 +588,7 @@ const math = {
     <h3>The Chain Rule of Probability</h3>
     <p>
       Any joint probability over a sequence can be decomposed into a product
-      of conditional probabilities. This is not an approximation&mdash;it is
+      of conditional probabilities. This is not an approximation: it is
       an exact identity from probability theory:
     </p>
 
@@ -657,7 +657,7 @@ const math = {
       How do we know whether one language model is better than another?
       The standard metric is <strong>perplexity</strong>: it measures how
       "surprised" the model is by a held-out test set. Lower perplexity means
-      the model assigns higher probability to the actual text&mdash;it
+      the model assigns higher probability to the actual text: it
       predicts more accurately.
     </p>
 
@@ -695,7 +695,7 @@ const math = {
             is simple, but solving it well on internet-scale data requires
             sophisticated internal representations that transfer to downstream
             tasks. In a sense, next-token prediction is a
-            <strong>universal learning signal</strong>&mdash;any pattern in
+            <strong>universal learning signal</strong>: any pattern in
             text that helps prediction can, in principle, be learned.
           </p>
         </div>
@@ -715,15 +715,15 @@ const math = {
 
     <h3>Resources</h3>
     <ul class="resource-list">
-      <li><a href="https://lena-voita.github.io/nlp_course/language_modeling.html" target="_blank" rel="noopener">Lena Voita: NLP Course &mdash; Language Modeling</a> &mdash; clear, visual introduction to language modeling concepts.</li>
-      <li><a href="https://huggingface.co/docs/transformers/en/perplexity" target="_blank" rel="noopener">HuggingFace: Perplexity of Fixed-Length Models</a> &mdash; technical details on computing perplexity.</li>
-      <li><a href="https://cdn.openai.com/research-covers/language-unsupervised/language_understanding_paper.pdf" target="_blank" rel="noopener">Radford et al. (2018), <em>Improving Language Understanding by Generative Pre-Training</em></a> &mdash; GPT-1: demonstrating that generative pre-training transfers to downstream tasks.</li>
-      <li><a href="https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf" target="_blank" rel="noopener">Radford et al. (2019), <em>Language Models are Unsupervised Multitask Learners</em></a> &mdash; GPT-2: scaling up and the emergence of zero-shot capabilities.</li>
+      <li><a href="https://lena-voita.github.io/nlp_course/language_modeling.html" target="_blank" rel="noopener">Lena Voita: NLP Course: Language Modeling</a>: clear, visual introduction to language modeling concepts.</li>
+      <li><a href="https://huggingface.co/docs/transformers/en/perplexity" target="_blank" rel="noopener">HuggingFace: Perplexity of Fixed-Length Models</a>: technical details on computing perplexity.</li>
+      <li><a href="https://cdn.openai.com/research-covers/language-unsupervised/language_understanding_paper.pdf" target="_blank" rel="noopener">Radford et al. (2018), <em>Improving Language Understanding by Generative Pre-Training</em></a>: GPT-1: demonstrating that generative pre-training transfers to downstream tasks.</li>
+      <li><a href="https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf" target="_blank" rel="noopener">Radford et al. (2019), <em>Language Models are Unsupervised Multitask Learners</em></a>: GPT-2: scaling up and the emergence of zero-shot capabilities.</li>
     </ul>
   </section>
 
   <!-- ===================================================================
-       SECTION 5 — THE TRANSFORMER
+       SECTION 5: THE TRANSFORMER
        =================================================================== -->
   <section id="transformers">
     <h2>The Transformer</h2>
@@ -799,7 +799,7 @@ const math = {
     </div>
     <p class="visual-diagram__caption" style="margin-top: var(--sp-2); text-align: center;">
       Click each token to see its attention pattern. Then switch sentences
-      and click <strong>"bank"</strong> again&mdash;notice how the attention
+      and click <strong>"bank"</strong> again: notice how the attention
       shifts entirely from "river" to "deposit" and "money."
       (Attention weights are illustrative, not extracted from a specific model.)
     </p>
@@ -820,7 +820,7 @@ const math = {
     <div class="multihead-viz">
       <!-- Head 1: Syntactic -->
       <div class="multihead-viz__head">
-        <p class="multihead-viz__title" style="color: #2D8ABF;">Head 1 &mdash; Syntactic</p>
+        <p class="multihead-viz__title" style="color: #2D8ABF;">Head 1: Syntactic</p>
         <svg viewBox="0 0 180 180" width="180" height="180" xmlns="http://www.w3.org/2000/svg" style="font-family: 'JetBrains Mono', monospace; font-size: 9px;">
           <g transform="translate(36,36)">
             <text x="-4" y="-8" text-anchor="end" fill="#6B7280" font-size="7">Query &darr;</text>
@@ -888,7 +888,7 @@ const math = {
 
       <!-- Head 2: Semantic -->
       <div class="multihead-viz__head">
-        <p class="multihead-viz__title" style="color: #e07040;">Head 2 &mdash; Semantic</p>
+        <p class="multihead-viz__title" style="color: #e07040;">Head 2: Semantic</p>
         <svg viewBox="0 0 180 180" width="180" height="180" xmlns="http://www.w3.org/2000/svg" style="font-family: 'JetBrains Mono', monospace; font-size: 9px;">
           <g transform="translate(36,36)">
             <text x="-4" y="-8" text-anchor="end" fill="#6B7280" font-size="7">Query &darr;</text>
@@ -954,7 +954,7 @@ const math = {
 
       <!-- Head 3: Positional -->
       <div class="multihead-viz__head">
-        <p class="multihead-viz__title" style="color: #2A9D8F;">Head 3 &mdash; Positional</p>
+        <p class="multihead-viz__title" style="color: #2A9D8F;">Head 3: Positional</p>
         <svg viewBox="0 0 180 180" width="180" height="180" xmlns="http://www.w3.org/2000/svg" style="font-family: 'JetBrains Mono', monospace; font-size: 9px;">
           <g transform="translate(36,36)">
             <text x="-4" y="-8" text-anchor="end" fill="#6B7280" font-size="7">Query &darr;</text>
@@ -971,7 +971,7 @@ const math = {
             <text x="-4" y="88" text-anchor="end" fill="#3D4455">the</text>
             <text x="-4" y="112" text-anchor="end" fill="#3D4455">river</text>
             <text x="-4" y="136" text-anchor="end" fill="#3D4455">bank</text>
-            <!-- Row: I — attends to self + next -->
+            <!-- Row: I attends to self + next -->
             <rect x="0" y="4" width="22" height="22" rx="2" fill="#2A9D8F" opacity="0.50"/>
             <rect x="24" y="4" width="22" height="22" rx="2" fill="#2A9D8F" opacity="0.35"/>
             <rect x="48" y="4" width="22" height="22" rx="2" fill="#2A9D8F" opacity="0.08"/>
@@ -1086,7 +1086,7 @@ const math = {
 
     <h3>Positional Encodings</h3>
     <p>
-      Self-attention processes all tokens in parallel&mdash;there is nothing
+      Self-attention processes all tokens in parallel: there is nothing
       in the mechanism that distinguishes position 1 from position 100.
       Without help, "dog bites man" and "man bites dog" would produce
       identical representations.
@@ -1135,7 +1135,7 @@ const math = {
         The Transformer replaced sequential processing with parallel attention.
         Every token can attend to every other token directly, regardless of
         distance. This architectural choice is why LLMs could scale to billions
-        of parameters trained on trillions of tokens&mdash;the foundation of
+        of parameters trained on trillions of tokens: the foundation of
         their remarkable capabilities.
       </p>
     </div>
@@ -1154,21 +1154,21 @@ const math = {
 
     <h3>Resources</h3>
     <ul class="resource-list">
-      <li><a href="https://arxiv.org/abs/1706.03762" target="_blank" rel="noopener">Vaswani et al. (2017), <em>Attention Is All You Need</em></a> &mdash; the paper that introduced the Transformer architecture.</li>
-      <li><a href="https://jalammar.github.io/illustrated-transformer/" target="_blank" rel="noopener">Jay Alammar: The Illustrated Transformer</a> &mdash; the canonical visual walkthrough of the architecture.</li>
-      <li><a href="https://www.youtube.com/watch?v=eMlx5fFNoYc" target="_blank" rel="noopener">3Blue1Brown: "Attention in Transformers, Visually Explained"</a> &mdash; intuitive geometric explanation of attention.</li>
-      <li><a href="https://bbycroft.net/llm" target="_blank" rel="noopener">Brendan Bycroft's LLM Visualization</a> &mdash; interactive 3D walkthrough of an entire Transformer.</li>
-      <li><a href="https://poloclub.github.io/transformer-explainer/" target="_blank" rel="noopener">Transformer Explainer (Polo Club of Data Science)</a> &mdash; interactive visual explanation of how Transformers work.</li>
-      <li><a href="https://jalammar.github.io/illustrated-gpt2/" target="_blank" rel="noopener">Jay Alammar: The Illustrated GPT-2</a> &mdash; how the decoder-only Transformer works in practice.</li>
-      <li><a href="https://transformer-circuits.pub/2022/in-context-learning-and-induction-heads/index.html" target="_blank" rel="noopener">Anthropic: In-context Learning and Induction Heads (2022)</a> &mdash; a mechanistic view of how Transformers learn.</li>
-      <li><a href="https://arxiv.org/abs/1512.03385" target="_blank" rel="noopener">He et al. (2016), <em>Deep Residual Learning for Image Recognition</em></a> &mdash; introduced skip/residual connections that enable training of very deep networks.</li>
-      <li><a href="https://arxiv.org/abs/1607.06450" target="_blank" rel="noopener">Ba, Kiros &amp; Hinton (2016), <em>Layer Normalization</em></a> &mdash; the normalisation variant used in Transformers (applied per-sample, not per-batch).</li>
-      <li><a href="https://arxiv.org/abs/2104.09864" target="_blank" rel="noopener">Su et al. (2021), <em>RoFormer: Enhanced Transformer with Rotary Position Embedding</em></a> &mdash; the positional encoding used in most modern LLMs (Llama, Mistral, etc.).</li>
+      <li><a href="https://arxiv.org/abs/1706.03762" target="_blank" rel="noopener">Vaswani et al. (2017), <em>Attention Is All You Need</em></a>: the paper that introduced the Transformer architecture.</li>
+      <li><a href="https://jalammar.github.io/illustrated-transformer/" target="_blank" rel="noopener">Jay Alammar: The Illustrated Transformer</a>: the canonical visual walkthrough of the architecture.</li>
+      <li><a href="https://www.youtube.com/watch?v=eMlx5fFNoYc" target="_blank" rel="noopener">3Blue1Brown: "Attention in Transformers, Visually Explained"</a>: intuitive geometric explanation of attention.</li>
+      <li><a href="https://bbycroft.net/llm" target="_blank" rel="noopener">Brendan Bycroft's LLM Visualization</a>: interactive 3D walkthrough of an entire Transformer.</li>
+      <li><a href="https://poloclub.github.io/transformer-explainer/" target="_blank" rel="noopener">Transformer Explainer (Polo Club of Data Science)</a>: interactive visual explanation of how Transformers work.</li>
+      <li><a href="https://jalammar.github.io/illustrated-gpt2/" target="_blank" rel="noopener">Jay Alammar: The Illustrated GPT-2</a>: how the decoder-only Transformer works in practice.</li>
+      <li><a href="https://transformer-circuits.pub/2022/in-context-learning-and-induction-heads/index.html" target="_blank" rel="noopener">Anthropic: In-context Learning and Induction Heads (2022)</a>: a mechanistic view of how Transformers learn.</li>
+      <li><a href="https://arxiv.org/abs/1512.03385" target="_blank" rel="noopener">He et al. (2016), <em>Deep Residual Learning for Image Recognition</em></a>: introduced skip/residual connections that enable training of very deep networks.</li>
+      <li><a href="https://arxiv.org/abs/1607.06450" target="_blank" rel="noopener">Ba, Kiros &amp; Hinton (2016), <em>Layer Normalization</em></a>: the normalisation variant used in Transformers (applied per-sample, not per-batch).</li>
+      <li><a href="https://arxiv.org/abs/2104.09864" target="_blank" rel="noopener">Su et al. (2021), <em>RoFormer: Enhanced Transformer with Rotary Position Embedding</em></a>: the positional encoding used in most modern LLMs (Llama, Mistral, etc.).</li>
     </ul>
   </section>
 
   <!-- ===================================================================
-       SECTION 6 — SCALING LAWS
+       SECTION 6: SCALING LAWS
        =================================================================== -->
   <section id="scaling">
     <h2>Scaling Laws</h2>
@@ -1178,7 +1178,7 @@ const math = {
       consequential discoveries in modern AI: language model performance
       improves <em>predictably</em> as you increase compute,
       data, or model size. Across a wide range of scales, the relationship
-      follows smooth power-law curves&mdash;a remarkably strong empirical
+      follows smooth power-law curves: a remarkably strong empirical
       regularity. This insight transformed AI development from
       experimentation into engineering.
     </p>
@@ -1203,7 +1203,7 @@ const math = {
       data, same pattern. Double the parameters, same again. The exponents
       differ, but the power-law form holds across model families and
       training setups. (We will see shortly that the variables are not
-      truly independent&mdash;how you balance model size and data matters.)
+      truly independent: how you balance model size and data matters.)
     </p>
 
     <!-- Three-panel scaling law visualization -->
@@ -1314,7 +1314,7 @@ const math = {
     </div>
     <p class="visual-diagram__caption" style="text-align: center;">
       Test loss as a function of compute, dataset size, and model parameters
-      (log-log scale). Each relationship follows a smooth power law &mdash;
+      (log-log scale). Each relationship follows a smooth power law : 
       a straight line on log-log axes. Adapted from Kaplan et al. (2020).
     </p>
 
@@ -1337,13 +1337,13 @@ const math = {
       Understanding scaling explains why a 70B model handles nuanced
       political text better than a 7B model, why API costs differ by
       orders of magnitude, and why model choice is a research design
-      decision&mdash;not just a technical one.
+      decision: not just a technical one.
     </p>
 
     <h3>Implications for Model Development</h3>
     <p>
       Scaling laws drove the race from GPT-2 (1.5B) to GPT-3 (175B) to
-      frontier models with hundreds of billions of dense parameters&mdash;or,
+      frontier models with hundreds of billions of dense parameters: or,
       in mixture-of-experts architectures, over a trillion total. Each generation
       validated the power-law prediction: more scale, better loss.
     </p>
@@ -1355,7 +1355,7 @@ const math = {
     </p>
     <p>
       <a href="https://arxiv.org/abs/2203.15556" target="_blank" rel="noopener">Hoffmann et al. (2022)</a>
-      showed that most early large models were <em>undertrained</em>&mdash;balancing
+      showed that most early large models were <em>undertrained</em>: balancing
       model size and training data matters as much as raw scale. This insight
       reshaped how training budgets are allocated.
     </p>
@@ -1363,7 +1363,7 @@ const math = {
       These constraints are pushing the field toward complementary strategies:
       better data curation, improved architectures, reasoning-focused
       training (reinforcement learning from human feedback), and a
-      fundamentally different approach&mdash;<strong>test-time compute
+      fundamentally different approach: <strong>test-time compute
       scaling</strong>: spending more compute at inference rather than
       training.
     </p>
@@ -1374,7 +1374,7 @@ const math = {
       </svg>
       <p>
         <strong>Coming in Day 2:</strong> We explore
-        <strong>test-time compute scaling</strong>&mdash;using prompting
+        <strong>test-time compute scaling</strong>: using prompting
         strategies like chain-of-thought reasoning to extract more capability
         at inference. This represents a fundamental shift: instead of only
         scaling <em>training</em>, we can also scale <em>thinking</em>.
@@ -1406,7 +1406,7 @@ const math = {
             human feedback (RLHF), constitutional AI, and reasoning-focused
             training. <strong>Test-time compute</strong>: chain-of-thought
             prompting, self-consistency, and tree search let models "think
-            longer" at inference&mdash;a form of scaling that does not require
+            longer" at inference: a form of scaling that does not require
             retraining.
           </p>
         </div>
@@ -1420,7 +1420,7 @@ const math = {
         practical tool for forecasting. They tell us <em>why</em> larger
         models are better, <em>how much</em> better they will be, and
         <em>when</em> pure scaling hits diminishing returns. For social
-        scientists, this means model choice is not arbitrary&mdash;it is
+        scientists, this means model choice is not arbitrary: it is
         a design decision with predictable consequences for task performance,
         cost, and capability.
       </p>
@@ -1428,13 +1428,13 @@ const math = {
 
     <h3>Resources</h3>
     <ul class="resource-list">
-      <li><a href="https://arxiv.org/abs/2001.08361" target="_blank" rel="noopener">Kaplan et al. (2020), <em>Scaling Laws for Neural Language Models</em></a> &mdash; quantified the power-law relationships between compute, data, parameters, and loss. The paper that turned scaling into a predictive science.</li>
-      <li><a href="https://arxiv.org/abs/2203.15556" target="_blank" rel="noopener">Hoffmann et al. (2022), <em>Training Compute-Optimal Large Language Models</em></a> &mdash; showed that optimal scaling requires balancing model size and training data. Essential reading for understanding modern training decisions.</li>
+      <li><a href="https://arxiv.org/abs/2001.08361" target="_blank" rel="noopener">Kaplan et al. (2020), <em>Scaling Laws for Neural Language Models</em></a>: quantified the power-law relationships between compute, data, parameters, and loss. The paper that turned scaling into a predictive science.</li>
+      <li><a href="https://arxiv.org/abs/2203.15556" target="_blank" rel="noopener">Hoffmann et al. (2022), <em>Training Compute-Optimal Large Language Models</em></a>: showed that optimal scaling requires balancing model size and training data. Essential reading for understanding modern training decisions.</li>
     </ul>
   </section>
 
   <!-- ===================================================================
-       SECTION 7 — SOCIAL SCIENCE APPLICATIONS
+       SECTION 7: SOCIAL SCIENCE APPLICATIONS
        =================================================================== -->
   <section id="social-science">
     <h2>Social Science Applications</h2>
@@ -1443,7 +1443,7 @@ const math = {
       They have direct, substantive applications in social science research.
       This section highlights key papers that demonstrate how word embeddings,
       language models, and the Transformer architecture open new research
-      possibilities&mdash;and introduce new methodological challenges.
+      possibilities: and introduce new methodological challenges.
     </p>
 
     <h3>Bias Detection in Word Embeddings</h3>
@@ -1463,7 +1463,7 @@ const math = {
         <a href="https://www.science.org/doi/10.1126/science.aal4230" target="_blank" rel="noopener"><em>Semantics derived automatically from language corpora contain human-like biases.</em></a>
         Science. Demonstrated that word embeddings replicate a wide range
         of implicit biases measured in humans via the Implicit Association
-        Test (IAT)&mdash;including
+        Test (IAT): including
         associations between European-American names and pleasant words, and
         between African-American names and unpleasant words. This paper
         established that embedding geometry is a lens for studying culture.
@@ -1479,7 +1479,7 @@ const math = {
         <a href="https://www.pnas.org/doi/10.1073/pnas.1720347115" target="_blank" rel="noopener"><em>Word Embeddings Quantify 100 Years of Gender and Ethnic Stereotypes.</em></a>
         PNAS. By training embeddings on text from each decade of the 20th
         century, they tracked how gender and ethnic stereotypes in American
-        English evolved over time&mdash;a computational history of bias that
+        English evolved over time: a computational history of bias that
         aligns with known social changes.
       </p>
     </div>
@@ -1516,8 +1516,8 @@ const math = {
         and data control require access to open-source models. When a model
         is a black box controlled by a company, researchers cannot fully
         understand or verify their instrument. This paper connects the
-        architectural foundations we have studied&mdash;pre-training data,
-        model weights, tokenization&mdash;to fundamental questions of
+        architectural foundations we have studied: pre-training data,
+        model weights, tokenization: to fundamental questions of
         scientific integrity.
       </p>
     </div>
@@ -1543,8 +1543,8 @@ const math = {
     <div class="key-takeaway">
       <p class="key-takeaway__label">Key Takeaway</p>
       <p>
-        The foundations covered in this module&mdash;embeddings, tokenization,
-        language modeling, attention, and scaling&mdash;are not just technical
+        The foundations covered in this module: embeddings, tokenization,
+        language modeling, attention, and scaling: are not just technical
         prerequisites. They are the building blocks of a new research
         methodology. Understanding how models represent and process language
         is essential for using them responsibly as instruments of social
@@ -1573,12 +1573,12 @@ const math = {
         [0.05, 0.10, 0.08, 0.07, 0.50, 0.20]
       ],
       insights: [
-        "\"I\" attends to itself and the verb \"sat\" — establishing the subject.",
-        "\"sat\" attends to its subject \"I\" and the destination \"bank\" — connecting actor to location.",
-        "\"by\" attends to the nearby nouns \"the\" and \"river\" — preposition links to its object.",
-        "\"the\" attends strongly to \"river\" — the determiner knows which noun it modifies.",
-        "\"river\" attends strongly to \"bank\" — the model links these semantically related words.",
-        "\"bank\" attends strongly to \"river\" — context resolves this as a river bank, not a financial one."
+        "\"I\" attends to itself and the verb \"sat\": establishing the subject.",
+        "\"sat\" attends to its subject \"I\" and the destination \"bank\": connecting actor to location.",
+        "\"by\" attends to the nearby nouns \"the\" and \"river\": preposition links to its object.",
+        "\"the\" attends strongly to \"river\": the determiner knows which noun it modifies.",
+        "\"river\" attends strongly to \"bank\": the model links these semantically related words.",
+        "\"bank\" attends strongly to \"river\": context resolves this as a river bank, not a financial one."
       ]
     },
     {
@@ -1594,14 +1594,14 @@ const math = {
         [0.06, 0.08, 0.05, 0.04, 0.32, 0.05, 0.28, 0.12]
       ],
       insights: [
-        "\"I\" attends to itself and \"went\" — the subject anchors to its verb.",
+        "\"I\" attends to itself and \"went\": the subject anchors to its verb.",
         "\"went\" spreads attention across purpose words: \"deposit\" and \"money.\"",
-        "\"to\" attends strongly to \"bank\" — the preposition links to its destination.",
-        "\"the\" attends strongly to \"bank\" — the determiner locks onto its noun.",
-        "\"bank\" attends to \"deposit\" and \"money\" — context resolves this as a financial bank.",
-        "\"to\" (second) attends strongly to \"deposit\" — this preposition links to the action.",
-        "\"deposit\" attends to \"money\" and \"bank\" — the verb connects to its object and location.",
-        "\"money\" attends to \"bank\" and \"deposit\" — the object connects to action and place."
+        "\"to\" attends strongly to \"bank\": the preposition links to its destination.",
+        "\"the\" attends strongly to \"bank\": the determiner locks onto its noun.",
+        "\"bank\" attends to \"deposit\" and \"money\": context resolves this as a financial bank.",
+        "\"to\" (second) attends strongly to \"deposit\": this preposition links to the action.",
+        "\"deposit\" attends to \"money\" and \"bank\": the verb connects to its object and location.",
+        "\"money\" attends to \"bank\" and \"deposit\": the object connects to action and place."
       ]
     }
   ];

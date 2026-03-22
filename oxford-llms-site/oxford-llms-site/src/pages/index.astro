@@ -6,7 +6,7 @@ import LogoMark from '../components/LogoMark.astro';
 
 <Base title="Oxford LLMs">
 
-  <!-- HERO — on plain white -->
+  <!-- HERO: on plain white -->
   <section class="hero">
     <div class="container">
       <LogoMark size={52} className="hero__logo" />
@@ -20,15 +20,15 @@ import LogoMark from '../components/LogoMark.astro';
   <!-- Blend: white → tint -->
   <div class="blend-to-tint"></div>
 
-  <!-- THREE PILLARS — on tinted background -->
+  <!-- THREE PILLARS: on tinted background -->
   <section class="section-tinted" style="padding: var(--sp-6) 0;">
     <div class="container">
       <div class="grid-3">
         <a href="/research/" class="card card--accent-1 card--pillar">
           <h3 class="card__title">Research</h3>
           <p class="card__text">
-            ICML submission under review. NeurIPS and EMNLP papers in progress.
-            Synthetic sampling methods for LLM-based opinion prediction.
+            New methods for LLMs in social science: synthetic data, opinion prediction, and model evaluation.
+            Some work is ongoing; other projects are completed and are being peer-reviewed.
           </p>
           <span class="card__link">View papers →</span>
         </a>
@@ -57,19 +57,19 @@ import LogoMark from '../components/LogoMark.astro';
   <!-- Blend: tint → white -->
   <div class="blend-to-white"></div>
 
-  <!-- UPCOMING — on plain white -->
+  <!-- UPCOMING: on plain white -->
   <section class="section-plain" style="padding: var(--sp-6) 0;">
     <div class="container">
       <p class="section-label">Upcoming</p>
       <div class="grid-2">
         <div class="card card--accent-2">
           <span class="tag tag--2">Course</span>
-          <h3 class="card__title" style="margin-top: var(--sp-3);">Oxford — Mar 23–27, 2026</h3>
+          <h3 class="card__title" style="margin-top: var(--sp-3);">Oxford, Mar 23–27, 2026</h3>
           <p class="card__text">5-day intensive on LLMs for social science. DPIR, University of Oxford.</p>
         </div>
         <div class="card card--accent-4">
           <span class="tag tag--4">Apply</span>
-          <h3 class="card__title" style="margin-top: var(--sp-3);">Summer School — Applications open Apr 10</h3>
+          <h3 class="card__title" style="margin-top: var(--sp-3);">Summer School: Applications open Apr 10</h3>
           <p class="card__text">Five days at Nuffield College. Join the third cohort of early-career researchers.</p>
         </div>
       </div>
@@ -79,7 +79,7 @@ import LogoMark from '../components/LogoMark.astro';
   <!-- Blend: white → tint -->
   <div class="blend-to-tint"></div>
 
-  <!-- STATS — on tinted background -->
+  <!-- STATS: on tinted background -->
   <section class="section-tinted" style="padding: var(--sp-6) 0;">
     <div class="container">
       <div class="stats card--accent-2">
@@ -106,77 +106,75 @@ import LogoMark from '../components/LogoMark.astro';
   <!-- Blend: tint → white -->
   <div class="blend-to-white"></div>
 
-  <!-- PARTNERS — on plain white -->
+  <!-- PARTNERS: on plain white -->
   <section class="section-plain" style="padding: var(--sp-5) 0 var(--sp-4);">
     <div class="container">
       <Partners />
     </div>
   </section>
 
-  <!-- Footer gradient: white → deepest blue, compressed at bottom -->
-  <div class="footer-gradient">
-    <footer class="footer">
-      <div class="container footer__inner">
-        <div class="footer__left">
-          <img src="/img/logo/logo_mark_silver.png" alt="" class="footer__logo" />
-          <span class="footer__copy">&copy; 2026 Oxford LLMs</span>
-        </div>
-        <ul class="footer__links">
-          <li>
-            <a
-              href="https://github.com/Oxford-LLMs-Research"
-              class="footer__link footer__link--icon"
-              target="_blank"
-              rel="noopener"
-              aria-label="Oxford LLMs on GitHub"
-            >
-              <img src="/img/icons/github-mark.svg" alt="GitHub" class="footer__icon-image footer__icon-image--github" />
-            </a>
-          </li>
-          <li>
-            <a
-              href="https://huggingface.co/oxford-llms"
-              class="footer__link footer__link--icon"
-              target="_blank"
-              rel="noopener"
-              aria-label="Oxford LLMs on Hugging Face"
-            >
-              <img src="/img/icons/hf-logo.svg" alt="Hugging Face" class="footer__icon-image footer__icon-image--hf" />
-            </a>
-          </li>
-          <li>
-            <a
-              href="mailto:maksim.zubok@nuffield.ox.ac.uk"
-              class="footer__link footer__link--icon"
-              aria-label="Email Oxford LLMs"
-            >
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <rect
-                  x="4"
-                  y="7"
-                  width="16"
-                  height="10"
-                  rx="2"
-                  ry="2"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.4"
-                />
-                <path
-                  d="M5 8.5L12 13l7-4.5"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.4"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-              </svg>
-            </a>
-          </li>
-        </ul>
+  <hr class="footer-rule" aria-hidden="true" />
+  <footer class="footer footer--home">
+    <div class="container footer__inner">
+      <div class="footer__left">
+        <img src="/img/logo/logo_mark_silver.png" alt="" class="footer__logo" />
+        <span class="footer__copy">&copy; 2026 Oxford LLMs</span>
       </div>
-    </footer>
-  </div>
+      <ul class="footer__links">
+        <li>
+          <a
+            href="https://github.com/Oxford-LLMs-Research"
+            class="footer__link footer__link--icon"
+            target="_blank"
+            rel="noopener"
+            aria-label="Oxford LLMs on GitHub"
+          >
+            <img src="/img/icons/github-mark.svg" alt="GitHub" class="footer__icon-image footer__icon-image--github" />
+          </a>
+        </li>
+        <li>
+          <a
+            href="https://huggingface.co/oxford-llms"
+            class="footer__link footer__link--icon"
+            target="_blank"
+            rel="noopener"
+            aria-label="Oxford LLMs on Hugging Face"
+          >
+            <img src="/img/icons/hf-logo.svg" alt="Hugging Face" class="footer__icon-image footer__icon-image--hf" />
+          </a>
+        </li>
+        <li>
+          <a
+            href="mailto:maksim.zubok@nuffield.ox.ac.uk"
+            class="footer__link footer__link--icon"
+            aria-label="Email Oxford LLMs"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <rect
+                x="4"
+                y="7"
+                width="16"
+                height="10"
+                rx="2"
+                ry="2"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.4"
+              />
+              <path
+                d="M5 8.5L12 13l7-4.5"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.4"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </footer>
 
 </Base>
 
