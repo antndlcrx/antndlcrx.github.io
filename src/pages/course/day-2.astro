@@ -6,17 +6,7 @@ const sections = [
   { id: 'prompting', label: 'Prompting' },
   { id: 'reasoning', label: 'Reasoning' },
   { id: 'evaluating', label: 'Evaluating & Choosing Models' },
-  { id: 'social-science', label: 'Social Science Applications' },
 ];
-
-const math = {
-  rlhfObjective: String.raw`$$\max_{\pi} \; \mathbb{E}_{x \sim \mathcal{D},\; y \sim \pi(\cdot|x)}\!\left[r(x, y)\right] - \beta \, \text{KL}\!\left[\pi(\cdot|x) \;\|\; \pi_{\text{ref}}(\cdot|x)\right]$$`,
-  rlhfCaption: String.raw`The policy $\pi$ is trained to maximise expected reward $r(x, y)$ while staying close to the reference policy $\pi_{\text{ref}}$ (the SFT model). The coefficient $\beta$ controls how strongly the model is penalised for deviating from the reference policy: keeping generations close to the SFT model's distribution and preventing degenerate outputs.`,
-  dpoLoss: String.raw`$$\mathcal{L}_{\text{DPO}}(\pi_\theta) = -\mathbb{E}_{(x,\, y_w,\, y_l)}\!\left[\log \sigma\!\left(\beta \log \frac{\pi_\theta(y_w \mid x)}{\pi_{\text{ref}}(y_w \mid x)} - \beta \log \frac{\pi_\theta(y_l \mid x)}{\pi_{\text{ref}}(y_l \mid x)}\right)\right]$$`,
-  dpoCaption: String.raw`DPO directly increases the probability of the preferred response $y_w$ relative to the dispreferred $y_l$, each measured against the reference model. The language model itself serves as an implicit reward model: no separate reward model is needed.`,
-  perplexity: String.raw`$$\text{PPL}(X) = \exp\!\left(-\frac{1}{T}\sum_{t=1}^{T} \log P(x_t \mid x_{\lt t})\right)$$`,
-  perplexityCaption: String.raw`Lower perplexity means the model predicts the text more confidently. A perplexity of $k$ means the model is, on average, as uncertain as choosing uniformly among $k$ options.`,
-};
 ---
 
 <CourseLayout
@@ -34,7 +24,7 @@ const math = {
     <p>
       In <a href="/course/day-1">Day 1</a>, we built the core loop of a
       language model: tokenize, embed, attend, predict. We saw that a base
-      model generates fluent text: but it just completes whatever you
+      model generates fluent text, but it just completes whatever you
       give it. Ask it to classify a tweet, and it writes another tweet. It is
       not being uncooperative; it was trained to predict the next token, so
       that is exactly what it does.
@@ -103,7 +93,7 @@ const math = {
         <text x="647" y="55" text-anchor="middle" fill="white" style="font-family: var(--font-body);" font-size="11" font-weight="600">Aligned</text>
         <text x="647" y="71" text-anchor="middle" fill="white" style="font-family: var(--font-body);" font-size="11" font-weight="600">Assistant</text>
 
-        <!-- Behaviour labels (what changes) -->
+        <!-- Behaviour labels -->
         <text x="65" y="110" text-anchor="middle" style="fill: var(--text-muted, #6B7280); font-family: var(--font-body);" font-size="9">Next-token predictor</text>
         <text x="220" y="110" text-anchor="middle" style="fill: var(--text-muted, #6B7280); font-family: var(--font-body);" font-size="9">Follows instructions</text>
         <text x="375" y="110" text-anchor="middle" style="fill: var(--text-muted, #6B7280); font-family: var(--font-body);" font-size="9">Prefers better answers</text>
@@ -119,7 +109,7 @@ const math = {
         The post-training pipeline. Each stage builds on the previous one
         and uses different training data (shown in blue below each box). Not
         every model follows this exact sequence: some combine stages or
-        use variants: but the general pattern is consistent across major
+        use variants, but the general pattern is consistent across major
         model families. Illustrative diagram.
       </p>
     </div>
@@ -127,251 +117,76 @@ const math = {
     <h3>Supervised Fine-Tuning (SFT)</h3>
     <p>
       The first stage: show the model curated
-      <strong>(instruction, response)</strong> pairs: from as few as
-      hundreds to hundreds of thousands: and train it to imitate
+      <strong>(instruction, response)</strong> pairs and train it to imitate
       the responses. This is analogous to giving someone a style guide with
       worked examples: <em>&ldquo;when asked X, respond like Y.&rdquo;</em>
     </p>
-
-    <div class="definition-box">
-      <p class="definition-box__label">Definition</p>
-      <p class="definition-box__term">Supervised Fine-Tuning (SFT)</p>
-      <p>
-        Training a pretrained model on curated (instruction, response) pairs
-        so it learns to produce task-oriented responses instead of open-ended
-        text completions. SFT teaches the model the <em>format</em> of helpful
-        behaviour: how to structure answers, when to ask for clarification,
-        and how to handle different request types.
-      </p>
-    </div>
-
     <p>
       After SFT, the model can follow instructions and produce formatted
       responses. But it has only a limited sense of which valid response is
-      <em>better</em> than another: it has learned from high-quality
+      <em>better</em> than another. It has learned from high-quality
       demonstrations, but it cannot reliably distinguish between two
       on-topic responses that differ in subtle quality dimensions like
-      depth, accuracy, or nuance. Something more is needed to teach
-      fine-grained quality discrimination.
+      depth, accuracy, or nuance.
     </p>
 
-    <h3>Reward Modeling &amp; RLHF</h3>
+    <h3>Preference Optimization: Teaching Quality</h3>
     <p>
-      The key idea behind Reinforcement Learning from Human Feedback (RLHF):
-      let humans define &ldquo;quality&rdquo; by <strong>comparing pairs of
-      model outputs</strong>. For a given prompt, the model generates two
-      responses. A human annotator decides which is better. This preference
-      data is then used to train a <strong>reward model</strong>: a
-      separate neural network that predicts how much a human would prefer a
-      given response.
+      The key idea: let humans define &ldquo;quality&rdquo; by
+      <strong>comparing pairs of model outputs</strong>. For a given prompt,
+      the model generates two responses. A human annotator decides which is
+      better. This preference data is then used to train the model to
+      favour responses that humans prefer.
     </p>
-
-    <div class="definition-box">
-      <p class="definition-box__label">Definition</p>
-      <p class="definition-box__term">RLHF (Reinforcement Learning from Human Feedback)</p>
-      <p>
-        A training procedure where human preference judgments are distilled
-        into a reward model, which is then used to optimise the language model
-        via reinforcement learning (typically PPO). The model learns to produce
-        responses that score highly on the reward model while remaining close
-        to the original SFT model.
-      </p>
-    </div>
-
     <p>
-      Once the reward model is trained, the language model is optimised using
-      Proximal Policy Optimization (PPO) to produce responses that score
-      highly. But there is a critical constraint: the optimised model must
-      not stray too far from the SFT model. Without this constraint, the
-      model could discover degenerate strategies that exploit the reward
-      model: producing high-scoring but nonsensical text. The KL
-      divergence penalty prevents this.
+      Two main approaches exist. <strong>RLHF</strong> (Reinforcement
+      Learning from Human Feedback) trains a separate reward model on the
+      preference data, then uses reinforcement learning to optimise the
+      language model against that reward. <strong>DPO</strong> (Direct
+      Preference Optimization) skips the reward model entirely: it directly
+      optimises the language model on the preference pairs. DPO tends to
+      produce comparable results with simpler training infrastructure, and
+      is used by many recent open models including Llama 3 and Qwen 2.5.
     </p>
-
-    <div class="formula-block">
-      <p set:html={math.rlhfObjective} />
-      <p class="formula-block__caption" set:html={math.rlhfCaption} />
-    </div>
-
-    <!-- RLHF architecture diagram -->
-    <div class="visual-diagram">
-      <svg viewBox="0 0 560 310" style="width: 100%; max-width: 560px; display: block; margin: 0 auto;" role="img" aria-label="RLHF architecture showing two models and training loop">
-        <defs>
-          <marker id="arrow-rlhf" viewBox="0 0 10 7" refX="10" refY="3.5" markerWidth="8" markerHeight="6" orient="auto-start-reverse">
-            <path d="M 0 0 L 10 3.5 L 0 7 z" style="fill: var(--accent, #2D8ABF);"/>
-          </marker>
-          <marker id="arrow-rlhf-muted" viewBox="0 0 10 7" refX="10" refY="3.5" markerWidth="8" markerHeight="6" orient="auto-start-reverse">
-            <path d="M 0 0 L 10 3.5 L 0 7 z" style="fill: var(--text-muted, #6B7280);"/>
-          </marker>
-        </defs>
-
-        <!-- Phase labels -->
-        <text x="12" y="16" style="fill: var(--text-muted, #6B7280); font-family: var(--font-body);" font-size="9" font-weight="600" text-transform="uppercase">PHASE 1: COLLECT PREFERENCES</text>
-        <line x1="10" y1="22" x2="240" y2="22" style="stroke: var(--border, #E2E6EE);" stroke-width="1"/>
-        <text x="290" y="16" style="fill: var(--text-muted, #6B7280); font-family: var(--font-body);" font-size="9" font-weight="600" text-transform="uppercase">PHASE 2: OPTIMISE POLICY</text>
-        <line x1="288" y1="22" x2="548" y2="22" style="stroke: var(--border, #E2E6EE);" stroke-width="1"/>
-
-        <!-- Human annotators -->
-        <rect x="12" y="32" width="106" height="52" rx="6" style="fill: var(--surface, #F2F4F8); stroke: var(--border, #E2E6EE);" stroke-width="1.5"/>
-        <text x="65" y="54" text-anchor="middle" style="fill: var(--text, #1A1D27); font-family: var(--font-body);" font-size="10" font-weight="600">Human</text>
-        <text x="65" y="68" text-anchor="middle" style="fill: var(--text, #1A1D27); font-family: var(--font-body);" font-size="10" font-weight="600">Annotators</text>
-        <text x="65" y="100" text-anchor="middle" style="fill: var(--text-muted, #6B7280); font-family: var(--font-body);" font-size="8" font-style="italic">Compare response pairs:</text>
-        <text x="65" y="112" text-anchor="middle" style="fill: var(--text-muted, #6B7280); font-family: var(--font-body);" font-size="8" font-style="italic">&ldquo;A is better than B&rdquo;</text>
-
-        <!-- Arrow from annotators to reward model -->
-        <line x1="121" y1="58" x2="148" y2="58" style="stroke: var(--accent, #2D8ABF);" stroke-width="1.5" marker-end="url(#arrow-rlhf)"/>
-
-        <!-- Reward model (distinct entity) -->
-        <rect x="153" y="32" width="130" height="52" rx="6" style="fill: var(--blue-9, #E6F0FA); stroke: var(--accent, #2D8ABF);" stroke-width="1.5" stroke-dasharray="5,3"/>
-        <text x="218" y="52" text-anchor="middle" style="fill: var(--accent-dark, #1E5A8A); font-family: var(--font-body);" font-size="11" font-weight="700">Reward Model</text>
-        <text x="218" y="67" text-anchor="middle" style="fill: var(--text-sec, #3D4455); font-family: var(--font-body);" font-size="8">Separate neural network</text>
-        <text x="218" y="79" text-anchor="middle" style="fill: var(--text-sec, #3D4455); font-family: var(--font-body);" font-size="8">predicts r(x, y)</text>
-        <text x="218" y="100" text-anchor="middle" style="fill: var(--text-muted, #6B7280); font-family: var(--font-body);" font-size="8" font-style="italic">Trained on preference</text>
-        <text x="218" y="112" text-anchor="middle" style="fill: var(--text-muted, #6B7280); font-family: var(--font-body);" font-size="8" font-style="italic">data, then frozen</text>
-
-        <!-- Policy model (the LM being optimised) -->
-        <rect x="300" y="32" width="130" height="52" rx="6" style="fill: var(--accent, #2D8ABF); stroke: var(--accent-dark, #1E5A8A);" stroke-width="1.5"/>
-        <text x="365" y="52" text-anchor="middle" fill="white" style="font-family: var(--font-body);" font-size="11" font-weight="700">Policy Model</text>
-        <text x="365" y="67" text-anchor="middle" fill="white" style="font-family: var(--font-body);" font-size="8" opacity="0.85">The LM being optimised</text>
-        <text x="365" y="79" text-anchor="middle" fill="white" style="font-family: var(--font-body);" font-size="8" opacity="0.85">via PPO</text>
-
-        <!-- Reference model (faded) -->
-        <rect x="440" y="32" width="108" height="52" rx="6" style="fill: var(--surface, #F2F4F8); stroke: var(--border, #E2E6EE);" stroke-width="1.5"/>
-        <text x="494" y="49" text-anchor="middle" style="fill: var(--text-muted, #6B7280); font-family: var(--font-body);" font-size="9" font-weight="600">Reference</text>
-        <text x="494" y="62" text-anchor="middle" style="fill: var(--text-muted, #6B7280); font-family: var(--font-body);" font-size="9" font-weight="600">Model (frozen)</text>
-        <text x="494" y="76" text-anchor="middle" style="fill: var(--text-muted, #6B7280); font-family: var(--font-body);" font-size="7.5" font-style="italic">SFT checkpoint</text>
-
-        <!-- The training loop (bottom half) -->
-        <!-- Step 1: Policy generates response -->
-        <rect x="40" y="150" width="145" height="48" rx="5" style="fill: var(--blue-9, #E6F0FA); stroke: var(--accent, #2D8ABF);" stroke-width="1"/>
-        <text x="112" y="170" text-anchor="middle" style="fill: var(--accent-dark, #1E5A8A); font-family: var(--font-body);" font-size="9" font-weight="700">1. GENERATE</text>
-        <text x="112" y="184" text-anchor="middle" style="fill: var(--text-sec, #3D4455); font-family: var(--font-body);" font-size="8">Policy produces response y</text>
-
-        <!-- Arrow: generate -> score -->
-        <line x1="188" y1="174" x2="215" y2="174" style="stroke: var(--accent, #2D8ABF);" stroke-width="1.5" marker-end="url(#arrow-rlhf)"/>
-
-        <!-- Step 2: Reward model scores -->
-        <rect x="220" y="150" width="135" height="48" rx="5" style="fill: var(--blue-9, #E6F0FA); stroke: var(--accent, #2D8ABF);" stroke-width="1"/>
-        <text x="287" y="170" text-anchor="middle" style="fill: var(--accent-dark, #1E5A8A); font-family: var(--font-body);" font-size="9" font-weight="700">2. SCORE</text>
-        <text x="287" y="184" text-anchor="middle" style="fill: var(--text-sec, #3D4455); font-family: var(--font-body);" font-size="8">Reward model computes r(x, y)</text>
-
-        <!-- Arrow: score -> update -->
-        <line x1="358" y1="174" x2="385" y2="174" style="stroke: var(--accent, #2D8ABF);" stroke-width="1.5" marker-end="url(#arrow-rlhf)"/>
-
-        <!-- Step 3: PPO update -->
-        <rect x="390" y="150" width="148" height="48" rx="5" style="fill: var(--blue-8, #C4DCEF); stroke: var(--accent, #2D8ABF);" stroke-width="1"/>
-        <text x="464" y="170" text-anchor="middle" style="fill: var(--accent-dark, #1E5A8A); font-family: var(--font-body);" font-size="9" font-weight="700">3. UPDATE POLICY</text>
-        <text x="464" y="184" text-anchor="middle" style="fill: var(--text-sec, #3D4455); font-family: var(--font-body);" font-size="8">PPO: max reward &minus; &beta; &middot; KL</text>
-
-        <!-- Connection lines from top models to bottom loop -->
-        <line x1="365" y1="84" x2="112" y2="147" style="stroke: var(--text-muted, #6B7280);" stroke-width="1" stroke-dasharray="3,3" marker-end="url(#arrow-rlhf-muted)"/>
-        <line x1="218" y1="84" x2="287" y2="147" style="stroke: var(--text-muted, #6B7280);" stroke-width="1" stroke-dasharray="3,3" marker-end="url(#arrow-rlhf-muted)"/>
-        <line x1="494" y1="84" x2="464" y2="147" style="stroke: var(--text-muted, #6B7280);" stroke-width="1" stroke-dasharray="3,3" marker-end="url(#arrow-rlhf-muted)"/>
-
-        <!-- Feedback loop arrow -->
-        <path d="M 464 201 L 464 225 Q 464 240 449 240 L 127 240 Q 112 240 112 225 L 112 201" fill="none" style="stroke: var(--accent, #2D8ABF);" stroke-width="1.5" stroke-dasharray="6,3" marker-end="url(#arrow-rlhf)"/>
-        <text x="288" y="258" text-anchor="middle" style="fill: var(--text-muted, #6B7280); font-family: var(--font-body);" font-size="8.5" font-style="italic">Iterate: generate new responses, score, update weights</text>
-
-        <!-- KL constraint annotation -->
-        <rect x="375" y="272" width="175" height="28" rx="4" style="fill: var(--surface, #F2F4F8); stroke: var(--border, #E2E6EE);" stroke-width="1"/>
-        <text x="462" y="290" text-anchor="middle" style="fill: var(--text-sec, #3D4455); font-family: var(--font-body);" font-size="8">KL(&pi; || &pi;<tspan baseline-shift="sub" font-size="6">ref</tspan>) keeps policy near SFT</text>
-      </svg>
-      <p class="visual-diagram__caption">
-        The RLHF architecture. Two separate neural networks interact: the
-        <strong>reward model</strong> (trained once on human preferences, then
-        frozen) scores responses, while <strong>PPO</strong> updates the
-        policy model to maximise reward. The <strong>reference model</strong>
-        (a frozen copy of the SFT checkpoint) provides the KL constraint
-        that prevents the policy from producing degenerate, high-scoring
-        text. Illustrative diagram.
-      </p>
-    </div>
-
     <p>
-      The RLHF framework was developed by
-      <a href="https://arxiv.org/abs/1706.03741" target="_blank" rel="noopener">Christiano et al. (2017)</a>
-      for general reinforcement learning and adapted for language models by
-      <a href="https://arxiv.org/abs/2203.02155" target="_blank" rel="noopener">Ouyang et al. (2022)</a>
-      in the InstructGPT paper. The core innovation was showing that relatively
-      modest amounts of human preference data: tens of thousands of
-      comparisons, not millions: could dramatically improve model
-      behaviour.
+      In both approaches, the optimised model must stay close to the SFT
+      model. Without this constraint, the model could discover degenerate
+      strategies that exploit the preference signal: producing
+      high-scoring but nonsensical text. The mathematical mechanism differs
+      (a KL divergence penalty in RLHF, an implicit constraint in DPO),
+      but the purpose is the same: keep the model useful while improving
+      quality.
     </p>
 
-    <h3>Direct Preference Optimization (DPO)</h3>
-    <p>
-      <a href="https://arxiv.org/abs/2305.18290" target="_blank" rel="noopener">Rafailov et al. (2023)</a>
-      showed that the separate reward model in RLHF is not strictly necessary.
-      Their key insight: the language model itself can serve as an implicit
-      reward model. DPO directly optimises the model on preference pairs
-      without training a separate reward model or running an RL loop.
-    </p>
-
-    <div class="definition-box">
-      <p class="definition-box__label">Definition</p>
-      <p class="definition-box__term">Direct Preference Optimization (DPO)</p>
-      <p>
-        A training method that aligns a language model with human preferences
-        by directly optimising on pairs of preferred and dispreferred
-        responses, without training a separate reward model. DPO achieves
-        comparable results to RLHF with simpler training infrastructure.
-      </p>
-    </div>
-
-    <div class="formula-block">
-      <p set:html={math.dpoLoss} />
-      <p class="formula-block__caption" set:html={math.dpoCaption} />
-    </div>
-
-    <p>
-      <em>Notation note:</em> the DPO loss writes the policy as
-      &pi;<sub>&theta;</sub> to emphasise that &theta; are the parameters
-      being optimised: the same policy written as &pi; in the RLHF
-      objective above.
-    </p>
-
-    <p>
-      In practice, DPO tends to produce results comparable to RLHF with
-      substantially simpler training infrastructure: no reward model
-      to maintain, no RL training loop to stabilise. Many recent open models,
-      including Llama 3 and Qwen 2.5, use DPO or its variants for preference
-      alignment.
-    </p>
+    <!-- PREFERENCE PAIR EXPLORER -->
+    <div id="preference-explorer-root"></div>
 
     <h3>Safety Training &amp; Constitutional AI</h3>
     <p>
-      The final stage of post-training addresses safety: teaching the model
-      when <em>not</em> to comply.
-    </p>
-    <p>
-      <strong>Red-teaming:</strong> human testers deliberately try to elicit
-      harmful outputs (instructions for violence, discriminatory content,
-      private information). The model is then trained to refuse these inputs.
-    </p>
-    <p>
+      The final stage addresses safety: teaching the model when
+      <em>not</em> to comply. <strong>Red-teaming</strong> involves human
+      testers deliberately trying to elicit harmful outputs, and the model
+      is then trained to refuse these inputs.
       <strong>Constitutional AI</strong>
-      (<a href="https://arxiv.org/abs/2212.08073" target="_blank" rel="noopener">Bai et al., 2022</a>):
-      the model critiques its own outputs against a set of written principles
-      (a &ldquo;constitution&rdquo;) and is trained to prefer the self-revised
-      versions. This reduces reliance on human annotators for safety-related
-      feedback.
+      (<a href="https://arxiv.org/abs/2212.08073" target="_blank" rel="noopener">Bai et al., 2022</a>)
+      takes a different approach: the model critiques its own outputs against
+      a set of written principles (a &ldquo;constitution&rdquo;) and is
+      trained to prefer the self-revised versions, reducing reliance on
+      human annotators for safety feedback.
     </p>
     <p>
       Safety training introduces an <strong>alignment tax</strong>: the model
       may become overly cautious, refusing benign requests that superficially
       resemble harmful ones. For researchers, this manifests as models declining
-      to engage with sensitive topics: even when the research purpose is
-      legitimate. Understanding this trade-off helps diagnose unexpected
-      refusals in research workflows.
+      to engage with sensitive topics even when the research purpose is
+      legitimate.
     </p>
 
     <h3>What Post-Training Changes (And What It Doesn&rsquo;t)</h3>
     <p>
       Post-training primarily reshapes <em>behaviour</em> rather than
-      adding <em>knowledge</em>. The vast majority of the model&rsquo;s
-      factual knowledge, language capabilities, and reasoning patterns come
-      from pre-training. If the base model has weak coverage of a domain,
-      post-training alone is unlikely to fill that gap: the instruct
+      adding <em>knowledge</em>. If the base model has weak coverage of a
+      domain, post-training alone is unlikely to fill that gap: the instruct
       version will just express its ignorance more politely, or (worse)
       confabulate an answer more convincingly.
     </p>
@@ -381,15 +196,12 @@ const math = {
       <p class="definition-box__term">Hallucination (Confabulation)</p>
       <p>
         The generation of confident, well-structured text that is factually
-        incorrect, unsupported, or fabricated. Language models do not
-        &ldquo;know&rdquo; whether their outputs are true: they
-        produce text that is statistically plausible given the context.
-        Post-training can make hallucinations <em>more</em> dangerous:
-        RLHF trains the model to produce authoritative-sounding responses,
-        which means fabricated claims may be delivered with the same
-        confidence as accurate ones. For research, this means model outputs
-        should never be treated as ground truth without independent
-        verification.
+        incorrect, unsupported, or fabricated. Post-training can make
+        hallucinations <em>more</em> dangerous: RLHF trains the model to
+        produce authoritative-sounding responses, which means fabricated
+        claims may be delivered with the same confidence as accurate ones.
+        For research, this means model outputs should never be treated as
+        ground truth without independent verification.
       </p>
     </div>
 
@@ -406,9 +218,23 @@ const math = {
       research. RLHF annotators encode their preferences into the reward
       model. The demographic composition of the annotator pool, their cultural
       context, and the guidelines they follow all shape what the model
-      considers a &ldquo;good&rdquo; answer. We return to this in the
-      <a href="#social-science">Social Science Applications</a> section.
+      considers a &ldquo;good&rdquo; answer.
     </p>
+
+    <div class="course-note">
+      <svg class="course-note__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+      </svg>
+      <p>
+        <strong>Santurkar et al. (2023),</strong>
+        <a href="https://arxiv.org/abs/2303.17548" target="_blank" rel="noopener"><em>Whose Opinions Do Language Models Reflect?</em></a>
+        ICML. Demonstrates that RLHF shifts model outputs toward the opinion
+        distributions of specific demographic groups, particularly
+        those overrepresented among annotators. The model&rsquo;s
+        &ldquo;opinions&rdquo; are partly an artifact of whose preferences
+        shaped its training.
+      </p>
+    </div>
 
     <div class="stop-and-think">
       <div class="stop-and-think__header">
@@ -431,7 +257,7 @@ const math = {
             conclusions that align with the annotator pool&rsquo;s views. On
             politically contested topics, it may present one position as more
             &ldquo;balanced&rdquo; or &ldquo;helpful.&rdquo; For social science
-            research, this means the model is not a neutral instrument : 
+            research, this means the model is not a neutral instrument:
             its outputs carry the preferences baked in during alignment. This
             is a form of measurement bias that researchers must account for.
           </p>
@@ -446,8 +272,8 @@ const math = {
       <p>
         <strong>In the notebook:</strong> Exercise 1 puts you in the role of
         an RLHF annotator. You rank pairs of model responses and discover
-        first-hand how subjective &ldquo;better&rdquo; can be : 
-        especially on contested topics like immigration policy or causal
+        first-hand how subjective &ldquo;better&rdquo; can be, especially
+        on contested topics like immigration policy or causal
         inference methodology.
       </p>
     </div>
@@ -460,9 +286,6 @@ const math = {
         <strong>Preference optimization</strong> (RLHF or DPO) teaches
         quality: which responses are better. <strong>Safety
         training</strong> teaches boundaries: when not to respond.
-        In practice these stages interact: SFT data quality affects
-        output quality, and preference optimization can reshape format as
-        well as content: but the separation is a useful mental model.
         These are design choices made by the model provider, and they shape
         every output the model produces in your research.
       </p>
@@ -471,7 +294,6 @@ const math = {
     <h3>Resources</h3>
     <ul class="resource-list">
       <li><a href="https://arxiv.org/abs/2203.02155" target="_blank" rel="noopener">Ouyang et al. (2022), <em>Training Language Models to Follow Instructions with Human Feedback</em></a>: the InstructGPT paper; foundational work on RLHF for language models.</li>
-      <li><a href="https://arxiv.org/abs/1706.03741" target="_blank" rel="noopener">Christiano et al. (2017), <em>Deep Reinforcement Learning from Human Preferences</em></a>: the original RLHF framework that InstructGPT builds upon.</li>
       <li><a href="https://arxiv.org/abs/2305.18290" target="_blank" rel="noopener">Rafailov et al. (2023), <em>Direct Preference Optimization</em></a>: eliminates the need for a separate reward model in preference learning.</li>
       <li><a href="https://arxiv.org/abs/2212.08073" target="_blank" rel="noopener">Bai et al. (2022), <em>Constitutional AI: Harmlessness from AI Feedback</em></a>: Anthropic&rsquo;s approach to scalable safety alignment.</li>
       <li><a href="https://huyenchip.com/2023/05/02/rlhf.html" target="_blank" rel="noopener">Chip Huyen: &ldquo;RLHF: Reinforcement Learning from Human Feedback&rdquo;</a>: accessible technical overview of the full pipeline.</li>
@@ -486,7 +308,7 @@ const math = {
     <h2>Prompting</h2>
     <p>
       Post-training gave us a model that follows instructions. The quality
-      of those instructions: the <strong>prompt</strong>: now
+      of those instructions, the <strong>prompt</strong>, now
       determines the quality of the output. For social scientists, this is
       not just a practical concern. A prompt is a <strong>measurement
       instrument</strong>: it defines what construct you measure, how reliably
@@ -509,177 +331,97 @@ const math = {
       sensitivity, and validate it against known ground truth.
     </p>
 
-    <h3>Zero-Shot Prompting</h3>
-    <p>
-      The simplest approach: describe the task and provide the input, with no
-      examples. The model relies entirely on its pre-trained knowledge and
-      post-training to interpret the request.
-    </p>
-    <p>
-      Zero-shot prompting works well when the task is unambiguous and aligns
-      with the model&rsquo;s training distribution: standard sentiment
-      analysis, language identification, simple factual questions. It tends to
-      struggle with tasks that require a specific interpretation of categories,
-      domain conventions, or nuanced distinctions (such as the difference
-      between stance and sentiment).
-    </p>
-
-    <h3>Few-Shot Prompting &amp; In-Context Learning</h3>
-    <p>
-      A striking property of large language models: they can learn new tasks
-      from a handful of examples provided <em>in the prompt itself</em>.
-      This is <strong>in-context learning</strong>, demonstrated at scale by
-      <a href="https://arxiv.org/abs/2005.14165" target="_blank" rel="noopener">Brown et al. (2020)</a>
-      in the GPT-3 paper.
-    </p>
-    <p>
-      In few-shot prompting, you include labeled examples before the target
-      input. The model infers the classification pattern from these examples
-      and applies it to the new input. This is not fine-tuning: no
-      weights are updated. The model processes the examples as part of its
-      context and adapts its behaviour accordingly.
-    </p>
-
-    <div class="definition-box">
-      <p class="definition-box__label">Definition</p>
-      <p class="definition-box__term">In-Context Learning</p>
+    <div class="course-note">
+      <svg class="course-note__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+      </svg>
       <p>
-        The ability of a language model to adapt its behaviour based on
-        examples provided in the prompt, without any weight updates. The
-        model infers the task from the pattern of input&ndash;output pairs
-        and applies it to new inputs. In-context learning tends to improve
-        with model size: larger models learn from examples more reliably.
+        <strong>Ziems et al. (2024),</strong>
+        <a href="https://arxiv.org/abs/2305.03514" target="_blank" rel="noopener"><em>Can Large Language Models Transform Computational Social Science?</em></a>
+        Computational Linguistics. A comprehensive review that treats prompt
+        design as experimental design. LLMs introduce new validity concerns
+        (prompt sensitivity, model opacity, temporal instability) alongside
+        their capabilities.
       </p>
     </div>
 
+    <h3>Anatomy of a Classification Prompt</h3>
     <p>
-      Key practical considerations for few-shot prompting: balance the
-      examples across classes (do not provide five &ldquo;support&rdquo;
-      examples and one &ldquo;oppose&rdquo; example). Shuffle the order : 
-      models can be sensitive to which class appears last. And keep examples
-      representative of the cases the model will encounter, not just easy ones.
+      A well-designed prompt has distinct structural components, each serving
+      a specific function. The interactive diagram below breaks down a
+      complete classification prompt. Click any highlighted region to see
+      what it does, why it matters, and what happens if you leave it out.
     </p>
 
-    <h3>System Prompts &amp; Role Specification</h3>
+    <!-- PROMPT ANATOMY DIAGRAM -->
+    <div id="prompt-anatomy-root"></div>
+
     <p>
-      Most API-based models accept a <strong>system prompt</strong> that
-      frames the model&rsquo;s identity and behavioural constraints before the
-      user&rsquo;s message. System prompts can set context
-      (&ldquo;You are a political science research assistant&rdquo;), define
-      output format (&ldquo;Always respond with valid JSON&rdquo;), and
-      establish boundaries (&ldquo;Do not provide your own opinion on the
-      topic&rdquo;).
-    </p>
-    <p>
-      For research applications, well-crafted system prompts can improve
-      consistency by anchoring the model&rsquo;s behaviour across many
-      classifications. However, system prompts are not a guarantee : 
-      sufficiently unusual inputs can override them. They are best thought of
-      as strong defaults, not hard constraints.
+      The notebook exercises walk you through building prompts at each
+      level of complexity: zero-shot (just a task description), few-shot
+      (with labeled examples), and chain-of-thought (with reasoning steps).
+      The interactive above shows the fully-specified version. The
+      <em>Minimal</em> toggle shows what you lose when you strip it down.
     </p>
 
-    <h3>Structured Outputs</h3>
-    <p>
-      When building classification pipelines, you need machine-parseable
-      output: not free-form text. <strong>Structured output</strong>
-      means asking the model to respond in a specific format: JSON, XML, or
-      a constrained schema.
-    </p>
-    <p>
-      Larger models comply with formatting instructions more reliably. Smaller
-      models (under ~10B parameters) often produce nearly-valid JSON with small
-      errors: a missing comma, an extra field. Modern APIs from major
-      providers now offer <strong>guaranteed structured output</strong> modes
-      that constrain the model&rsquo;s generation to valid JSON conforming to
-      a provided schema, eliminating parsing failures at the cost of slightly
-      constrained generation.
-    </p>
-
-    <h3>Temperature &amp; Sampling Parameters</h3>
+    <h3>Temperature &amp; Sampling</h3>
     <p>
       Beyond the prompt itself, <strong>sampling parameters</strong> control
       how the model selects tokens from its predicted probability
-      distribution. These settings directly affect output variability and
-      reproducibility.
+      distribution. The most important parameter is
+      <strong>temperature</strong>. Drag the slider below and watch what
+      happens to the distribution over candidate output tokens.
     </p>
 
-    <div class="definition-box">
-      <p class="definition-box__label">Definition</p>
-      <p class="definition-box__term">Temperature</p>
-      <p>
-        A parameter that scales the model&rsquo;s output logits before
-        applying softmax. <strong>Temperature&nbsp;=&nbsp;0</strong> (or
-        near-zero) makes the model deterministic, always selecting the
-        highest-probability token. Higher temperatures flatten the
-        distribution, increasing randomness and diversity. For
-        classification and annotation tasks, low temperature (0&ndash;0.2)
-        is standard to ensure consistent, reproducible outputs.
-      </p>
-    </div>
+    <!-- TEMPERATURE VISUALIZER -->
+    <div id="temperature-viz-root"></div>
 
-    <p>
-      A related parameter, <strong>top-p</strong> (nucleus sampling),
-      restricts token selection to the smallest set whose cumulative
-      probability exceeds a threshold (e.g., 0.95). In practice, most
-      research workflows set temperature to 0 and leave top-p at its
-      default. The key point: <strong>always report your sampling
-      parameters</strong>. A classification study run at temperature 0 and
-      the same study run at temperature 0.7 can produce meaningfully
-      different results, and failing to report this makes replication
-      impossible.
-    </p>
-
-    <h3>Prompt Sensitivity &amp; Reproducibility</h3>
+    <h3>Prompt Sensitivity</h3>
     <p>
       Here is the finding that should concern every social scientist using
       LLMs: <strong>small changes to prompt wording can produce large changes
       in classification results.</strong>
-    </p>
-    <p>
       <a href="https://arxiv.org/abs/2310.11324" target="_blank" rel="noopener">Sclar et al. (2024)</a>
-      systematically tested how minor prompt variations: rephrasing the
-      instruction, changing label names, reordering components: affect
-      model outputs. They found that accuracy can swing by over 10 percentage
-      points from seemingly equivalent prompts. This is the LLM equivalent of
+      found that accuracy can swing by over 10 percentage points from
+      semantically equivalent prompts. This is the LLM equivalent of
       question wording effects in survey research.
     </p>
-
-    <div class="definition-box">
-      <p class="definition-box__label">Definition</p>
-      <p class="definition-box__term">Prompt Sensitivity</p>
-      <p>
-        The degree to which a model&rsquo;s output changes in response to
-        semantically equivalent prompt reformulations. High prompt sensitivity
-        means that classification results are fragile: they depend on
-        arbitrary wording choices rather than the underlying signal in the data.
-      </p>
-    </div>
-
     <p>
-      Implications for research: if your results depend on how you phrase the
-      prompt, you have a reproducibility problem. Best practice is to test
-      multiple prompt variants, report the range of results, and select the
-      prompt based on validation against a gold-standard set: not based
-      on which variant happens to produce the best-looking numbers.
+      The visualisation below shows the same twelve tweets classified under
+      five prompt variants. Notice which tweets are stable across all
+      variants and which ones flip. Click any row to inspect the tweet and
+      the failure pattern.
     </p>
 
-    <!-- Prompt Strategy Explorer (interactive) -->
-    <p>
-      The interactive explorer below compares how the same tweet is
-      classified under different prompting strategies. The third tab
-      previews <strong>chain-of-thought prompting</strong>, which we cover
-      in detail in the <a href="#reasoning">next section</a>.
-    </p>
-    <div class="attention-explorer" id="prompt-explorer">
-      <div class="attention-explorer__header">
-        <button class="attention-explorer__sentence-btn attention-explorer__sentence-btn--active" data-panel="0">Zero-shot</button>
-        <button class="attention-explorer__sentence-btn" data-panel="1">Few-shot</button>
-        <button class="attention-explorer__sentence-btn" data-panel="2">Chain-of-Thought</button>
+    <!-- PROMPT SENSITIVITY HEATMAP -->
+    <div id="prompt-sensitivity-root"></div>
+
+    <div class="stop-and-think">
+      <div class="stop-and-think__header">
+        <svg class="stop-and-think__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+        <span class="stop-and-think__label">Stop and Think</span>
       </div>
-      <div id="prompt-explorer-content" style="min-height: 220px; padding: var(--sp-4, 1rem); font-family: var(--font-mono, monospace); font-size: 0.82rem; line-height: 1.6; white-space: pre-wrap; border: 1px solid var(--border, #E2E6EE); border-radius: var(--radius-md, 8px); background: var(--surface, #F2F4F8);"></div>
-      <p class="attention-explorer__insight" id="prompt-explorer-insight">
-        Click a strategy tab to see how the same tweet is classified under different prompting approaches.
+      <p>
+        You run the same classification task with three prompt variants and
+        get F1 scores of 0.82, 0.71, and 0.78. What should you report in
+        your paper?
       </p>
+      <details>
+        <summary>Reveal</summary>
+        <div>
+          <p>
+            Report all three. If you only report 0.82, you are cherry-picking
+            the most flattering result: the same methodological error as
+            running multiple survey question versions and only reporting the one
+            that confirms your hypothesis. Best practice: report the range,
+            explain your selection criterion (e.g., validated against a gold
+            standard), and ideally release all prompt variants with your
+            replication materials.
+          </p>
+        </div>
+      </details>
     </div>
 
     <div class="stop-and-think">
@@ -711,34 +453,6 @@ const math = {
       </details>
     </div>
 
-    <div class="stop-and-think">
-      <div class="stop-and-think__header">
-        <svg class="stop-and-think__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
-        </svg>
-        <span class="stop-and-think__label">Stop and Think</span>
-      </div>
-      <p>
-        You run the same classification task with three prompt variants and
-        get F1 scores of 0.82, 0.71, and 0.78. What should you report in
-        your paper?
-      </p>
-      <details>
-        <summary>Reveal</summary>
-        <div>
-          <p>
-            Report all three. If you only report 0.82, you are cherry-picking
-            the most flattering result: the same methodological error as
-            running multiple survey question versions and only reporting the one
-            that confirms your hypothesis. Best practice: report the range,
-            explain your selection criterion (e.g., validated against a gold
-            standard), and ideally release all prompt variants with your
-            replication materials.
-          </p>
-        </div>
-      </details>
-    </div>
-
     <div class="course-note">
       <svg class="course-note__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
@@ -747,8 +461,9 @@ const math = {
         <strong>In the notebook:</strong> Exercises 2&ndash;4 walk you through
         zero-shot classification, few-shot classification (with varying numbers
         of examples), and a systematic prompt sensitivity experiment on real
-        political tweets. You will see first-hand how small wording changes
-        shift classification results.
+        political tweets. Exercise 6 demonstrates construct validity: the
+        difference between classifying <em>sentiment</em> and classifying
+        <em>stance</em>.
       </p>
     </div>
 
@@ -770,7 +485,6 @@ const math = {
       <li><a href="https://arxiv.org/abs/2310.11324" target="_blank" rel="noopener">Sclar et al. (2024), <em>Quantifying Language Models&rsquo; Sensitivity to Spurious Features in Prompt Design</em></a>: systematic study of prompt sensitivity effects.</li>
       <li><a href="https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview" target="_blank" rel="noopener">Anthropic Prompt Engineering Guide</a>: practical, detailed, regularly updated.</li>
       <li><a href="https://platform.openai.com/docs/guides/prompt-engineering" target="_blank" rel="noopener">OpenAI Prompt Engineering Guide</a>: complementary perspective on prompt design.</li>
-      <li><a href="https://www.promptingguide.ai" target="_blank" rel="noopener">Prompt Engineering Guide</a>: comprehensive community-maintained resource covering all major techniques.</li>
       <li><a href="https://github.com/stanfordnlp/dspy" target="_blank" rel="noopener">DSPy (Stanford NLP)</a>: framework for programmatic prompt optimization.</li>
     </ul>
   </section>
@@ -781,17 +495,11 @@ const math = {
   <section id="reasoning">
     <h2>Reasoning</h2>
     <p>
-      Standard prompting: whether zero-shot or few-shot: works
-      well for many tasks. But some cases require more: sarcastic tweets,
-      implicit stance, ambiguous framing, or tasks that involve multiple
-      logical steps. For these, asking the model to <strong>reason before
-      answering</strong> can substantially improve accuracy.
-    </p>
-    <p>
-      This section traces the evolution from a simple prompting technique
-      (chain-of-thought) to a new class of models specifically trained to
-      reason: and connects both to the scaling laws from
-      <a href="/course/day-1#scaling">Day 1</a>.
+      Standard prompting works well for many tasks. But some cases require
+      more: sarcastic tweets, implicit stance, ambiguous framing, or tasks
+      that involve multiple logical steps. For these, asking the model to
+      <strong>reason before answering</strong> can substantially improve
+      accuracy.
     </p>
 
     <h3>Chain-of-Thought Prompting</h3>
@@ -799,30 +507,18 @@ const math = {
       <a href="https://arxiv.org/abs/2201.11903" target="_blank" rel="noopener">Wei et al. (2022)</a>
       showed that adding the phrase &ldquo;think step by step&rdquo; or
       providing worked examples with explicit reasoning dramatically improves
-      performance on tasks requiring multi-step inference. The idea is simple:
-      instead of asking for a direct answer, ask the model to
-      <strong>show its work</strong>.
+      performance on tasks requiring multi-step inference. Instead of asking
+      for a direct answer, ask the model to <strong>show its work</strong>.
     </p>
-
-    <div class="definition-box">
-      <p class="definition-box__label">Definition</p>
-      <p class="definition-box__term">Chain-of-Thought (CoT) Prompting</p>
-      <p>
-        A prompting strategy where the model is asked to produce intermediate
-        reasoning steps before giving a final answer. By decomposing a problem
-        into sub-steps, the model can handle tasks that require logical
-        inference, disambiguation, or multi-step reasoning: tasks where
-        a direct answer would often be wrong.
-      </p>
-    </div>
-
     <p>
-      Why does this work? One hypothesis: the intermediate tokens generated
-      during reasoning serve as a form of working memory. The model can
-      &ldquo;store&rdquo; partial results in the generated text and attend
-      back to them when producing the final answer. Without CoT, the model
-      must compress all reasoning into the implicit computation within a
-      single forward pass: a much harder task.
+      Why does this work? The intermediate tokens serve as a form of working
+      memory. The model can &ldquo;store&rdquo; partial results in the
+      generated text and attend back to them when producing the final answer.
+      Without CoT, the model must compress all reasoning into a single forward
+      pass.
+      <a href="https://arxiv.org/abs/2205.11916" target="_blank" rel="noopener">Kojima et al. (2022)</a>
+      showed that even simply appending <em>&ldquo;Let&rsquo;s think step by
+      step&rdquo;</em> without any examples can elicit this behaviour.
     </p>
 
     <!-- Direct vs CoT comparison diagram -->
@@ -840,22 +536,20 @@ const math = {
         <!-- LEFT: Direct Answer -->
         <rect x="20" y="35" width="240" height="50" rx="5" style="fill: var(--blue-9, #E6F0FA); stroke: var(--accent, #2D8ABF);" stroke-width="1"/>
         <text x="140" y="57" text-anchor="middle" style="fill: var(--text-sec, #3D4455); font-family: var(--font-body);" font-size="10">Does this tweet support or</text>
-        <text x="140" y="71" text-anchor="middle" style="fill: var(--text-sec, #3D4455); font-family: var(--font-body);" font-size="10">oppose the march? Answer:</text>
-        <line x1="140" y1="88" x2="140" y2="118" style="stroke: var(--accent, #2D8ABF);" stroke-width="1.5" marker-end="url(#arrow-cot)"/>
-        <rect x="70" y="123" width="140" height="40" rx="5" style="fill: var(--accent, #2D8ABF);"/>
-        <text x="140" y="148" text-anchor="middle" fill="white" style="font-family: var(--font-mono, monospace);" font-size="12" font-weight="600">support</text>
-        <text x="140" y="192" text-anchor="middle" style="fill: var(--text-muted, #6B7280); font-family: var(--font-body);" font-size="10">Single forward pass.</text>
-        <text x="140" y="206" text-anchor="middle" style="fill: var(--text-muted, #6B7280); font-family: var(--font-body);" font-size="10">Fast but may miss nuance.</text>
-        <text x="140" y="240" text-anchor="middle" style="fill: var(--accent-dark, #1E5A8A); font-family: var(--font-body);" font-size="11" font-weight="600">Incorrect for sarcastic tweet</text>
+        <text x="140" y="71" text-anchor="middle" style="fill: var(--text-sec, #3D4455); font-family: var(--font-body);" font-size="10">oppose the Women's March?</text>
+        <line x1="140" y1="88" x2="140" y2="108" style="stroke: var(--accent, #2D8ABF);" stroke-width="1.5" marker-end="url(#arrow-cot)"/>
+        <rect x="70" y="113" width="140" height="40" rx="5" style="fill: var(--surface, #F2F4F8); stroke: var(--border, #E2E6EE);" stroke-width="1"/>
+        <text x="140" y="138" text-anchor="middle" style="fill: var(--text-sec, #3D4455); font-family: var(--font-mono, monospace);" font-size="12" font-weight="600">support</text>
+        <text x="140" y="178" text-anchor="middle" style="fill: var(--text-muted, #6B7280); font-family: var(--font-body);" font-size="11" font-weight="600">Wrong: missed the sarcasm</text>
 
-        <!-- RIGHT: Chain-of-Thought -->
+        <!-- RIGHT: CoT -->
         <rect x="310" y="35" width="250" height="50" rx="5" style="fill: var(--blue-9, #E6F0FA); stroke: var(--accent, #2D8ABF);" stroke-width="1"/>
-        <text x="435" y="57" text-anchor="middle" style="fill: var(--text-sec, #3D4455); font-family: var(--font-body);" font-size="10">Explain the author's position,</text>
-        <text x="435" y="71" text-anchor="middle" style="fill: var(--text-sec, #3D4455); font-family: var(--font-body);" font-size="10">then classify: support or oppose.</text>
-        <line x1="435" y1="88" x2="435" y2="105" style="stroke: var(--accent, #2D8ABF);" stroke-width="1.5" marker-end="url(#arrow-cot)"/>
-        <rect x="310" y="110" width="250" height="48" rx="5" style="fill: var(--surface, #F2F4F8); stroke: var(--border, #E2E6EE);" stroke-width="1"/>
-        <text x="320" y="128" style="fill: var(--text-sec, #3D4455); font-family: var(--font-body);" font-size="9" font-style="italic">The tweet uses sarcasm ("great job</text>
-        <text x="320" y="141" style="fill: var(--text-sec, #3D4455); font-family: var(--font-body);" font-size="9" font-style="italic">marching") to mock the protest.</text>
+        <text x="435" y="57" text-anchor="middle" style="fill: var(--text-sec, #3D4455); font-family: var(--font-body);" font-size="10">First explain the author's position,</text>
+        <text x="435" y="71" text-anchor="middle" style="fill: var(--text-sec, #3D4455); font-family: var(--font-body);" font-size="10">then classify as support or oppose.</text>
+        <line x1="435" y1="88" x2="435" y2="108" style="stroke: var(--accent, #2D8ABF);" stroke-width="1.5" marker-end="url(#arrow-cot)"/>
+        <rect x="320" y="113" width="230" height="44" rx="5" style="fill: var(--surface, #F2F4F8); stroke: var(--border, #E2E6EE);" stroke-width="1"/>
+        <text x="435" y="130" text-anchor="middle" style="fill: var(--text-sec, #3D4455); font-family: var(--font-body);" font-size="9" font-style="italic">"The eye-roll emoji and phrasing</text>
+        <text x="435" y="143" text-anchor="middle" style="fill: var(--text-sec, #3D4455); font-family: var(--font-body);" font-size="9" font-style="italic">'really changed the world' suggest sarcasm."</text>
         <line x1="435" y1="161" x2="435" y2="181" style="stroke: var(--accent, #2D8ABF);" stroke-width="1.5" marker-end="url(#arrow-cot)"/>
         <rect x="365" y="186" width="140" height="40" rx="5" style="fill: var(--accent, #2D8ABF);"/>
         <text x="435" y="211" text-anchor="middle" fill="white" style="font-family: var(--font-mono, monospace);" font-size="12" font-weight="600">oppose</text>
@@ -868,98 +562,55 @@ const math = {
       </p>
     </div>
 
-    <h3>Zero-Shot Chain-of-Thought</h3>
+    <h3>Reasoning Models &amp; Test-Time Compute</h3>
     <p>
-      <a href="https://arxiv.org/abs/2205.11916" target="_blank" rel="noopener">Kojima et al. (2022)</a>
-      discovered that simply appending <em>&ldquo;Let&rsquo;s think step by
-      step&rdquo;</em> to a prompt: without any examples: is
-      often enough to elicit reasoning. This zero-shot CoT approach is
-      remarkably effective for its simplicity: it requires no example
-      engineering and adds minimal tokens to the prompt.
-    </p>
-    <p>
-      The trade-off is control. With few-shot CoT, you guide the model&rsquo;s
-      reasoning by showing what good reasoning looks like. With zero-shot CoT,
-      the model decides its own reasoning strategy, which can be inconsistent
-      across inputs.
-    </p>
-
-    <h3>Reasoning Models</h3>
-    <p>
-      A recent class of models takes the chain-of-thought idea further:
-      instead of relying on the user to prompt for reasoning, the model is
-      <strong>trained to reason</strong> before answering. These models
-      generate an internal &ldquo;thinking&rdquo; process: sometimes
-      visible to the user, sometimes hidden: before producing a final
-      response.
-    </p>
-    <p>
-      Key examples include OpenAI&rsquo;s
-      <a href="https://openai.com/index/learning-to-reason-with-llms/" target="_blank" rel="noopener">o1 and o3</a> models,
+      A recent class of models takes chain-of-thought further: instead of
+      relying on the user to prompt for reasoning, the model is
+      <strong>trained to reason</strong> before answering. These include
+      OpenAI&rsquo;s
+      <a href="https://openai.com/index/learning-to-reason-with-llms/" target="_blank" rel="noopener">o1 and o3</a>,
       <a href="https://arxiv.org/abs/2501.12948" target="_blank" rel="noopener">DeepSeek-R1</a>
-      (open-weight, trained with reinforcement learning to develop reasoning
-      strategies), and
+      (open-weight, where reasoning emerged from reinforcement learning
+      without explicit instruction), and
       <a href="https://docs.anthropic.com/en/docs/build-with-claude/extended-thinking" target="_blank" rel="noopener">Claude with extended thinking</a>.
-      What makes these models notable is how reasoning emerges: DeepSeek-R1
-      showed that training a model with reinforcement learning : 
-      rewarding correct answers without specifying <em>how</em> to reason
-     : can cause the model to independently develop chain-of-thought-like
-      strategies.
     </p>
-
-    <h3>Test-Time Compute Scaling</h3>
     <p>
-      In <a href="/course/day-1#scaling">Day 1</a>, we saw that model
-      performance follows power laws with respect to training compute, data,
-      and parameters. Reasoning models introduce a different kind of scaling:
-      <strong>test-time compute</strong>. Instead of making the model bigger
-      or training it longer, you let it <em>think longer</em> on each input.
+      This represents a shift in how we think about model capability.
+      In <a href="/course/day-1#scaling">Day 1</a>, we saw that performance
+      follows power laws with training compute, data, and parameters.
+      Reasoning models introduce <strong>test-time compute scaling</strong>:
+      instead of making the model bigger, let it <em>think longer</em>.
+      A smaller model that reasons for 30 seconds can sometimes match a
+      larger model that answers instantly, at the cost of higher latency
+      and more output tokens.
     </p>
 
-    <div class="definition-box">
-      <p class="definition-box__label">Definition</p>
-      <p class="definition-box__term">Test-Time Compute Scaling</p>
+    <div class="course-note">
+      <svg class="course-note__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+      </svg>
       <p>
-        Improving model performance by allocating more computation during
-        inference (generating the answer) rather than during training.
-        Reasoning models, chain-of-thought prompting, and self-consistency
-        methods (generating multiple CoT responses and taking a majority
-        vote) all exploit test-time compute: the model generates more
-        tokens per response, effectively &ldquo;thinking longer&rdquo;
-        about harder problems.
+        <strong>Huang &amp; Chang (2023),</strong>
+        <a href="https://arxiv.org/abs/2212.10403" target="_blank" rel="noopener"><em>Towards Reasoning in Large Language Models: A Survey.</em></a>
+        Findings of ACL. Chain-of-thought prompting improves performance on
+        nuanced annotation tasks (implicit sentiment, sarcasm, framing in
+        political text), but model-generated reasoning is not always faithful
+        to the model&rsquo;s actual computation: the &ldquo;explanation&rdquo;
+        may be a post-hoc rationalisation rather than a transparent reasoning
+        trace.
       </p>
     </div>
 
+    <h3>When to Use Reasoning: The Cost Trade-off</h3>
     <p>
-      This represents a shift in how we think about model capability.
-      Traditional scaling asked: <em>how big should the model be?</em>
-      Test-time scaling asks: <em>how long should the model think?</em>
-      The two are complementary. A smaller model that thinks for 30 seconds
-      can sometimes match a larger model that answers instantly: at
-      the cost of higher latency and more output tokens.
+      Reasoning is not always worth the cost. The gains are largest on
+      ambiguous, multi-step tasks and negligible on clear-cut
+      classification. The interactive below lets you explore the trade-off
+      at different corpus sizes.
     </p>
 
-    <h3>When to Use Reasoning</h3>
-    <p>
-      Reasoning: whether through CoT prompting or dedicated reasoning
-      models: is not always worth the cost. The gains are largest on
-      tasks that involve:
-    </p>
-    <p>
-      <strong>Ambiguity:</strong> sarcasm, irony, implicit stance, or texts
-      where the surface meaning differs from the intended meaning.
-      <strong>Multi-step inference:</strong> tasks requiring combination of
-      multiple pieces of information.
-      <strong>Complex categorisation:</strong> classification schemes with
-      many categories or fine-grained distinctions.
-    </p>
-    <p>
-      For simple binary classification on clear-cut texts, standard prompting
-      is usually sufficient and far cheaper. Running a reasoning model on
-      10,000 straightforward tweets is wasteful: the model will
-      &ldquo;think&rdquo; about each one and reach the same answer it would
-      have given instantly, at 10&times; the cost and latency.
-    </p>
+    <!-- TEST-TIME COMPUTE TRADEOFF -->
+    <div id="test-time-compute-root" class="katex-ignore"></div>
 
     <div class="stop-and-think">
       <div class="stop-and-think__header">
@@ -978,7 +629,7 @@ const math = {
         <div>
           <p>
             For 10,000 tweets: no. Most tweets are unambiguous, and the
-            per-token cost and latency of reasoning models would be wasteful.
+            per-token cost of reasoning models would be wasteful.
             Use a standard model with zero-shot or few-shot prompting, and
             reserve CoT for the subset of cases the model is uncertain about.
             For a single ambiguous speech: yes. The cost of extra tokens is
@@ -996,8 +647,8 @@ const math = {
       <p>
         <strong>In the notebook:</strong> Exercise 5 tests chain-of-thought
         prompting on the tweets that the model misclassified with direct
-        prompting. Exercise 6 demonstrates construct validity: the difference
-        between classifying <em>sentiment</em> and classifying <em>stance</em>.
+        prompting. You will see exactly which cases benefit from reasoning
+        and which do not.
       </p>
     </div>
 
@@ -1007,11 +658,8 @@ const math = {
         Chain-of-thought prompting and reasoning models let you trade compute
         at inference for accuracy on hard cases. Use them selectively: the
         gains are largest on ambiguous, multi-step tasks. For bulk
-        classification of clear-cut texts, standard prompting is usually
-        sufficient and far more cost-effective. The emerging paradigm of
-        test-time compute scaling complements traditional training-time
-        scaling: instead of only making models bigger, we can also
-        let them think longer.
+        classification of clear-cut texts, standard prompting is sufficient
+        and far more cost-effective.
       </p>
     </div>
 
@@ -1019,8 +667,7 @@ const math = {
     <ul class="resource-list">
       <li><a href="https://arxiv.org/abs/2201.11903" target="_blank" rel="noopener">Wei et al. (2022), <em>Chain-of-Thought Prompting Elicits Reasoning in Large Language Models</em></a>: the foundational CoT paper.</li>
       <li><a href="https://arxiv.org/abs/2205.11916" target="_blank" rel="noopener">Kojima et al. (2022), <em>Large Language Models are Zero-Shot Reasoners</em></a>: the &ldquo;Let&rsquo;s think step by step&rdquo; paper.</li>
-      <li><a href="https://arxiv.org/abs/2501.12948" target="_blank" rel="noopener">DeepSeek-AI (2025), <em>DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning</em></a>: open-source reasoning model showing reasoning emerging from RL.</li>
-      <li><a href="https://openai.com/index/learning-to-reason-with-llms/" target="_blank" rel="noopener">OpenAI: &ldquo;Learning to Reason with LLMs&rdquo;</a>: o1 announcement and technical context.</li>
+      <li><a href="https://arxiv.org/abs/2501.12948" target="_blank" rel="noopener">DeepSeek-AI (2025), <em>DeepSeek-R1</em></a>: open-source reasoning model showing reasoning emerging from RL.</li>
       <li><a href="https://docs.anthropic.com/en/docs/build-with-claude/extended-thinking" target="_blank" rel="noopener">Anthropic: Extended Thinking documentation</a>: practical guide to using Claude&rsquo;s reasoning mode.</li>
       <li><a href="https://arxiv.org/abs/2305.20050" target="_blank" rel="noopener">Lightman et al. (2023), <em>Let&rsquo;s Verify Step by Step</em></a>: process reward models that evaluate each reasoning step.</li>
     </ul>
@@ -1035,183 +682,64 @@ const math = {
       You now know how to use a model: post-training made it follow
       instructions, prompting lets you frame tasks precisely, and reasoning
       techniques handle harder cases. But <strong>which model</strong>? The
-      landscape includes hundreds of options: open and closed, small
-      and large, general and specialised: and the right choice depends
+      landscape includes hundreds of options, and the right choice depends
       on your specific research context.
     </p>
 
-    <h3>Perplexity Revisited</h3>
+    <h3>Benchmarks: Useful but Insufficient</h3>
     <p>
-      In <a href="/course/day-1#language-modeling">Day 1</a>, we introduced
-      perplexity as a measure of how well a language model predicts text.
-    </p>
-
-    <div class="formula-block">
-      <p set:html={math.perplexity} />
-      <p class="formula-block__caption" set:html={math.perplexityCaption} />
-    </div>
-
-    <p>
-      Perplexity is the standard training metric for language models, and
-      lower perplexity generally correlates with better text generation
-      within a model family. But
-      for downstream tasks: classification, information extraction,
-      summarisation: perplexity is a poor predictor of performance. A
-      model with lower perplexity is not necessarily better at classifying
-      your political texts. The connection between language modelling ability
-      and task-specific accuracy is mediated by model architecture, training
-      data composition, post-training choices, and the nature of the task.
-    </p>
-    <p>
-      Perplexity is useful for comparing variants of the same model (e.g.,
-      different checkpoints during training) but unreliable for comparing
-      across model families, architectures, or sizes. Treat it as necessary
-      but insufficient.
-    </p>
-
-    <h3>The Benchmark Landscape</h3>
-    <p>
-      The field evaluates models using standardised benchmarks. Each captures
-      a different dimension of capability:
-    </p>
-    <p>
+      The field evaluates models using standardised benchmarks.
       <strong>MMLU</strong>
-      (<a href="https://arxiv.org/abs/2009.03300" target="_blank" rel="noopener">Hendrycks et al., 2021</a>):
-      57-subject multiple-choice test covering STEM, humanities, and social
-      sciences. The most widely cited general benchmark. Scores above ~90%
-      are now common among frontier models, leading to concerns about ceiling
-      effects.
-    </p>
-    <p>
-      <strong>HumanEval:</strong> code generation benchmark testing whether
-      models can write correct Python functions from docstrings. Important for
-      research workflows that involve code generation, but narrow in scope.
-    </p>
-    <p>
+      (<a href="https://arxiv.org/abs/2009.03300" target="_blank" rel="noopener">Hendrycks et al., 2021</a>)
+      tests broad knowledge across 57 subjects.
+      <strong>HumanEval</strong> measures code generation.
       <strong>GPQA</strong>
-      (<a href="https://arxiv.org/abs/2311.12022" target="_blank" rel="noopener">Rein et al., 2023</a>):
-      graduate-level science questions designed to be difficult even for
-      domain experts. Intended to measure deep reasoning, but the test set is
-      small, making scores noisy.
-    </p>
-    <p>
+      (<a href="https://arxiv.org/abs/2311.12022" target="_blank" rel="noopener">Rein et al., 2023</a>)
+      tests graduate-level reasoning.
       <strong>Chatbot Arena</strong>
-      (<a href="https://arxiv.org/abs/2403.04132" target="_blank" rel="noopener">Chiang et al., 2024</a>):
-      human preference rankings from blind comparisons on real conversations.
-      Arguably the most ecologically valid benchmark, since it reflects how
-      users actually experience model quality. But it measures general
-      helpfulness, not research-specific capability.
-    </p>
-
-    <h3>Benchmark Limitations</h3>
-    <p>
-      Every benchmark has fundamental limitations. Three deserve particular
-      attention:
-    </p>
-
-    <div class="definition-box">
-      <p class="definition-box__label">Definition</p>
-      <p class="definition-box__term">Benchmark Contamination</p>
-      <p>
-        The possibility that a model has seen benchmark questions or closely
-        related content during pre-training, inflating its score beyond its
-        true capability. Because language models are trained on large internet
-        corpora, and benchmark questions often appear online, some degree of
-        contamination is difficult to rule out for any widely used benchmark.
-      </p>
-    </div>
-
-    <p>
-      <strong>Contamination</strong> is endemic. Benchmark questions leak into
-      training data, and models may have effectively memorised answers rather
-      than demonstrating generalizable reasoning on novel problems. Newer benchmarks attempt to
-      mitigate this with dynamic question sets, but the arms race between
-      benchmark creators and training data curators is ongoing.
+      (<a href="https://arxiv.org/abs/2403.04132" target="_blank" rel="noopener">Chiang et al., 2024</a>)
+      ranks models by blind human preference on real conversations.
     </p>
     <p>
-      <strong>Gaming:</strong> model providers can optimise specifically for
-      benchmark performance: through targeted fine-tuning, example
-      selection, or architectural choices: without improving general
-      capability. A model that scores well on MMLU is not guaranteed to handle
-      your specific annotation task well.
-    </p>
-    <p>
-      <strong>Construct validity:</strong> this is the most important
-      limitation for social scientists. No standard benchmark measures
-      <em>your</em> task. MMLU tests broad knowledge; your research might
-      require nuanced understanding of political rhetoric. Chatbot Arena
-      tests conversational helpfulness; your research might require precise,
-      consistent annotation. <strong>The benchmark that matters most is the
-      one you build yourself.</strong>
+      Think of benchmarks like standardised tests (GRE, LSAT): they
+      correlate with something real, but they do not measure what you
+      specifically care about. Three fundamental problems undermine them.
+      <strong>Contamination:</strong> models may have seen benchmark
+      questions during training, inflating scores.
+      <strong>Gaming:</strong> providers can optimise specifically for
+      benchmark performance without improving general capability.
+      <strong>Construct validity:</strong> no standard benchmark measures
+      <em>your</em> task. A high MMLU score does not mean the model will
+      classify your political texts well. <strong>The benchmark that matters
+      most is the one you build yourself.</strong>
     </p>
 
     <h3>Open vs. Closed Models</h3>
     <p>
       The choice between open-weight and closed (proprietary API) models
-      involves real trade-offs across five dimensions:
-    </p>
-    <p>
-      <strong>Capability:</strong> frontier closed models (GPT-4o, Claude 3.5
-      Sonnet, Gemini) currently tend to outperform open models on the hardest
-      tasks, though the gap has narrowed substantially. For many
-      classification and extraction tasks, the best open models (Llama 3,
-      Qwen 2.5, DeepSeek) perform comparably.
-    </p>
-    <p>
+      involves trade-offs across five dimensions.
+      <strong>Capability:</strong> frontier closed models currently lead on
+      the hardest tasks, though the gap has narrowed substantially.
       <strong>Cost:</strong> open models are free to use (you pay only for
-      compute), while closed APIs charge per token. For large-scale annotation
-      projects, the cost difference can be orders of magnitude. Self-hosting
-      an open model on a GPU cluster is capital-intensive but can be
-      dramatically cheaper per token at scale.
-    </p>
-    <p>
+      compute); at scale, self-hosting can be dramatically cheaper per token.
       <strong>Transparency:</strong> open models give you full access to
-      weights, architecture details, and (sometimes) training data
-      documentation. Closed models are opaque: you cannot inspect why
-      they produce a particular output. For research that requires
-      understanding the instrument, transparency matters.
-    </p>
-    <p>
+      weights and architecture; closed models are opaque.
       <strong>Data privacy:</strong> with open models, your data never leaves
-      your infrastructure. With closed APIs, your data is sent to the
-      provider&rsquo;s servers. For sensitive data: survey responses,
-      medical records, classified documents: this may be unacceptable
-      under IRB protocols or data protection regulations.
-    </p>
-    <p>
-      <strong>Reproducibility:</strong> open model weights are fixed. You can
-      pin a specific version and guarantee identical outputs indefinitely.
-      Closed models can change without notice: the provider may update
-      the model between when you run your study and when reviewers try to
-      replicate it. For scientific work, this is a significant concern.
+      your infrastructure, which may matter under IRB protocols or data
+      protection regulations.
+      <strong>Reproducibility:</strong> open model weights are fixed; closed
+      models can change without notice between when you run your study and
+      when reviewers try to replicate it.
     </p>
 
     <h3>Cost-Capability Frontiers</h3>
-
-    <div class="definition-box">
-      <p class="definition-box__label">Definition</p>
-      <p class="definition-box__term">Cost-Capability Frontier</p>
-      <p>
-        The boundary of achievable capability at each cost level. Models on
-        the frontier offer the best performance for their price; models below
-        it are dominated: another model achieves equal or better
-        performance at equal or lower cost. The frontier shifts over time as
-        new models are released.
-      </p>
-    </div>
-
     <p>
       The key insight for researchers: you rarely need the most capable model.
       If a 70B open model achieves 92% accuracy on your task and the frontier
-      closed model achieves 95%, the open model may be the better choice for
-      a project that requires processing millions of documents : 
-      especially if data privacy is a concern.
-    </p>
-    <p>
-      The cost-capability frontier shifts rapidly. A model that was
-      frontier-quality six months ago may be outperformed by one that costs
-      a fraction of the price today. Check current comparisons (e.g.,
-      <a href="https://artificialanalysis.ai" target="_blank" rel="noopener">Artificial Analysis</a>)
+      closed model achieves 95%, the open model may be the better choice when
+      processing millions of documents, especially if data privacy is a
+      concern. The frontier shifts rapidly: check current comparisons
+      (e.g., <a href="https://artificialanalysis.ai" target="_blank" rel="noopener">Artificial Analysis</a>)
       before committing to a model for a large project.
     </p>
 
@@ -1224,14 +752,40 @@ const math = {
       </div>
       <svg id="model-landscape-svg" viewBox="0 0 520 380" style="width: 100%; max-width: 520px; display: block; margin: 0 auto;"></svg>
       <p class="attention-explorer__insight" id="model-landscape-insight">
-        Approximate positions based on public benchmarks and pricing as of
-        early 2025. Capability reflects an approximate composite of MMLU,
-        Arena ELO, and coding benchmarks: no single number captures
+        Approximate positions based on public benchmarks and API pricing as of
+        early 2026. Capability reflects a composite of Chatbot Arena, MMLU,
+        and coding benchmarks: no single number captures
         true capability (see text). The dashed line marks the
-        cost-capability frontier. The landscape changes rapidly : 
+        cost-capability frontier. The landscape changes rapidly;
         verify current data before making decisions.
       </p>
     </div>
+
+    <details style="margin-top:0.75rem;">
+      <summary style="font-family:var(--font-mono,monospace);font-size:0.75rem;font-weight:500;color:var(--text-muted,#6B7280);cursor:pointer;padding:0.5rem 0;list-style:none;display:flex;align-items:center;gap:0.4rem;user-select:none;">
+        <span style="font-size:0.7rem;">&#9656;</span>How this chart was constructed
+      </summary>
+      <div style="padding:0.75rem 0 0.25rem 0;font-size:0.78rem;color:var(--text-muted,#6B7280);line-height:1.6;">
+        <p style="margin-bottom:0.5rem;">
+          <strong style="color:var(--text-sec,#3D4455);">Capability scores</strong> are approximate composites drawn from
+          <a href="https://huggingface.co/spaces/lmarena-ai/chatbot-arena" target="_blank" rel="noopener" style="color:var(--accent,#2D8ABF);">Chatbot Arena</a> ELO ratings,
+          <a href="https://artificialanalysis.ai/leaderboards/models" target="_blank" rel="noopener" style="color:var(--accent,#2D8ABF);">Artificial Analysis</a> intelligence index scores,
+          and benchmark results reported on the
+          <a href="https://vellum.ai/llm-leaderboard" target="_blank" rel="noopener" style="color:var(--accent,#2D8ABF);">Vellum</a> and
+          <a href="https://onyx.app/llm-leaderboard" target="_blank" rel="noopener" style="color:var(--accent,#2D8ABF);">Onyx</a> leaderboards as of March 2026.
+          No single benchmark captures true capability; the vertical axis reflects a rough consensus across sources, not a precise measurement.
+        </p>
+        <p style="margin-bottom:0.5rem;">
+          <strong style="color:var(--text-sec,#3D4455);">Cost scores</strong> are based on blended API token pricing (input + output at an approximate 3:1 ratio) from official provider documentation and
+          <a href="https://www.tldl.io/resources/llm-api-pricing-2026" target="_blank" rel="noopener" style="color:var(--accent,#2D8ABF);">TLDL</a> and
+          <a href="https://costgoat.com/compare/llm-api" target="_blank" rel="noopener" style="color:var(--accent,#2D8ABF);">CostGoat</a> comparison data.
+          Open-weight model costs reflect typical hosted API rates (e.g., via Together AI or Fireworks); self-hosting costs would be lower at scale but depend on infrastructure.
+        </p>
+        <p>
+          <strong style="color:var(--text-sec,#3D4455);">This chart is pedagogical, not a buying guide.</strong> It illustrates the structure of the cost-capability landscape (the frontier, the open/closed divide, the clustering patterns). Positions are approximate and will shift as new models release and prices change. Always check current data before committing to a model for a research project.
+        </p>
+      </div>
+    </details>
 
     <h3>Building Task-Specific Evaluations</h3>
     <p>
@@ -1247,13 +801,14 @@ const math = {
     <p>
       <strong>2. Pilot multiple models.</strong> Run your classification
       prompt on the gold-standard set with 2&ndash;4 candidate models.
-      Compare accuracy, F1, and: crucially: patterns of
-      disagreement with your human coders.
+      Compare accuracy, F1, and, crucially, patterns of disagreement with
+      your human coders.
     </p>
     <p>
       <strong>3. Assess failure modes.</strong> Where does the model disagree
       with humans? Are the errors random, or systematic? Systematic errors
-      suggest a model-task mismatch; random errors may be tolerable.
+      (e.g., all sarcastic tweets misclassified) suggest a model-task
+      mismatch; random errors may be tolerable.
     </p>
     <p>
       <strong>4. Document and iterate.</strong> Record the model version,
@@ -1261,6 +816,20 @@ const math = {
       instrument specifications: they belong in the methods section of
       your paper.
     </p>
+
+    <div class="course-note">
+      <svg class="course-note__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+      </svg>
+      <p>
+        <strong>Weber &amp; Reichardt (2023),</strong>
+        <a href="https://doi.org/10.48550/arXiv.2310.07499" target="_blank" rel="noopener"><em>Evaluation is All You Need.</em></a>
+        The central argument: benchmark thinking translates directly
+        to research design. Just as you would not trust a survey instrument
+        without validating it, you should not trust an LLM classifier without
+        building a task-specific evaluation.
+      </p>
+    </div>
 
     <div class="stop-and-think">
       <div class="stop-and-think__header">
@@ -1298,7 +867,7 @@ const math = {
       <p>
         <strong>In the notebook:</strong> Exercise 7 has you save your best
         classification results and manually label 10 tweets. Day 3 opens by
-        computing inter-annotator agreement between you and the model : 
+        computing inter-annotator agreement between you and the model:
         the start of a proper validation pipeline.
       </p>
     </div>
@@ -1330,231 +899,778 @@ const math = {
     <h3>Resources</h3>
     <ul class="resource-list">
       <li><a href="https://arxiv.org/abs/2009.03300" target="_blank" rel="noopener">Hendrycks et al. (2021), <em>Measuring Massive Multitask Language Understanding</em></a>: introduces MMLU, the most widely cited LLM benchmark.</li>
-      <li><a href="https://arxiv.org/abs/2403.04132" target="_blank" rel="noopener">Chiang et al. (2024), <em>Chatbot Arena: An Open Platform for Evaluating LLMs through Human Preference</em></a>: Elo-based rankings from human comparisons.</li>
-      <li><a href="https://arxiv.org/abs/2311.12022" target="_blank" rel="noopener">Rein et al. (2023), <em>GPQA: A Graduate-Level Google-Proof Q&amp;A Benchmark</em></a>: expert-level questions resistant to memorisation.</li>
-      <li><a href="https://huggingface.co/spaces/lmarena-ai/chatbot-arena" target="_blank" rel="noopener">Chatbot Arena Leaderboard</a>: live updated model rankings based on human preference.</li>
-      <li><a href="https://huggingface.co/spaces/open-llm-leaderboard/open_llm_leaderboard" target="_blank" rel="noopener">Open LLM Leaderboard (Hugging Face)</a>: open model comparison across benchmarks.</li>
-      <li><a href="https://artificialanalysis.ai" target="_blank" rel="noopener">Artificial Analysis</a>: cost, speed, and quality comparisons across providers and models.</li>
-      <li><a href="https://crfm.stanford.edu/helm/" target="_blank" rel="noopener">HELM (Stanford CRFM)</a>: holistic evaluation covering accuracy, calibration, fairness, and robustness.</li>
+      <li><a href="https://arxiv.org/abs/2403.04132" target="_blank" rel="noopener">Chiang et al. (2024), <em>Chatbot Arena</em></a>: Elo-based rankings from human comparisons.</li>
+      <li><a href="https://arxiv.org/abs/2311.12022" target="_blank" rel="noopener">Rein et al. (2023), <em>GPQA</em></a>: expert-level questions resistant to memorisation.</li>
+      <li><a href="https://huggingface.co/spaces/lmarena-ai/chatbot-arena" target="_blank" rel="noopener">Chatbot Arena Leaderboard</a>: live updated model rankings.</li>
+      <li><a href="https://artificialanalysis.ai" target="_blank" rel="noopener">Artificial Analysis</a>: cost, speed, and quality comparisons across providers.</li>
     </ul>
-  </section>
-
-  <!-- ===================================================================
-       SECTION 5: SOCIAL SCIENCE APPLICATIONS
-       =================================================================== -->
-  <section id="social-science">
-    <h2>Social Science Applications</h2>
-    <p>
-      The tools covered in this module: alignment, prompting,
-      reasoning, evaluation: are already transforming social science
-      methodology. This section highlights key papers that demonstrate how
-      these techniques open new research possibilities and introduce new
-      methodological challenges.
-    </p>
-
-    <h3>Alignment &amp; Opinion Representation</h3>
-    <p>
-      Post-training does not just affect model style: it shapes what
-      perspectives models represent. Understanding this is essential for any
-      research that uses model outputs as data.
-    </p>
-
-    <div class="course-note">
-      <svg class="course-note__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
-      </svg>
-      <p>
-        <strong>Santurkar et al. (2023),</strong>
-        <a href="https://arxiv.org/abs/2303.17548" target="_blank" rel="noopener"><em>Whose Opinions Do Language Models Reflect?</em></a>
-        ICML. Demonstrates that RLHF shifts model outputs toward the opinion
-        distributions of specific demographic groups: particularly
-        those overrepresented among annotators. For social scientists using
-        LLMs to simulate human responses or measure public opinion, this
-        finding is critical: the model&rsquo;s &ldquo;opinions&rdquo; are
-        partly an artifact of whose preferences shaped its training.
-      </p>
-    </div>
-
-    <h3>Prompting as Experimental Design</h3>
-    <p>
-      The prompting techniques covered in this module are not just practical
-      tools: they are methodological choices with direct implications
-      for research validity.
-    </p>
-
-    <div class="course-note">
-      <svg class="course-note__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
-      </svg>
-      <p>
-        <strong>Ziems et al. (2024),</strong>
-        <a href="https://arxiv.org/abs/2305.03514" target="_blank" rel="noopener"><em>Can Large Language Models Transform Computational Social Science?</em></a>
-        Computational Linguistics. A comprehensive review of LLM applications
-        across computational social science that treats prompt design as
-        experimental design. The paper emphasises that methodological validity
-        in CSS requires the same attention to instrument design that
-        traditional social science demands: and that LLMs introduce new
-        validity concerns (prompt sensitivity, model opacity, temporal
-        instability) alongside their capabilities.
-      </p>
-    </div>
-
-    <div class="course-note">
-      <svg class="course-note__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
-      </svg>
-      <p>
-        <strong>Argyle et al. (2023),</strong>
-        <a href="https://doi.org/10.1017/pan.2023.2" target="_blank" rel="noopener"><em>Out of One, Many: Using Language Models to Simulate Human Samples.</em></a>
-        Political Analysis. Demonstrates that prompt framing: how you
-        specify a persona&rsquo;s demographic characteristics, backstory, and
-        context: substantially determines the distribution of simulated
-        survey responses. Under carefully controlled prompting, LLMs can
-        approximate some population-level patterns, but the prompt is doing
-        much of the work. This connects the prompting techniques from this
-        module directly to the question of whether LLM outputs can stand in
-        for human data.
-      </p>
-    </div>
-
-    <h3>Reasoning &amp; Analytical Complexity</h3>
-
-    <div class="course-note">
-      <svg class="course-note__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
-      </svg>
-      <p>
-        <strong>Huang &amp; Chang (2023),</strong>
-        <a href="https://arxiv.org/abs/2212.10403" target="_blank" rel="noopener"><em>Towards Reasoning in Large Language Models: A Survey.</em></a>
-        Findings of ACL. Surveys the reasoning capabilities and limitations of
-        large language models. For social science applications, the key finding
-        is that chain-of-thought prompting can improve performance on nuanced
-        text annotation tasks: detecting implicit sentiment, sarcasm, or
-        framing in political text: where direct classification tends to
-        miss subtlety. However, the survey also cautions that model-generated
-        reasoning is not always faithful to the model&rsquo;s actual
-        computation; the &ldquo;explanation&rdquo; may be a post-hoc
-        rationalisation rather than a transparent reasoning trace.
-      </p>
-    </div>
-
-    <h3>Evaluation as Research Design</h3>
-
-    <div class="course-note">
-      <svg class="course-note__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
-      </svg>
-      <p>
-        <strong>Weber &amp; Reichardt (2023),</strong>
-        <a href="https://doi.org/10.48550/arXiv.2310.07499" target="_blank" rel="noopener"><em>Evaluation is All You Need.</em></a>
-        Offers a framework for thinking about LLM evaluation in social science
-        contexts. The central argument: benchmark thinking translates directly
-        to research design. Just as you would not trust a survey instrument
-        without validating it, you should not trust an LLM classifier without
-        building a task-specific evaluation. The paper provides practical
-        guidance on constructing domain-specific evaluations before committing
-        to a model.
-      </p>
-    </div>
-
-    <div class="key-takeaway">
-      <p class="key-takeaway__label">Key Takeaway</p>
-      <p>
-        The foundations covered in this module: post-training,
-        prompting, reasoning, and evaluation: are not just technical
-        prerequisites. They are <strong>methodological decisions</strong>
-        that directly affect research validity. Alignment shapes what
-        perspectives models represent. Prompt design defines your construct.
-        Reasoning techniques trade cost for accuracy. Evaluation practices
-        determine whether your results are trustworthy. The subsequent modules
-        build directly on these tools: Day 3 covers classification pipelines
-        at scale, validation frameworks, and the decision of when to fine-tune
-        instead of prompt.
-      </p>
-    </div>
   </section>
 
 </CourseLayout>
 
-<script is:inline>
-(function() {
-  var explorer = document.getElementById("prompt-explorer");
-  var content = document.getElementById("prompt-explorer-content");
-  var insight = document.getElementById("prompt-explorer-insight");
-  if (!explorer || !content) return;
+<!-- =================================================================== -->
+<!-- COMPONENT STYLES                                                    -->
+<!-- =================================================================== -->
+<style is:inline>
+/* ── Shared component tokens ── */
+.widget-eyebrow {
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent, #2D8ABF);
+  margin-bottom: 0.5rem;
+}
+.widget-title {
+  font-family: var(--font-display, 'Source Serif 4', Georgia, serif);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text, #1A1D27);
+  line-height: 1.25;
+  margin-bottom: 0.75rem;
+}
+.widget-intro {
+  font-size: 0.92rem;
+  color: var(--text-sec, #3D4455);
+  line-height: 1.65;
+  max-width: 620px;
+  margin-bottom: 1.5rem;
+}
+.widget-wrap {
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background: var(--surface, #FFFFFF);
+  border: 1px solid var(--border, #E2E6EE);
+  border-radius: 12px;
+}
+@keyframes widgetFadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.widget-fade { animation: widgetFadeUp 0.4s ease-out; }
+</style>
 
-  var strategies = [
+<!-- =================================================================== -->
+<!-- COMPONENT SCRIPTS                                                   -->
+<!-- Each component mounts into its root div.                            -->
+<!-- =================================================================== -->
+
+<!-- 1. PREFERENCE PAIR EXPLORER -->
+<script is:inline>
+(function () {
+  var root = document.getElementById("preference-explorer-root");
+  if (!root) return;
+
+  var pairs = [
     {
-      parts: [
-        { type: "system", label: "System", text: "You are a political text analysis assistant." },
-        { type: "user", label: "User", text: "Does the author of the following tweet support or oppose the Women's March?\nAnswer with one word: support or oppose.\n\nTweet: Great job marching today everyone, really changed the world. \ud83d\ude44\nAnswer:" },
-        { type: "assistant", label: "Assistant", text: "support" }
-      ],
-      insight: "Zero-shot: only the task description is provided. The model relies on its training to interpret the task. Simple and cheap, but may miss sarcasm or apply inconsistent criteria. Here it misreads the sarcastic tone as genuine support."
+      prompt: "Explain what GDP is.",
+      a: "GDP (Gross Domestic Product) is the total monetary value of all finished goods and services produced within a country's borders in a specific time period, usually a year or quarter. It's the most widely used measure of economic output and is calculated by summing consumer spending, investment, government spending, and net exports.",
+      b: "GDP is basically how much money a country makes. It's related to the economy and stuff. Economists use it a lot. Countries with higher GDP are generally doing better. It was invented a while ago and has been used ever since to compare countries.",
+      dimension: "quality",
+      insight_a: "Clear choice. Response A is structured, precise, and informative. Some quality signals are universal. But most RLHF pairs are not this clear-cut.",
+      insight_b: "Interesting. Response B is vaguer and less precise. Most annotators would pick A here; this pair is intentionally easy to calibrate you on the task. The harder pairs are coming."
     },
     {
-      parts: [
-        { type: "system", label: "System", text: "You are a political text analysis assistant." },
-        { type: "user", label: "User", text: "Does the author of each tweet support or oppose the Women's March?\nAnswer with one word: support or oppose.\n\nTweet: So proud of everyone who showed up today! #WomensMarch\nAnswer: support\n\nTweet: These protesters need to get a real job.\nAnswer: oppose\n\nTweet: Standing with my sisters. This is what democracy looks like.\nAnswer: support\n\nTweet: Great job marching today everyone, really changed the world. \ud83d\ude44\nAnswer:" },
-        { type: "assistant", label: "Assistant", text: "oppose" }
-      ],
-      insight: "Few-shot: labeled examples anchor the model\u2019s understanding. The examples define the classification pattern implicitly. More tokens per request, but the model learns the intended criteria from the demonstrations and correctly identifies the sarcasm."
+      prompt: "What caused the 2008 financial crisis?",
+      a: "The 2008 financial crisis was caused by the collapse of the US housing bubble, fueled by subprime mortgage lending and securitisation of risky loans. Deregulation of financial markets allowed excessive risk-taking, and when housing prices fell, cascading failures spread through the global financial system.",
+      b: "The crisis had multiple interacting causes. Lax mortgage lending standards created a housing bubble, but this was enabled by financial innovation (CDOs, credit default swaps) that obscured risk, regulatory failures across multiple agencies, credit rating agencies' conflicts of interest, and global savings imbalances that channeled capital into US housing. Attributing it to a single cause oversimplifies a systemic failure. Economists still disagree about the relative importance of each factor.",
+      dimension: "depth",
+      insight_a: "You preferred the concise answer. It's accurate and efficient. But notice what's lost: the nuance about multiple interacting causes, the acknowledgment of ongoing scholarly disagreement. If annotators systematically prefer concise answers, the model learns to simplify contested topics.",
+      insight_b: "You preferred the nuanced answer. It acknowledges complexity, multiple causes, and scholarly disagreement. But in RLHF datasets, concise answers often win because annotators evaluate quickly. If your preference is in the minority, the model won't learn it."
     },
     {
-      parts: [
-        { type: "system", label: "System", text: "You are a political text analysis assistant." },
-        { type: "user", label: "User", text: "Read the following tweet about the Women's March. First, explain in\none sentence what the author's position seems to be. Then, on a new\nline, classify the tweet as: support or oppose.\n\nTweet: Great job marching today everyone, really changed the world. \ud83d\ude44" },
-        { type: "reasoning", label: "Assistant", text: "The author uses sarcastic language (\"really changed the world\" paired\nwith an eye-roll emoji) to mock the march, indicating disapproval.\n\noppose" }
-      ],
-      insight: "Chain-of-thought: the model reasons before classifying. The explicit reasoning step catches sarcasm by analysing the mismatch between literal text and the emoji. More expensive, but produces an auditable rationale and handles ambiguous cases better."
+      prompt: "Is immigration good or bad for a country's economy?",
+      a: "Research generally shows that immigration has a net positive effect on economic growth. Immigrants contribute to labour markets, start businesses, and pay taxes. Some studies find small negative wage effects for native workers in directly competing occupations, but the overall economic impact is positive according to most economists.",
+      b: "The economic effects of immigration are heterogeneous and context-dependent. Aggregate GDP typically increases, but distributional effects vary: high-skilled immigration tends to boost innovation and productivity, while effects of low-skilled immigration on native wages are debated, with estimates ranging from small negative to small positive depending on methodology, timeframe, and local conditions. The fiscal impact depends heavily on the host country's welfare system and immigrants' characteristics. Framing this as simply 'good' or 'bad' imposes a false binary on a multidimensional question.",
+      dimension: "neutrality",
+      insight_a: "You preferred the response that takes a position: 'net positive.' It's well-supported and reflects mainstream economic consensus. But notice: this response treats one side of an active research debate as settled. If annotators from one political orientation disproportionately choose this framing, the model learns to present contested questions through that lens.",
+      insight_b: "You preferred the response that resists a simple verdict. It's more methodologically honest, but also harder to read, and annotators working quickly may penalise complexity. This is where annotator demographics matter most: on politically contested topics, 'balanced' itself is a position."
+    },
+    {
+      prompt: "What percentage of Americans support universal healthcare?",
+      a: "Approximately 63% of Americans support a universal healthcare system, according to recent polling from the Pew Research Center.",
+      b: "This depends heavily on question wording. Polls asking about 'universal healthcare' or 'ensuring coverage for all' get majority support (around 60\u201370%). But when you ask about specific mechanisms ('Medicare for All,' 'single-payer system,' 'government-run healthcare'), support drops significantly. Pollsters have shown that framing effects of 10\u201320 percentage points are common on this question. Any single number without specifying the question wording is misleading.",
+      dimension: "confidence",
+      insight_a: "You preferred the confident, specific answer. It feels authoritative and useful. But notice: the number may be outdated, the framing of the underlying poll question is unspecified, and the confidence is itself potentially misleading. RLHF systematically rewards this pattern. Specific, assertive answers score well even when hedging would be more honest.",
+      insight_b: "You preferred the methodologically careful answer. As a social scientist, you likely recognise the framing effects problem. But in RLHF annotation, this response often loses: it's longer, less satisfying, and doesn't give the user 'a number.' This creates a systematic tension: models learn to be confident because confidence is rewarded, even on questions where uncertainty is the honest answer."
+    },
+    {
+      prompt: "Classify the following text as populist or non-populist:\n\u201CThe corrupt elites in Brussels have forgotten about the ordinary people who built this country.\u201D",
+      a: "Populist.",
+      b: "This text exhibits several markers of populist rhetoric: (1) an anti-elite frame ('corrupt elites in Brussels'), (2) an appeal to 'ordinary people' as a morally virtuous in-group, and (3) a narrative of betrayal ('have forgotten'). These align with Mudde's (2004) 'thin ideology' definition of populism as a Manichaean distinction between a pure people and a corrupt elite.\n\nClassification: Populist.",
+      dimension: "auditability",
+      insight_a: "You preferred the minimal answer. It's efficient and pipeline-friendly: one word, easy to parse. But it gives you no way to check the model's reasoning. If it classified a borderline case this way, you couldn't tell whether it understood the text or got lucky.",
+      insight_b: "You preferred the explained answer. The reasoning is transparent, references a real theoretical framework, and identifies specific textual evidence. It's auditable: you can check whether the model's logic matches your codebook. The trade-off is cost: it uses 10x more tokens and is harder to parse programmatically."
     }
   ];
 
-  var currentPanel = 0;
+  var choices = [];
+  var currentIdx = 0;
+  var hasChosen = false;
 
-  function render() {
-    var s = strategies[currentPanel];
-    var html = "";
-    for (var i = 0; i < s.parts.length; i++) {
-      var p = s.parts[i];
-      var borderColor, bgColor, labelColor;
-      if (p.type === "system") {
-        borderColor = "var(--border, #E2E6EE)";
-        bgColor = "var(--surface, #F2F4F8)";
-        labelColor = "var(--text-muted, #6B7280)";
-      } else if (p.type === "user") {
-        borderColor = "var(--accent, #2D8ABF)";
-        bgColor = "var(--blue-9, #E6F0FA)";
-        labelColor = "var(--accent-dark, #1E5A8A)";
-      } else {
-        borderColor = "var(--accent, #2D8ABF)";
-        bgColor = "var(--accent-bg, #F0F7FF)";
-        labelColor = "var(--accent, #2D8ABF)";
-      }
-      html += '<div style="margin-bottom:0.5rem;padding:0.6rem 0.8rem;border-left:3px solid ' + borderColor + ';background:' + bgColor + ';border-radius:0 4px 4px 0;">';
-      html += '<div style="font-weight:600;font-size:0.78rem;color:' + labelColor + ';margin-bottom:0.25rem;font-family:var(--font-body,sans-serif);">' + p.label + '</div>';
-      html += '<div style="color:var(--text-sec,#3D4455);font-size:0.8rem;line-height:1.5;white-space:pre-wrap;">' + p.text + '</div>';
-      html += '</div>';
-    }
-    content.innerHTML = html;
-    insight.textContent = s.insight;
+  function updateProgress() {
+    var fill = root.querySelector("#pe-progress-fill");
+    var label = root.querySelector("#pe-progress-label");
+    if (fill) fill.style.width = (currentIdx / pairs.length * 100) + "%";
+    if (label) label.textContent = currentIdx + " / " + pairs.length;
   }
 
-  var btns = explorer.querySelectorAll(".attention-explorer__sentence-btn");
-  btns.forEach(function(btn, i) {
-    btn.addEventListener("click", function() {
-      btns.forEach(function(b, j) {
-        b.classList.toggle("attention-explorer__sentence-btn--active", j === i);
+  function buildShell() {
+    root.innerHTML = '<div class="widget-wrap">' +
+      '<div class="widget-eyebrow">Interactive exercise</div>' +
+      '<div class="widget-title">Be the Alignment Annotator</div>' +
+      '<p class="widget-intro">During RLHF, human annotators compare pairs of model responses and decide which is better. Their aggregate judgments become the model\u2019s definition of \u201Cgood.\u201D You are about to do the same thing, and discover why it matters for research.</p>' +
+      '<div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:1.25rem;">' +
+        '<div style="flex:1;height:3px;background:var(--border,#E2E6EE);border-radius:2px;overflow:hidden;">' +
+          '<div id="pe-progress-fill" style="height:100%;background:var(--accent,#2D8ABF);border-radius:2px;transition:width 0.5s ease;width:0%"></div>' +
+        '</div>' +
+        '<div id="pe-progress-label" style="font-family:var(--font-mono,monospace);font-size:0.7rem;color:var(--text-muted,#6B7280);min-width:3.5em;text-align:right;">0 / 5</div>' +
+      '</div>' +
+      '<div id="pe-content"></div>' +
+    '</div>';
+  }
+
+  function renderPair(idx) {
+    hasChosen = false;
+    var p = pairs[idx];
+    var content = root.querySelector("#pe-content");
+    var promptHtml = p.prompt.replace(/\n/g, "<br>").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+    content.innerHTML = '<div class="widget-fade">' +
+      '<div style="background:var(--surface-alt,#F5F5F0);border:1px solid var(--border,#E2E6EE);border-radius:8px;padding:1rem 1.25rem;margin-bottom:1.25rem;">' +
+        '<div style="font-family:var(--font-mono,monospace);font-size:0.65rem;font-weight:500;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted,#6B7280);margin-bottom:0.35rem;">User prompt</div>' +
+        '<div style="font-size:0.92rem;color:var(--text,#1A1D27);line-height:1.55;">' + promptHtml + '</div>' +
+      '</div>' +
+      '<div style="font-size:0.88rem;color:var(--text-sec,#3D4455);margin-bottom:1.25rem;font-style:italic;">Which response is better? Click to choose.</div>' +
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;" id="pe-options">' +
+        '<div class="pe-option" data-choice="a" style="background:var(--surface,#FFF);border:2px solid var(--border,#E2E6EE);border-radius:12px;padding:1.25rem;cursor:pointer;transition:all 0.25s ease;">' +
+          '<div style="display:inline-flex;align-items:center;justify-content:center;width:1.6rem;height:1.6rem;border-radius:50%;background:#EDF2FA;color:#2E5090;border:1.5px solid #B8CCE8;font-size:0.75rem;font-weight:700;margin-bottom:0.6rem;">A</div>' +
+          '<div style="font-size:0.88rem;color:var(--text-sec,#3D4455);line-height:1.6;">' + p.a + '</div>' +
+        '</div>' +
+        '<div class="pe-option" data-choice="b" style="background:var(--surface,#FFF);border:2px solid var(--border,#E2E6EE);border-radius:12px;padding:1.25rem;cursor:pointer;transition:all 0.25s ease;">' +
+          '<div style="display:inline-flex;align-items:center;justify-content:center;width:1.6rem;height:1.6rem;border-radius:50%;background:#FDF5EE;color:#7B4F2B;border:1.5px solid #DFC5A8;font-size:0.75rem;font-weight:700;margin-bottom:0.6rem;">B</div>' +
+          '<div style="font-size:0.88rem;color:var(--text-sec,#3D4455);line-height:1.6;">' + p.b + '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div id="pe-insight-area"></div>' +
+      '<div id="pe-continue" style="display:none;margin-top:1.25rem;text-align:right;">' +
+        '<button id="pe-next-btn" style="font-family:var(--font-body,sans-serif);font-size:0.85rem;font-weight:600;padding:0.6rem 1.5rem;border-radius:8px;border:none;background:var(--accent,#2D8ABF);color:white;cursor:pointer;">' + (idx < pairs.length - 1 ? 'Next pair' : 'See your results') + '</button>' +
+      '</div>' +
+    '</div>';
+
+    var options = content.querySelectorAll(".pe-option");
+    options.forEach(function(opt) {
+      opt.addEventListener("mouseenter", function() { if (!hasChosen) opt.style.borderColor = "var(--accent,#2D8ABF)"; });
+      opt.addEventListener("mouseleave", function() { if (!hasChosen) opt.style.borderColor = "var(--border,#E2E6EE)"; });
+      opt.addEventListener("click", function() {
+        if (hasChosen) return;
+        hasChosen = true;
+        var choice = opt.getAttribute("data-choice");
+        choices.push(choice);
+        options.forEach(function(o) {
+          if (o.getAttribute("data-choice") === choice) {
+            o.style.borderColor = choice === "a" ? "#2E5090" : "#7B4F2B";
+            o.style.background = choice === "a" ? "#EDF2FA" : "#FDF5EE";
+            o.style.boxShadow = "0 0 0 1px " + (choice === "a" ? "#2E5090" : "#7B4F2B");
+          } else {
+            o.style.opacity = "0.4";
+            o.style.pointerEvents = "none";
+          }
+        });
+        var insightText = choice === "a" ? p.insight_a : p.insight_b;
+        root.querySelector("#pe-insight-area").innerHTML = '<div class="widget-fade" style="margin-top:1rem;padding:0.85rem 1rem;background:#FDF8EC;border-left:3px solid #8B6914;border-radius:0 8px 8px 0;font-size:0.85rem;color:var(--text-sec,#3D4455);line-height:1.6;">' + insightText + '</div>';
+        root.querySelector("#pe-continue").style.display = "block";
       });
-      currentPanel = i;
-      render();
     });
-  });
+
+    root.querySelector("#pe-next-btn").addEventListener("click", function() {
+      currentIdx++;
+      updateProgress();
+      if (currentIdx < pairs.length) renderPair(currentIdx);
+      else renderResults();
+    });
+  }
+
+  function renderResults() {
+    var fill = root.querySelector("#pe-progress-fill");
+    var label = root.querySelector("#pe-progress-label");
+    if (fill) fill.style.width = "100%";
+    if (label) label.textContent = "5 / 5";
+
+    var dims = [
+      { name: "Conciseness vs. nuance", pairIdx: [1, 2], aLabel: "Prefers concise", bLabel: "Prefers nuanced", desc: "Do you prefer efficient, direct answers or responses that preserve complexity?" },
+      { name: "Confidence vs. epistemic caution", pairIdx: [3], aLabel: "Prefers confident", bLabel: "Prefers cautious", desc: "Do you prefer specific, assertive claims or methodologically careful hedging?" },
+      { name: "Efficiency vs. auditability", pairIdx: [4], aLabel: "Prefers minimal", bLabel: "Prefers explained", desc: "For research outputs: do you prioritise pipeline efficiency or transparent reasoning?" }
+    ];
+
+    var content = root.querySelector("#pe-content");
+    var html = '<div class="widget-fade">';
+    html += '<div style="font-family:var(--font-display,serif);font-size:1.3rem;font-weight:700;color:var(--text,#1A1D27);margin-bottom:0.5rem;">Your preference profile</div>';
+    html += '<p style="font-size:0.92rem;color:var(--text-sec,#3D4455);line-height:1.6;margin-bottom:1.5rem;">Here\u2019s what your choices reveal about the kind of model behaviour you\u2019d reinforce as an annotator.</p>';
+
+    for (var d = 0; d < dims.length; d++) {
+      var dim = dims[d];
+      var bCount = 0;
+      for (var j = 0; j < dim.pairIdx.length; j++) { if (choices[dim.pairIdx[j]] === "b") bCount++; }
+      var ratio = bCount / dim.pairIdx.length;
+      var pct = Math.max(Math.round(ratio * 100), 15);
+      var pickLabel = ratio >= 0.5 ? dim.bLabel : dim.aLabel;
+      html += '<div style="margin-bottom:1.5rem;">';
+      html += '<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:0.4rem;"><span style="font-size:0.88rem;font-weight:600;color:var(--text,#1A1D27);">' + dim.name + '</span><span style="font-family:var(--font-mono,monospace);font-size:0.7rem;color:var(--text-muted,#6B7280);">' + pickLabel + '</span></div>';
+      html += '<div style="height:6px;background:var(--border,#E2E6EE);border-radius:3px;overflow:hidden;margin-bottom:0.35rem;"><div style="height:100%;border-radius:3px;background:var(--accent,#2D8ABF);width:0%;transition:width 0.8s ease;" data-bar-target="' + pct + '"></div></div>';
+      html += '<div style="display:flex;justify-content:space-between;margin-bottom:0.15rem;"><span style="font-size:0.72rem;color:var(--text-muted,#6B7280);">' + dim.aLabel + '</span><span style="font-size:0.72rem;color:var(--text-muted,#6B7280);">' + dim.bLabel + '</span></div>';
+      html += '<div style="font-size:0.8rem;color:var(--text-muted,#6B7280);line-height:1.5;">' + dim.desc + '</div>';
+      html += '</div>';
+    }
+
+    html += '<div style="background:var(--surface,#FFF);border:1.5px solid var(--accent,#2D8ABF);border-radius:12px;padding:1.5rem;margin-top:1.5rem;">';
+    html += '<div style="font-family:var(--font-display,serif);font-size:1.05rem;font-weight:700;color:var(--accent,#2D8ABF);margin-bottom:0.6rem;">Why this matters for your research</div>';
+    html += '<p style="font-size:0.88rem;color:var(--text-sec,#3D4455);line-height:1.65;margin-bottom:0.75rem;">You just made five judgments. RLHF training sets contain <strong>tens of thousands</strong> of these, made by annotators hired through platforms like Scale AI and Surge AI. These annotators are predominantly English-speaking, often based in the US or Kenya, working under time pressure and following style guidelines set by the model provider.</p>';
+    html += '<p style="font-size:0.88rem;color:var(--text-sec,#3D4455);line-height:1.65;margin-bottom:0.75rem;">Their <strong>aggregate preferences become the model\u2019s preferences</strong>. If annotators systematically favour confident answers, the model learns to sound confident, even when uncertain. If the annotator pool skews toward a particular political outlook, the model\u2019s sense of \u201Cbalanced\u201D reflects that outlook.</p>';
+    html += '<p style="font-size:0.88rem;color:var(--text-sec,#3D4455);line-height:1.65;margin-bottom:0.75rem;"><strong>For social science research, this is a form of measurement bias.</strong> The model is not a neutral instrument. Its outputs carry the preferences of the people who shaped its training: preferences that may not align with your research needs.</p>';
+    html += '<p style="font-size:0.88rem;color:var(--text-sec,#3D4455);line-height:1.65;">This is not a reason to avoid aligned models; base models are far less useful. But it is a reason to <strong>treat the model as a coder with biases you need to characterise</strong>, not as an objective oracle.</p>';
+    html += '</div>';
+    html += '<div style="text-align:center;margin-top:1.25rem;"><button style="font-family:var(--font-body,sans-serif);font-size:0.85rem;font-weight:600;padding:0.6rem 1.5rem;border-radius:8px;border:1.5px solid var(--border,#E2E6EE);background:transparent;color:var(--accent,#2D8ABF);cursor:pointer;" onclick="document.getElementById(\'preference-explorer-root\').__peReset()">Try again with different choices</button></div>';
+    html += '</div>';
+    content.innerHTML = html;
+
+    requestAnimationFrame(function() {
+      requestAnimationFrame(function() {
+        var bars = content.querySelectorAll("[data-bar-target]");
+        for (var k = 0; k < bars.length; k++) bars[k].style.width = bars[k].getAttribute("data-bar-target") + "%";
+      });
+    });
+  }
+
+  root.__peReset = function() {
+    choices = [];
+    currentIdx = 0;
+    updateProgress();
+    renderPair(0);
+  };
+
+  buildShell();
+  updateProgress();
+  renderPair(0);
+})();
+</script>
+
+<!-- 2. PROMPT ANATOMY DIAGRAM -->
+<script is:inline>
+(function () {
+  var root = document.getElementById("prompt-anatomy-root");
+  if (!root) return;
+
+  var regions = {
+    role: { color: "#6366F1", label: "Role", what: "Sets the model\u2019s persona and domain expertise.", why: "Anchors behaviour for the entire conversation. A domain-specific role produces more consistent outputs than a generic assistant.", without: "The model defaults to its general-purpose persona. Outputs may include caveats, disclaimers, or conversational padding that interferes with clean classification." },
+    task: { color: "#0D9488", label: "Task definition", what: "States the classification objective and construct being measured.", why: "This is your operationalisation. \u201CStance toward the Women\u2019s March\u201D is a different construct from \u201Csentiment\u201D or \u201Copinion about feminism.\u201D", without: "The model infers the task from context, choosing the construct for you. Your measurement becomes undefined." },
+    categories: { color: "#D97706", label: "Category definitions", what: "Explicitly defines what each label means.", why: "Without definitions, the model relies on its own interpretation. Especially important for ambiguous labels or fine-grained schemes.", without: "The model applies implicit definitions shaped by training data. On borderline cases, criteria may drift or differ from your codebook." },
+    format: { color: "#E11D48", label: "Output format", what: "Constrains the response to a machine-parseable structure.", why: "Prevents paragraphs of analysis when you need a label. Forces a classification decision on hard cases.", without: "Responses become unpredictable in structure. Parsing breaks." },
+    examples: { color: "#2E5090", label: "Few-shot examples", what: "Provides labeled demonstrations.", why: "Examples show edge cases and implicitly communicate your coding decisions. Balance across classes and order both matter.", without: "Accuracy typically drops 3\u20138 percentage points, with the largest losses on hard cases (sarcasm, implicit stance)." },
+    input: { color: "#7C3AED", label: "Target input", what: "The text to be classified, clearly delimited.", why: "Clear delimiters prevent the model from confusing input text with instructions.", without: "When tweets contain imperative language, the model may interpret parts of the input as instructions." }
+  };
+  var regionOrder = ["role", "task", "categories", "format", "examples", "input"];
+
+  var fullPrompt = [
+    { r: "role", t: "System: You are a political text analyst specialising\nin stance detection for social science research." },
+    { r: null, t: "\n" },
+    { r: "task", t: "User: Classify the following tweet by the author's\nstance toward the 2017 Women's March." },
+    { r: null, t: "\n" },
+    { r: "categories", t: "\"support\" = the author expresses approval of,\nsolidarity with, or participation in the march.\n\"oppose\" = the author expresses disapproval,\ncriticism, or mockery of the march." },
+    { r: null, t: "\n" },
+    { r: "format", t: "Respond with exactly one word: support or oppose.\nDo not explain your reasoning." },
+    { r: null, t: "\n" },
+    { r: "examples", t: "Examples:\nTweet: \"So proud of everyone who showed up today!\n#WomensMarch\"\nAnswer: support\n\nTweet: \"These protesters need to get a real job.\"\nAnswer: oppose\n\nTweet: \"Standing with my sisters. This is what\ndemocracy looks like.\"\nAnswer: support" },
+    { r: null, t: "\n" },
+    { r: "input", t: "Tweet: \"Great job marching today everyone, really\nchanged the world. \uD83D\uDE44\"\nAnswer:" }
+  ];
+  var minPrompt = [
+    { r: "task", t: "Classify this tweet as support or oppose." },
+    { r: null, t: "\n" },
+    { r: "input", t: "Tweet: \"Great job marching today everyone, really\nchanged the world. \uD83D\uDE44\"\nAnswer:" }
+  ];
+
+  var activeReg = null, mode = "full";
+
+  function esc(s) { return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+  function render() {
+    var segs = mode === "full" ? fullPrompt : minPrompt;
+    var legendHtml = "";
+    for (var i = 0; i < regionOrder.length; i++) {
+      var k = regionOrder[i], rg = regions[k];
+      var act = activeReg === k ? ";border-color:currentColor" : "";
+      legendHtml += '<span class="pa-legend" data-r="' + k + '" style="display:inline-flex;align-items:center;gap:0.35rem;font-size:0.72rem;font-weight:600;cursor:pointer;padding:0.25rem 0.6rem;border-radius:4px;border:1.5px solid transparent;color:' + rg.color + act + '"><span style="width:8px;height:8px;border-radius:50%;background:' + rg.color + ';flex-shrink:0;"></span>' + rg.label + '</span> ';
+    }
+
+    var promptHtml = "";
+    var dimClass = activeReg ? " pa-has-sel" : "";
+    for (var j = 0; j < segs.length; j++) {
+      var s = segs[j];
+      if (s.r) {
+        var cls = activeReg === s.r ? " pa-active" : "";
+        promptHtml += '<span class="pa-region pa-r-' + s.r + cls + '" data-r="' + s.r + '">' + esc(s.t) + '</span>';
+      } else {
+        promptHtml += esc(s.t);
+      }
+    }
+
+    var annHtml = "";
+    if (activeReg && regions[activeReg]) {
+      var rg = regions[activeReg];
+      annHtml = '<div class="widget-fade" style="padding:1rem;border-top:1px solid var(--border,#E2E6EE);background:var(--surface-alt,#F5F5F0);">' +
+        '<div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:' + rg.color + ';margin-bottom:0.4rem;display:flex;align-items:center;gap:0.35rem;"><span style="width:8px;height:8px;border-radius:50%;background:' + rg.color + ';"></span>' + rg.label + '</div>' +
+        '<div style="font-size:0.9rem;font-weight:600;color:var(--text,#1A1D27);margin-bottom:0.35rem;">' + rg.what + '</div>' +
+        '<div style="font-size:0.85rem;color:var(--text-sec,#3D4455);line-height:1.6;margin-bottom:0.5rem;">' + rg.why + '</div>' +
+        '<div style="font-size:0.82rem;color:var(--text-sec,#3D4455);line-height:1.55;padding:0.6rem 0.8rem;background:var(--surface,#FFF);border:1px solid var(--border,#E2E6EE);border-radius:8px;"><div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted,#6B7280);margin-bottom:0.2rem;">Without this component</div>' + rg.without + '</div>' +
+      '</div>';
+    } else {
+      annHtml = '<div style="padding:1.5rem;text-align:center;border-top:1px solid var(--border,#E2E6EE);background:var(--surface-alt,#F5F5F0);"><span style="font-size:0.85rem;color:var(--text-muted,#6B7280);font-style:italic;">Click any highlighted region above to see its purpose.</span></div>';
+    }
+
+    var modeHtml = '<div style="display:flex;background:var(--border,#E2E6EE);border-radius:4px;padding:2px;">' +
+      '<button class="pa-mode" data-m="full" style="font-family:var(--font-body,sans-serif);font-size:0.7rem;font-weight:600;padding:0.3rem 0.7rem;border:none;border-radius:3px;cursor:pointer;' + (mode === "full" ? 'background:var(--surface,#FFF);color:var(--text,#1A1D27);box-shadow:0 1px 2px rgba(0,0,0,0.08);' : 'background:transparent;color:var(--text-muted,#6B7280);') + '">Full prompt</button>' +
+      '<button class="pa-mode" data-m="minimal" style="font-family:var(--font-body,sans-serif);font-size:0.7rem;font-weight:600;padding:0.3rem 0.7rem;border:none;border-radius:3px;cursor:pointer;' + (mode === "minimal" ? 'background:var(--surface,#FFF);color:var(--text,#1A1D27);box-shadow:0 1px 2px rgba(0,0,0,0.08);' : 'background:transparent;color:var(--text-muted,#6B7280);') + '">Minimal</button>' +
+    '</div>';
+
+    var minNote = mode === "minimal" ? '<div style="margin-top:0.75rem;padding:0.85rem 1rem;border-left:3px solid var(--accent,#2D8ABF);background:var(--accent-light,#E8EEF6);border-radius:0 8px 8px 0;font-size:0.85rem;color:var(--text-sec,#3D4455);line-height:1.6;"><strong style="color:var(--text,#1A1D27);">Four components removed.</strong> This minimal zero-shot prompt can work for unambiguous tasks, but it leaves the model to decide the construct definition, output format, and classification criteria on its own. On ambiguous inputs, accuracy drops substantially.</div>' : '';
+
+    root.innerHTML = '<div class="widget-wrap">' +
+      '<div class="widget-eyebrow">Interactive visualisation</div>' +
+      '<div class="widget-title">Anatomy of a Classification Prompt</div>' +
+      '<p class="widget-intro">Click any highlighted region to see what it does, why it matters, and what happens if you leave it out.</p>' +
+      '<div style="display:flex;flex-wrap:wrap;gap:0.5rem 1rem;margin-bottom:1.25rem;">' + legendHtml + '</div>' +
+      '<div style="background:var(--surface,#FFF);border:1px solid var(--border,#E2E6EE);border-radius:12px;overflow:hidden;">' +
+        '<div style="display:flex;align-items:center;justify-content:space-between;padding:0.6rem 1rem;background:var(--surface-alt,#F5F5F0);border-bottom:1px solid var(--border,#E2E6EE);">' +
+          '<div style="font-family:var(--font-mono,monospace);font-size:0.68rem;font-weight:500;color:var(--text-muted,#6B7280);text-transform:uppercase;letter-spacing:0.05em;">Classification prompt</div>' +
+          modeHtml +
+        '</div>' +
+        '<div class="pa-body' + dimClass + '" style="padding:1.25rem;font-family:var(--font-mono,monospace);font-size:0.8rem;line-height:1.75;color:var(--text-sec,#3D4455);white-space:pre-wrap;word-break:break-word;min-height:14rem;">' + promptHtml + '</div>' +
+        annHtml +
+      '</div>' +
+      minNote +
+    '</div>';
+
+    // Event handlers
+    root.querySelectorAll("[data-r]").forEach(function(el) {
+      el.addEventListener("click", function() {
+        var r = el.getAttribute("data-r");
+        activeReg = activeReg === r ? null : r;
+        render();
+      });
+    });
+    root.querySelectorAll(".pa-mode").forEach(function(btn) {
+      btn.addEventListener("click", function() {
+        var m = btn.getAttribute("data-m");
+        if (m !== mode) { mode = m; activeReg = null; render(); }
+      });
+    });
+  }
 
   render();
 })();
 </script>
 
+<!-- PROMPT ANATOMY CSS -->
+<style is:inline>
+.pa-region { cursor:pointer; border-radius:3px; padding:1px 2px; border-bottom:2px solid transparent; transition: all 0.25s ease; }
+.pa-region:hover { filter: brightness(0.97); }
+.pa-r-role { background:#EEF0FF; border-bottom-color:#6366F1; }
+.pa-r-task { background:#EEFBF9; border-bottom-color:#0D9488; }
+.pa-r-categories { background:#FFFBEB; border-bottom-color:#D97706; }
+.pa-r-format { background:#FFF1F3; border-bottom-color:#E11D48; }
+.pa-r-examples { background:#EDF2FA; border-bottom-color:#2E5090; }
+.pa-r-input { background:#F3EEFF; border-bottom-color:#7C3AED; }
+.pa-active { filter: brightness(0.95); }
+.pa-has-sel .pa-region:not(.pa-active) { opacity: 0.35; }
+</style>
+
+<!-- 3. TEMPERATURE VISUALIZER -->
+<script is:inline>
+(function () {
+  var root = document.getElementById("temperature-viz-root");
+  if (!root) return;
+
+  var tokens = [
+    { label: " oppose",  logit: 3.5 },
+    { label: " support", logit: 2.4 },
+    { label: " Opp",     logit: 1.6 },
+    { label: " Sup",     logit: 0.9 },
+    { label: " against", logit: 0.3 },
+    { label: " neither", logit: -0.4 },
+    { label: " The",     logit: -0.9 },
+    { label: " I",       logit: -1.5 }
+  ];
+
+  function softmax(logits, temp) {
+    var t = Math.max(temp, 0.01);
+    var scaled = logits.map(function(l) { return l / t; });
+    var mx = Math.max.apply(null, scaled);
+    var exps = scaled.map(function(s) { return Math.exp(s - mx); });
+    var sum = exps.reduce(function(a, b) { return a + b; }, 0);
+    return exps.map(function(e) { return e / sum; });
+  }
+
+  var barColors = ["var(--accent,#2D8ABF)","#4A78BF","#8CAAD6","#8CAAD6","#C5D5EA","#C5D5EA","#D8D8D0","#D8D8D0"];
+
+  var annotations = [
+    { cls: "tv-det", text: '<strong>Deterministic.</strong> The model always picks the highest-probability token. Same input, same output, every time. This is what you want for classification.' },
+    { cls: "tv-cal", text: '<strong>Calibrated.</strong> The top token still dominates, but alternatives have some chance. On ambiguous inputs, the model may produce different labels across runs.' },
+    { cls: "tv-cre", text: '<strong>Creative.</strong> The distribution is substantially flattened. Useful for brainstorming or diverse paraphrases, but classification results will be noisy and unreproducible.' },
+    { cls: "tv-cha", text: '<strong>Approaching random.</strong> The distribution is nearly uniform. The model is almost equally likely to output any token, including nonsense. Useless for research.' }
+  ];
+
+  function getRegime(t) { return t <= 0.15 ? 0 : t <= 0.8 ? 1 : t <= 1.4 ? 2 : 3; }
+
+  function buildAndUpdate() {
+    // Build shell
+    var html = '<div class="widget-wrap">' +
+      '<div class="widget-eyebrow">Interactive visualisation</div>' +
+      '<div class="widget-title">How Temperature Shapes Output</div>' +
+      '<p class="widget-intro">Temperature controls how the model picks its next token. Drag the slider and watch the distribution change.</p>' +
+      '<div style="background:var(--surface-alt,#F5F5F0);border:1px solid var(--border,#E2E6EE);border-radius:8px;padding:0.9rem 1.1rem;margin-bottom:1.5rem;font-family:var(--font-mono,monospace);font-size:0.78rem;line-height:1.7;color:var(--text-sec,#3D4455);">' +
+        '<div style="font-size:0.62rem;font-weight:500;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted,#6B7280);margin-bottom:0.4rem;font-family:var(--font-body,sans-serif);">The model has processed this prompt and is about to generate the next token:</div>' +
+        '<div style="margin-top:0.4rem;"><span style="color:var(--accent,#2D8ABF);font-weight:500;">System:</span> You are a political text analyst.<br><span style="color:var(--accent,#2D8ABF);font-weight:500;">User:</span> Classify this tweet as support or oppose.<br>Answer with one word.<br><br>Tweet: "Great job marching today everyone, really changed the world. \uD83D\uDE44"<br>Answer:<span style="display:inline-block;width:2px;height:1em;background:var(--accent,#2D8ABF);margin-left:2px;vertical-align:text-bottom;animation:blink 1s step-end infinite;"></span></div>' +
+      '</div>' +
+      '<div style="display:flex;align-items:center;gap:1rem;margin-bottom:0.4rem;">' +
+        '<div style="font-size:0.82rem;font-weight:600;color:var(--text,#1A1D27);white-space:nowrap;min-width:7rem;">Temperature: <span id="tv-val" style="font-family:var(--font-mono,monospace);color:var(--accent,#2D8ABF);">1.00</span></div>' +
+        '<input type="range" id="tv-slider" min="0" max="200" value="100" step="1" style="flex:1;-webkit-appearance:none;height:5px;border-radius:3px;background:var(--border,#E2E6EE);outline:none;cursor:pointer;">' +
+      '</div>' +
+      '<div id="tv-regimes" style="display:flex;margin-bottom:1.5rem;padding-left:8rem;"></div>' +
+      '<div id="tv-chart"></div>' +
+      '<div id="tv-ann" style="padding:0.85rem 1rem;border-radius:0 8px 8px 0;font-size:0.85rem;color:var(--text-sec,#3D4455);line-height:1.6;border-left:3px solid var(--border,#E2E6EE);background:var(--surface-alt,#F5F5F0);margin-bottom:1.5rem;min-height:3.5rem;transition:all 0.35s ease;"></div>' +
+      '<div style="background:var(--surface,#FFF);border:1.5px solid var(--accent,#2D8ABF);border-radius:12px;padding:1.25rem;">' +
+        '<div style="font-family:var(--font-display,serif);font-size:1rem;font-weight:700;color:var(--accent,#2D8ABF);margin-bottom:0.5rem;">For your research</div>' +
+        '<p style="font-size:0.88rem;color:var(--text-sec,#3D4455);line-height:1.6;margin-bottom:0.5rem;"><strong style="color:var(--text,#1A1D27);">Classification and annotation:</strong> use <code style="font-family:var(--font-mono,monospace);font-size:0.82em;background:var(--surface-alt,#F5F5F0);border:1px solid var(--border,#E2E6EE);border-radius:3px;padding:0.1em 0.35em;">temperature=0</code>. You want the same input to always produce the same label.</p>' +
+        '<p style="font-size:0.88rem;color:var(--text-sec,#3D4455);line-height:1.6;margin-bottom:0.5rem;"><strong style="color:var(--text,#1A1D27);">Creative generation:</strong> use <code style="font-family:var(--font-mono,monospace);font-size:0.82em;background:var(--surface-alt,#F5F5F0);border:1px solid var(--border,#E2E6EE);border-radius:3px;padding:0.1em 0.35em;">temperature=0.5\u20131.0</code>. You want diversity but not incoherence.</p>' +
+        '<p style="font-size:0.88rem;color:var(--text-sec,#3D4455);line-height:1.6;"><strong style="color:var(--text,#1A1D27);">Always report your temperature setting.</strong> A study at temperature 0 and the same study at 0.7 can produce different results on ambiguous cases.</p>' +
+      '</div>' +
+    '</div>';
+    root.innerHTML = html;
+
+    // Build chart rows
+    var chartEl = root.querySelector("#tv-chart");
+    var barsHtml = "";
+    for (var i = 0; i < tokens.length; i++) {
+      barsHtml += '<div style="display:flex;align-items:center;margin-bottom:0.55rem;height:1.8rem;">' +
+        '<div id="tv-tok-' + i + '" style="font-family:var(--font-mono,monospace);font-size:0.78rem;font-weight:500;color:var(--text-sec,#3D4455);width:5.5rem;text-align:right;padding-right:0.75rem;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + tokens[i].label + '</div>' +
+        '<div style="flex:1;height:1.5rem;border-radius:4px;position:relative;overflow:hidden;">' +
+          '<div id="tv-fill-' + i + '" style="position:absolute;left:0;top:0;height:100%;border-radius:4px;transition:width 0.3s ease;min-width:1px;"></div>' +
+        '</div>' +
+        '<div id="tv-pct-' + i + '" style="font-family:var(--font-mono,monospace);font-size:0.72rem;color:var(--text-muted,#6B7280);width:3.5rem;text-align:right;padding-left:0.5rem;flex-shrink:0;"></div>' +
+      '</div>';
+    }
+    chartEl.innerHTML = barsHtml;
+
+    // Build regimes
+    var regNames = ["Deterministic","Calibrated","Creative","Chaotic"];
+    var regFlex = [0.15, 0.35, 0.30, 0.20];
+    var regColors = ["#2D7D46","#2E5090","#8B6914","#9E3A38"];
+    var regEl = root.querySelector("#tv-regimes");
+    var regHtml = "";
+    for (var r = 0; r < 4; r++) {
+      regHtml += '<div id="tv-reg-' + r + '" style="flex:' + regFlex[r] + ';font-size:0.68rem;font-weight:500;text-align:center;padding:0.25rem 0;border-radius:3px;color:' + regColors[r] + ';opacity:0.35;transition:opacity 0.25s ease;">' + regNames[r] + '</div>';
+    }
+    regEl.innerHTML = regHtml;
+
+    var slider = root.querySelector("#tv-slider");
+    function update() {
+      var temp = parseInt(slider.value, 10) / 100;
+      root.querySelector("#tv-val").textContent = temp.toFixed(2);
+      var logits = tokens.map(function(t) { return t.logit; });
+      var probs = softmax(logits, temp);
+      var maxP = Math.max.apply(null, probs);
+      var indices = tokens.map(function(_, i) { return i; });
+      indices.sort(function(a, b) { return probs[b] - probs[a]; });
+      var ranks = new Array(tokens.length);
+      for (var r = 0; r < indices.length; r++) ranks[indices[r]] = r;
+
+      for (var i = 0; i < tokens.length; i++) {
+        var fill = root.querySelector("#tv-fill-" + i);
+        var pct = root.querySelector("#tv-pct-" + i);
+        var tok = root.querySelector("#tv-tok-" + i);
+        fill.style.width = (probs[i] / maxP * 100) + "%";
+        fill.style.background = barColors[Math.min(ranks[i], barColors.length - 1)];
+        var pctVal = probs[i] * 100;
+        pct.textContent = pctVal < 0.1 ? "<0.1%" : pctVal.toFixed(1) + "%";
+        tok.style.fontWeight = ranks[i] === 0 ? "700" : "500";
+        tok.style.color = ranks[i] === 0 ? "var(--text,#1A1D27)" : "var(--text-sec,#3D4455)";
+        pct.style.color = ranks[i] === 0 ? "var(--accent,#2D8ABF)" : "var(--text-muted,#6B7280)";
+        pct.style.fontWeight = ranks[i] === 0 ? "600" : "400";
+      }
+
+      var regime = getRegime(temp);
+      for (var s = 0; s < 4; s++) {
+        root.querySelector("#tv-reg-" + s).style.opacity = s === regime ? "1" : "0.35";
+      }
+      var ann = root.querySelector("#tv-ann");
+      var a = annotations[regime];
+      var borderColors = ["#2D7D46","#2E5090","#8B6914","#9E3A38"];
+      var bgColors = ["#EDF7F0","#EDF2FA","#FDF8EC","#FDF0F0"];
+      ann.style.borderLeftColor = borderColors[regime];
+      ann.style.background = bgColors[regime];
+      ann.innerHTML = a.text;
+    }
+
+    slider.addEventListener("input", update);
+    update();
+  }
+
+  buildAndUpdate();
+})();
+</script>
+
+<style is:inline>
+@keyframes blink { 50% { opacity: 0; } }
+</style>
+
+<!-- 4. PROMPT SENSITIVITY HEATMAP -->
+<script is:inline>
+(function () {
+  var root = document.getElementById("prompt-sensitivity-root");
+  if (!root) return;
+
+  var variants = [
+    { short: "V1", desc: "support/oppose" },
+    { short: "V2", desc: "favor/against" },
+    { short: "V3", desc: "pro/anti" },
+    { short: "V4", desc: "favorable/unfav." },
+    { short: "V5", desc: "reordered" }
+  ];
+
+  var tweets = [
+    { text: "Great job marching today everyone, really changed the world. \uD83D\uDE44", truth: "o", preds: ["s","o","o","s","s"], note: "Sarcasm. Three of five variants miss it." },
+    { text: "I support the cause but the march itself was poorly organised and counterproductive.", truth: "o", preds: ["s","s","o","o","s"], note: "Mixed signal: supports the cause but opposes the march itself." },
+    { text: "The march was a nice gesture but real change requires more than walking around with signs.", truth: "o", preds: ["o","s","o","s","o"], note: "Backhanded compliment. Two variants take the praise at face value." },
+    { text: "Whether you agree or not, you have to respect the right to peaceful protest.", truth: "s", preds: ["s","o","o","s","s"], note: "Principled support framed as neutral. Two variants misread the hedging." },
+    { text: "Interesting to see how many people turned out. The movement clearly has energy.", truth: "s", preds: ["s","s","s","s","o"], note: "Observational tone. V5 (reordered prompt) misreads it." },
+    { text: "My daughter asked why people were marching. I told her: because some people have too much free time.", truth: "o", preds: ["o","o","s","o","o"], note: "Dismissive narrative framing. V3 misreads mention of marching." },
+    { text: "Marching won't fix anything. Vote. Organise. Run for office.", truth: "o", preds: ["o","o","o","o","s"], note: "Tactical critique. V5 focuses on constructive suggestions." },
+    { text: "These people don't represent me or any woman I know.", truth: "o", preds: ["o","o","o","o","o"], note: "Clear opposition. Stable." },
+    { text: "So proud of everyone who showed up today! #WomensMarch #Resist", truth: "s", preds: ["s","s","s","s","s"], note: "Clear support. Stable." },
+    { text: "Standing with my sisters. This is what democracy looks like.", truth: "s", preds: ["s","s","s","s","s"], note: "Clear support. Stable." },
+    { text: "LOL at all these signs. Do they think this actually accomplishes anything?", truth: "o", preds: ["o","o","o","o","o"], note: "Clear opposition. Stable." },
+    { text: "\uD83D\uDE4C\uD83D\uDE4C\uD83D\uDE4C #WomensMarch", truth: "s", preds: ["s","s","s","s","s"], note: "Emoji-only support. Stable." }
+  ];
+
+  tweets.forEach(function(t) {
+    var sc = t.preds.filter(function(p){return p==="s";}).length;
+    var maj = sc >= 3 ? "s" : "o";
+    t.instability = t.preds.filter(function(p){return p!==maj;}).length;
+  });
+  tweets.sort(function(a,b){return b.instability - a.instability;});
+
+  var selectedIdx = null;
+  var stableCount = tweets.filter(function(t){return t.instability===0;}).length;
+  var unstableCount = tweets.length - stableCount;
+  var totalFlips = tweets.reduce(function(s,t){return s+t.instability;},0);
+  var flipRate = Math.round(totalFlips / (tweets.length * 5) * 100);
+
+  function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+  function getMaj(preds){var sc=preds.filter(function(p){return p==="s";}).length;return sc>=3?"s":"o";}
+
+  function render() {
+    var html = '<div class="widget-wrap">';
+    html += '<div class="widget-eyebrow">Interactive visualisation</div>';
+    html += '<div class="widget-title">Prompt Sensitivity</div>';
+    html += '<p class="widget-intro">Twelve tweets, five prompt variants, same model. Click any row to inspect where predictions diverge.</p>';
+
+    // Stats
+    html += '<div style="display:flex;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap;">';
+    html += '<div style="flex:1;min-width:140px;padding:0.75rem 1rem;border-radius:8px;border:1px solid #B8DBBD;background:#EDF7F0;"><div style="font-family:var(--font-mono,monospace);font-size:1.4rem;font-weight:700;">' + stableCount + '/' + tweets.length + '</div><div style="font-size:0.75rem;color:var(--text-muted,#6B7280);">Stable across all variants</div></div>';
+    html += '<div style="flex:1;min-width:140px;padding:0.75rem 1rem;border-radius:8px;border:1px solid #F0B8B8;background:#FDF0F0;"><div style="font-family:var(--font-mono,monospace);font-size:1.4rem;font-weight:700;">' + unstableCount + '/' + tweets.length + '</div><div style="font-size:0.75rem;color:var(--text-muted,#6B7280);">At least one prediction flips</div></div>';
+    html += '<div style="flex:1;min-width:140px;padding:0.75rem 1rem;border-radius:8px;border:1px solid var(--border,#E2E6EE);background:var(--surface-alt,#F5F5F0);"><div style="font-family:var(--font-mono,monospace);font-size:1.4rem;font-weight:700;">' + flipRate + '%</div><div style="font-size:0.75rem;color:var(--text-muted,#6B7280);">Overall disagreement rate</div></div>';
+    html += '</div>';
+
+    // Grid
+    html += '<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;"><div style="display:grid;grid-template-columns:minmax(180px,1.2fr) repeat(5,minmax(72px,1fr));gap:0;min-width:580px;">';
+    // Header
+    html += '<div style="font-family:var(--font-body,sans-serif);font-size:0.75rem;font-weight:600;color:var(--text-muted,#6B7280);padding:0.5rem 0.6rem;border-bottom:2px solid var(--border,#E2E6EE);text-align:left;">Tweet</div>';
+    for (var v = 0; v < variants.length; v++) {
+      html += '<div style="font-family:var(--font-mono,monospace);font-size:0.68rem;font-weight:600;color:var(--text-muted,#6B7280);padding:0.5rem 0.4rem;border-bottom:2px solid var(--border,#E2E6EE);text-align:center;line-height:1.35;">' + variants[v].short + '<br><span style="font-weight:400;opacity:0.7;">' + variants[v].desc + '</span></div>';
+    }
+    // Rows
+    for (var i = 0; i < tweets.length; i++) {
+      var t = tweets[i];
+      var isSel = selectedIdx === i;
+      var rowBg = isSel ? "background:var(--accent-light,#E8EEF6);" : "";
+      var maj = getMaj(t.preds);
+      // Tweet cell
+      html += '<div class="ps-click" data-i="' + i + '" style="font-size:0.78rem;color:var(--text-sec,#3D4455);padding:0.65rem 0.6rem;border-bottom:1px solid var(--border,#E2E6EE);cursor:pointer;display:flex;align-items:center;line-height:1.4;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;' + rowBg + '">';
+      html += '<span style="font-family:var(--font-mono,monospace);font-size:0.68rem;color:var(--text-muted,#6B7280);width:1.5rem;flex-shrink:0;">' + (i+1) + '</span>';
+      html += '<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;">' + esc(t.text) + '</span>';
+      // Pips
+      html += '<span style="flex-shrink:0;margin-left:0.5rem;display:flex;gap:2px;">';
+      for (var p = 0; p < 5; p++) html += '<span style="width:5px;height:5px;border-radius:50%;background:' + (p < t.instability ? '#D44' : 'var(--border,#E2E6EE)') + ';"></span>';
+      html += '</span></div>';
+      // Pred cells
+      for (var vi = 0; vi < 5; vi++) {
+        var pred = t.preds[vi];
+        var isFlip = t.instability > 0 && pred !== maj;
+        var tagBg = pred === "s" ? "#E0EAFA" : "#FAEAD8";
+        var tagCol = pred === "s" ? "#2E5090" : "#9E5C28";
+        var ring = isFlip ? "box-shadow:0 0 0 2px #D44;" : "";
+        html += '<div class="ps-click" data-i="' + i + '" style="padding:0.65rem 0.4rem;border-bottom:1px solid var(--border,#E2E6EE);display:flex;align-items:center;justify-content:center;cursor:pointer;' + rowBg + '">';
+        html += '<span style="font-family:var(--font-mono,monospace);font-size:0.7rem;font-weight:600;padding:0.2rem 0.55rem;border-radius:3px;background:' + tagBg + ';color:' + tagCol + ';' + ring + '">' + (pred === "s" ? "support" : "oppose") + '</span>';
+        html += '</div>';
+      }
+    }
+    html += '</div></div>';
+
+    // Detail panel
+    if (selectedIdx !== null) {
+      var t = tweets[selectedIdx];
+      html += '<div class="widget-fade" style="margin-top:1.25rem;background:var(--surface,#FFF);border:1.5px solid var(--border,#E2E6EE);border-radius:12px;padding:1.25rem;">';
+      html += '<div style="font-family:var(--font-mono,monospace);font-size:0.65rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted,#6B7280);margin-bottom:0.3rem;">Tweet ' + (selectedIdx+1) + '</div>';
+      html += '<div style="font-size:0.92rem;color:var(--text,#1A1D27);line-height:1.6;margin-bottom:0.75rem;font-style:italic;">\u201C' + esc(t.text) + '\u201D</div>';
+      html += '<div style="font-size:0.82rem;color:var(--text-sec,#3D4455);margin-bottom:0.75rem;">Ground truth: <strong>' + (t.truth==="s"?"support":"oppose") + '</strong></div>';
+      html += '<div style="font-size:0.82rem;color:var(--text-sec,#3D4455);margin-bottom:0.75rem;line-height:1.55;">' + t.note + '</div>';
+      html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">';
+      for (var v = 0; v < 5; v++) {
+        var pred = t.preds[v];
+        var isWrong = pred !== t.truth;
+        var bg = isWrong ? "border-color:#E8A0A0;background:#FDF0F0;" : "";
+        html += '<div style="padding:0.5rem 0.7rem;border-radius:8px;border:1px solid var(--border,#E2E6EE);background:var(--surface-alt,#F5F5F0);font-size:0.78rem;line-height:1.5;' + bg + '">';
+        html += '<div style="font-weight:600;color:var(--text,#1A1D27);font-size:0.72rem;">' + variants[v].short + ': ' + variants[v].desc + '</div>';
+        html += '<div>' + (pred==="s"?"support":"oppose") + (isWrong?" \u2717":" \u2713") + '</div>';
+        html += '</div>';
+      }
+      html += '</div></div>';
+    }
+
+    // Takeaway
+    html += '<div style="margin-top:1.5rem;padding:0.85rem 1rem;border-left:3px solid var(--accent,#2D8ABF);background:var(--accent-light,#E8EEF6);border-radius:0 8px 8px 0;font-size:0.85rem;color:var(--text-sec,#3D4455);line-height:1.6;"><strong style="color:var(--text,#1A1D27);">The prompt is your measurement instrument.</strong> If rewording the question changes the answer, your measurement is fragile. Test multiple variants, report the range, and select your final prompt based on validation against a gold standard.</div>';
+
+    html += '</div>';
+    root.innerHTML = html;
+
+    root.querySelectorAll(".ps-click").forEach(function(el) {
+      el.addEventListener("click", function() {
+        var idx = parseInt(el.getAttribute("data-i"), 10);
+        selectedIdx = selectedIdx === idx ? null : idx;
+        render();
+      });
+    });
+  }
+
+  render();
+})();
+</script>
+
+<!-- 5. TEST-TIME COMPUTE TRADEOFF -->
+<script is:inline>
+(function () {
+  var root = document.getElementById("test-time-compute-root");
+  if (!root) return;
+
+  var sizes = [500,1000,5000,10000,50000];
+  var labels = ["500","1,000","5,000","10,000","50,000"];
+  var hardFrac = 0.15;
+
+  var strats = [
+    { name:"Standard prompting", desc:"Direct classification. No reasoning.", cpt:0.000095, tpt:0.3, ae:0.94, ah:0.62 },
+    { name:"Chain-of-thought", desc:"\"Think step by step\" on every tweet.", cpt:0.00025, tpt:0.8, ae:0.95, ah:0.74 },
+    { name:"Reasoning model", desc:"Dedicated reasoning model on every tweet.", cpt:0.0032, tpt:3.0, ae:0.96, ah:0.85 },
+    { name:"Hybrid", desc:"Standard first, reasoning only on uncertain ~15%.", hybrid:true, ae:0.94, ah:0.83 }
+  ];
+
+  function getCost(si,n){if(strats[si].hybrid)return n*(1-hardFrac)*0.000095+n*hardFrac*0.0032;return strats[si].cpt*n;}
+  function getTime(si,n){if(strats[si].hybrid)return n*(1-hardFrac)*0.3+n*hardFrac*3.0;return strats[si].tpt*n;}
+  function getAcc(si){return strats[si].ae*(1-hardFrac)+strats[si].ah*hardFrac;}
+  function fmtCost(c){if(c<0.01)return"<$0.01";if(c<10)return"$"+c.toFixed(2);return"$"+Math.round(c);}
+  function fmtTime(s){if(s<60)return Math.round(s)+"s";if(s<3600)return Math.round(s/60)+" min";return(s/3600).toFixed(1)+" hr";}
+
+  function render() {
+    var sliderVal = root.querySelector("#ttc-slider") ? parseInt(root.querySelector("#ttc-slider").value,10) : 2;
+    var n = sizes[sliderVal];
+
+    var costs=[],times=[],accs=[];
+    for(var i=0;i<4;i++){costs.push(getCost(i,n));times.push(getTime(i,n));accs.push(getAcc(i));}
+    var maxC=Math.max.apply(null,costs),maxT=Math.max.apply(null,times);
+
+    var html='<div class="widget-wrap">';
+    html+='<div class="widget-eyebrow">Interactive visualisation</div>';
+    html+='<div class="widget-title">The Cost of Thinking</div>';
+    html+='<p class="widget-intro">Reasoning improves accuracy on hard cases but costs more. Drag the slider to change corpus size and compare four strategies.</p>';
+
+    // Scenario
+    html+='<div style="background:var(--surface-alt,#F5F5F0);border:1px solid var(--border,#E2E6EE);border-radius:12px;padding:1.25rem;margin-bottom:1.75rem;">';
+    html+='<div style="font-size:0.82rem;font-weight:600;color:var(--text,#1A1D27);margin-bottom:0.35rem;">Scenario: stance classification on political tweets</div>';
+    html+='<div style="font-size:0.82rem;color:var(--text-muted,#6B7280);margin-bottom:1rem;">Binary classification. ~15% of tweets are ambiguous. The rest are clear-cut.</div>';
+    html+='<div style="display:flex;align-items:center;gap:1rem;">';
+    html+='<div style="font-size:0.82rem;font-weight:600;color:var(--text,#1A1D27);white-space:nowrap;min-width:6.5rem;">Corpus: <span style="font-family:var(--font-mono,monospace);color:var(--accent,#2D8ABF);">'+labels[sliderVal]+'</span></div>';
+    html+='<input type="range" id="ttc-slider" min="0" max="4" value="'+sliderVal+'" step="1" style="flex:1;-webkit-appearance:none;height:5px;border-radius:3px;background:var(--border,#E2E6EE);outline:none;cursor:pointer;">';
+    html+='</div>';
+    html+='<div style="display:flex;justify-content:space-between;padding-left:7.5rem;margin-top:0.3rem;">';
+    for(var m=0;m<labels.length;m++)html+='<span style="font-family:var(--font-mono,monospace);font-size:0.65rem;color:var(--text-muted,#6B7280);">'+labels[m]+'</span>';
+    html+='</div></div>';
+
+    // Cards
+    html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem;">';
+    for(var s=0;s<4;s++){
+      var isBest=s===3;
+      html+='<div style="background:var(--surface,#FFF);border:1.5px solid '+(isBest?'#2D7D46':'var(--border,#E2E6EE)')+';border-radius:12px;padding:1.1rem 1.15rem;position:relative;'+(isBest?'box-shadow:0 0 0 1px #B8DBBD;':'')+'">';
+      if(isBest)html+='<div style="position:absolute;top:-0.55rem;right:0.75rem;font-family:var(--font-mono,monospace);font-size:0.6rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#2D7D46;background:#EDF7F0;border:1px solid #B8DBBD;padding:0.1rem 0.5rem;border-radius:3px;">Best tradeoff</div>';
+      html+='<div style="font-size:0.9rem;font-weight:700;color:var(--text,#1A1D27);margin-bottom:0.15rem;">'+strats[s].name+'</div>';
+      html+='<div style="font-size:0.75rem;color:var(--text-muted,#6B7280);margin-bottom:0.9rem;line-height:1.45;">'+strats[s].desc+'</div>';
+
+      // Metrics
+      var metrics=[
+        {icon:"$",label:"Cost",val:fmtCost(costs[s]),pct:maxC>0?costs[s]/maxC*100:0,color:"#9E3A38"},
+        {icon:"\u23F1",label:"Time",val:fmtTime(times[s]),pct:maxT>0?times[s]/maxT*100:0,color:"#8B6914"},
+        {icon:"\u2713",label:"Accuracy",val:(accs[s]*100).toFixed(1)+"%",pct:Math.max(0,Math.min(100,(accs[s]-0.80)/0.20*100)),color:"#2D7D46"}
+      ];
+      for(var mi=0;mi<metrics.length;mi++){
+        var mt=metrics[mi];
+        html+='<div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem;">';
+        html+='<div style="width:1rem;text-align:center;font-size:0.75rem;">'+mt.icon+'</div>';
+        html+='<div style="font-size:0.75rem;color:var(--text-muted,#6B7280);width:4rem;flex-shrink:0;">'+mt.label+'</div>';
+        html+='<div style="flex:1;height:6px;background:var(--surface-alt,#F5F5F0);border:1px solid var(--border,#E2E6EE);border-radius:3px;overflow:hidden;"><div style="height:100%;border-radius:3px;background:'+mt.color+';width:'+mt.pct+'%;transition:width 0.5s ease;"></div></div>';
+        html+='<div style="font-family:var(--font-mono,monospace);font-size:0.75rem;font-weight:600;min-width:3.5rem;text-align:right;color:'+mt.color+';">'+mt.val+'</div>';
+        html+='</div>';
+      }
+      html+='</div>';
+    }
+    html+='</div>';
+
+    // Insight
+    var rc=costs[2],hc=costs[3],sc=costs[0],mult=Math.round(rc/sc);
+    var insightText="";
+    if(n<=500)insightText='<strong>At small scale, cost differences are negligible.</strong> Even the reasoning model costs under $2. Use whatever gives the best accuracy.';
+    else if(n<=1000)insightText='<strong>Still affordable across all strategies.</strong> The reasoning model costs ~'+fmtCost(rc)+', roughly '+mult+'x standard. Focus on accuracy.';
+    else if(n<=5000)insightText='<strong>The tradeoffs start to bite.</strong> Reasoning costs '+fmtCost(rc)+' while standard costs '+fmtCost(sc)+'. The hybrid gets most of the accuracy gain for '+fmtCost(hc)+'.';
+    else if(n<=10000)insightText='<strong>Cost matters at this scale.</strong> Reasoning on all 10,000 tweets costs '+fmtCost(rc)+' and takes '+fmtTime(times[2])+'. The hybrid saves '+fmtCost(rc-hc)+' while sacrificing only 2 points on hard cases.';
+    else insightText='<strong>At 50,000 tweets, strategy choice is a budget decision.</strong> Reasoning costs '+fmtCost(rc)+' and takes '+fmtTime(times[2])+'. That is '+mult+'x standard for a '+((accs[2]-accs[0])*100).toFixed(1)+'-point gain. The hybrid captures most of that for '+fmtCost(hc)+'.';
+    html+='<div style="padding:0.85rem 1rem;border-left:3px solid var(--accent,#2D8ABF);background:var(--accent-light,#E8EEF6);border-radius:0 8px 8px 0;font-size:0.85rem;color:var(--text-sec,#3D4455);line-height:1.6;margin-bottom:1.5rem;">'+insightText+'</div>';
+
+    // When to use what
+    html+='<div style="background:var(--surface,#FFF);border:1.5px solid var(--accent,#2D8ABF);border-radius:12px;padding:1.25rem;">';
+    html+='<div style="font-family:var(--font-display,serif);font-size:1rem;font-weight:700;color:var(--accent,#2D8ABF);margin-bottom:0.5rem;">When to use each strategy</div>';
+    html+='<p style="font-size:0.88rem;color:var(--text-sec,#3D4455);line-height:1.6;margin-bottom:0.5rem;"><strong style="color:var(--text,#1A1D27);">Standard prompting:</strong> right default for clear-cut tasks.</p>';
+    html+='<p style="font-size:0.88rem;color:var(--text-sec,#3D4455);line-height:1.6;margin-bottom:0.5rem;"><strong style="color:var(--text,#1A1D27);">Chain-of-thought:</strong> worth testing during development. Use it if it improves validation accuracy.</p>';
+    html+='<p style="font-size:0.88rem;color:var(--text-sec,#3D4455);line-height:1.6;margin-bottom:0.5rem;"><strong style="color:var(--text,#1A1D27);">Reasoning models:</strong> reserve for genuine analytical complexity (legal language, qualitative coding, domain expertise).</p>';
+    html+='<p style="font-size:0.88rem;color:var(--text-sec,#3D4455);line-height:1.6;margin-bottom:0.5rem;"><strong style="color:var(--text,#1A1D27);">Hybrid:</strong> the practical optimum. Standard model first, reasoning only on uncertain cases.</p>';
+    html+='</div>';
+
+    // Assumptions
+    html+='<details style="margin-top:1rem;"><summary style="font-family:var(--font-mono,monospace);font-size:0.75rem;font-weight:500;color:var(--text-muted,#6B7280);cursor:pointer;padding:0.5rem 0;list-style:none;display:flex;align-items:center;gap:0.4rem;"><span style="font-size:0.7rem;transition:transform 0.25s ease;">&#9656;</span>Assumptions behind these estimates</summary>';
+    html+='<div style="padding:0.75rem 0 0.25rem 0;font-size:0.78rem;color:var(--text-muted,#6B7280);line-height:1.6;">';
+    html+='<p style="margin-bottom:0.5rem;">These numbers are <strong style="color:var(--text-sec,#3D4455);">illustrative, not authoritative</strong>. Based on typical mid-2025 API pricing. Standard models ~$0.50\u20131.50/M tokens; reasoning models ~$3\u201312/M tokens. Accuracy estimates based on published classification benchmarks. The 15% hard-case fraction is approximate for political text tasks with sarcasm and implicit stance.</p>';
+    html+='<p>Check <a href="https://artificialanalysis.ai" target="_blank" rel="noopener" style="color:var(--accent,#2D8ABF);">Artificial Analysis</a> for current pricing before budgeting a project.</p>';
+    html+='</div></details>';
+
+    html+='</div>';
+    root.innerHTML=html;
+
+    root.querySelector("#ttc-slider").addEventListener("input", render);
+  }
+
+  render();
+})();
+</script>
+
+<!-- 6. MODEL LANDSCAPE CHART -->
 <script is:inline>
 (function() {
   var svg = document.getElementById("model-landscape-svg");
@@ -1563,21 +1679,27 @@ const math = {
   if (!svg || !explorer) return;
 
   var models = [
-    { name: "GPT-4o", cap: 0.87, cost: 0.62, type: "closed" },
-    { name: "Claude 3.5 Sonnet", cap: 0.88, cost: 0.55, type: "closed" },
-    { name: "Gemini 1.5 Pro", cap: 0.84, cost: 0.50, type: "closed" },
-    { name: "GPT-4o mini", cap: 0.73, cost: 0.12, type: "closed" },
-    { name: "o1", cap: 0.95, cost: 0.92, type: "closed" },
-    { name: "DeepSeek-V3", cap: 0.85, cost: 0.10, type: "open" },
-    { name: "Llama 3.1 405B", cap: 0.82, cost: 0.42, type: "open" },
-    { name: "Llama 3.1 70B", cap: 0.75, cost: 0.18, type: "open" },
-    { name: "Qwen 2.5 72B", cap: 0.77, cost: 0.16, type: "open" },
-    { name: "Mistral Large", cap: 0.78, cost: 0.35, type: "open" },
-    { name: "Llama 3.1 8B", cap: 0.56, cost: 0.04, type: "open" },
-    { name: "Gemma 2 27B", cap: 0.67, cost: 0.10, type: "open" }
+    { name: "Claude Opus 4.6", cap: 0.95, cost: 0.55, type: "closed" },
+    { name: "Claude Sonnet 4.6", cap: 0.89, cost: 0.32, type: "closed" },
+    { name: "GPT-5.4", cap: 0.94, cost: 0.38, type: "closed" },
+    { name: "GPT-5.2", cap: 0.90, cost: 0.28, type: "closed" },
+    { name: "Gemini 3.1 Pro", cap: 0.96, cost: 0.42, type: "closed" },
+    { name: "Gemini 2.5 Flash", cap: 0.78, cost: 0.05, type: "closed" },
+    { name: "DeepSeek V3.2", cap: 0.85, cost: 0.03, type: "open" },
+    { name: "DeepSeek R1", cap: 0.88, cost: 0.16, type: "open" },
+    { name: "Qwen 3.5", cap: 0.84, cost: 0.12, type: "open" },
+    { name: "Llama 4 Maverick", cap: 0.80, cost: 0.06, type: "open" },
+    { name: "Mistral Large", cap: 0.82, cost: 0.20, type: "open" },
+    { name: "GLM-5", cap: 0.86, cost: 0.14, type: "open" }
   ];
 
   var filter = "all";
+
+  /* Normalized axis ranges for plotting only (model cap/cost values unchanged). */
+  var AXIS_COST_MIN = 0;
+  var AXIS_COST_MAX = 0.62;
+  var AXIS_CAP_MIN = 0.74;
+  var AXIS_CAP_MAX = 1.0;
 
   function draw() {
     var pad = 60;
@@ -1585,6 +1707,15 @@ const math = {
     var plotL = pad + 10, plotR = w - 30;
     var plotT = 30, plotB = h - pad;
     var plotW = plotR - plotL, plotH = plotB - plotT;
+    var costSpan = AXIS_COST_MAX - AXIS_COST_MIN;
+    var capSpan = AXIS_CAP_MAX - AXIS_CAP_MIN;
+    function xCost(c) {
+      return plotL + (c - AXIS_COST_MIN) / costSpan * plotW;
+    }
+    function yCap(cap) {
+      return plotB - (cap - AXIS_CAP_MIN) / capSpan * plotH;
+    }
+    var costMid = (AXIS_COST_MIN + AXIS_COST_MAX) / 2;
     var s = "";
 
     s += '<rect x="' + plotL + '" y="' + plotT + '" width="' + plotW + '" height="' + plotH + '" rx="4" style="fill:var(--surface,#F2F4F8);stroke:var(--border,#E2E6EE);"/>';
@@ -1611,7 +1742,6 @@ const math = {
       return m.type === filter;
     });
 
-    // Pareto frontier: models not dominated on cost-capability
     var frontier = filtered.slice().sort(function(a, b) { return a.cost - b.cost; });
     var paretoPoints = [];
     var bestCap = -1;
@@ -1624,22 +1754,22 @@ const math = {
     if (paretoPoints.length > 1) {
       var fp = "";
       for (var pi = 0; pi < paretoPoints.length; pi++) {
-        var fpx = plotL + paretoPoints[pi].cost * plotW;
-        var fpy = plotB - (paretoPoints[pi].cap - 0.4) / 0.6 * plotH;
+        var fpx = xCost(paretoPoints[pi].cost);
+        var fpy = yCap(paretoPoints[pi].cap);
         fp += (pi === 0 ? "M" : "L") + fpx + "," + fpy;
       }
       s += '<path d="' + fp + '" fill="none" style="stroke:var(--accent,#2D8ABF);" stroke-width="1.5" stroke-dasharray="6,4" opacity="0.5"/>';
-      s += '<text x="' + (plotL + paretoPoints[0].cost * plotW + 4) + '" y="' + (plotB - (paretoPoints[0].cap - 0.4) / 0.6 * plotH + 16) + '" style="fill:var(--text-muted,#6B7280);font-family:var(--font-body);" font-size="8" font-style="italic">cost-capability frontier</text>';
+      s += '<text x="' + (xCost(paretoPoints[0].cost) + 4) + '" y="' + (yCap(paretoPoints[0].cap) + 16) + '" style="fill:var(--text-muted,#6B7280);font-family:var(--font-body);" font-size="8" font-style="italic">cost-capability frontier</text>';
     }
 
     var labels = [];
     for (var i = 0; i < filtered.length; i++) {
       var m = filtered[i];
-      var px = plotL + m.cost * plotW;
-      var py = plotB - (m.cap - 0.4) / 0.6 * plotH;
+      var px = xCost(m.cost);
+      var py = yCap(m.cap);
       var color = m.type === "closed" ? "var(--accent,#2D8ABF)" : "var(--accent-dark,#1E5A8A)";
       s += '<circle cx="' + px + '" cy="' + py + '" r="5.5" style="fill:' + color + ';" opacity="0.85"/>';
-      var anchor = m.cost > 0.6 ? "end" : "start";
+      var anchor = m.cost > costMid ? "end" : "start";
       var lx = anchor === "start" ? px + 9 : px - 9;
       var ly = py - 8;
       labels.push({ x: lx, y: ly, a: anchor, t: m.name });
@@ -1671,9 +1801,9 @@ const math = {
       filter = filterMap[i];
       draw();
       var msgs = [
-        "Approximate positions based on public benchmarks and pricing as of early 2025. Capability reflects an approximate composite of MMLU, Arena ELO, and coding benchmarks. The dashed line marks the cost-capability frontier. Verify current data before making decisions.",
-        "Open-weight models: weights are publicly available. You can run them locally, inspect them, and guarantee reproducibility. Cost depends on your compute infrastructure. The dashed line marks the cost-capability frontier.",
-        "Closed-weight models: accessible only via API. Generally higher capability on the hardest tasks, but costs per token and model versions can change without notice. The dashed line marks the cost-capability frontier."
+        "Approximate positions based on public benchmarks and API pricing as of early 2026. Capability reflects a composite of Chatbot Arena, MMLU, and coding benchmarks. The dashed line marks the cost-capability frontier. Note the cluster of open-weight models in the low-cost, high-capability region. Verify current data before making decisions.",
+        "Open-weight models: weights are publicly available. You can run them locally, inspect them, and guarantee reproducibility. DeepSeek V3.2 and Llama 4 Maverick offer strong capability at very low API cost. Self-hosting makes costs even lower at scale.",
+        "Closed-weight models: accessible only via API. The frontier models lead on the hardest tasks, but open models have closed much of the gap. Costs per token and model versions can change without notice."
       ];
       insight.textContent = msgs[i];
     });
