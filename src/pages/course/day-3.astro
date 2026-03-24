@@ -5,7 +5,7 @@ const sections = [
   { id: 'fine-tuning', label: 'Fine-Tuning' },
   { id: 'at-scale', label: 'Working at Scale' },
   { id: 'validation', label: 'Validation' },
-  { id: 'social-science', label: 'Social Science Applications' },
+  { id: 'social-science', label: 'Putting It Together' },
 ];
 
 const math = {
@@ -32,6 +32,29 @@ const math = {
 >
 
   <!-- ===================================================================
+       DAY INTRODUCTION
+       =================================================================== -->
+  <div class="day-intro">
+    <p>
+      You know how to prompt models. Now you need to deploy them as
+      <strong>research instruments</strong>. That requires three capabilities:
+      adapting models to your specific task when prompting hits a ceiling,
+      running them reliably at the scale your corpus demands, and &mdash; most
+      critically &mdash; verifying that the results are trustworthy enough to
+      build an argument on.
+    </p>
+    <p>
+      Today is about building that pipeline. By the end of this session you
+      will understand <strong>when and how to fine-tune</strong> (LoRA,
+      QLoRA, encoder models), how to <strong>move from notebook to
+      production</strong> (APIs, batching, self-hosted inference), and how to
+      <strong>validate rigorously</strong> (kappa, per-class F1, qualitative
+      error analysis). The thread connecting all three: the model is a
+      measurement instrument, and instruments require calibration.
+    </p>
+  </div>
+
+  <!-- ===================================================================
        SECTION 1: FINE-TUNING
        =================================================================== -->
   <section id="fine-tuning">
@@ -42,7 +65,7 @@ const math = {
       many tasks, this works well. But prompting has a ceiling: when your
       classification scheme is domain-specific, when the model makes
       systematic errors that better examples cannot fix, or when per-token
-      costs make API-based prompting prohibitive at scale : 
+      costs make API-based prompting prohibitive at scale &mdash;
       <strong>fine-tuning</strong> adapts a model&rsquo;s weights to your
       specific task.
     </p>
@@ -150,7 +173,7 @@ const math = {
       </svg>
       <p class="visual-diagram__caption">
         A simplified decision tree for choosing between prompting, RAG, and
-        fine-tuning. Real decisions often involve hybrid approaches : 
+        fine-tuning. Real decisions often involve hybrid approaches &mdash;
         for example, using RAG <em>and</em> fine-tuning together. The key
         factor is validation: if your current approach meets your threshold,
         added complexity is not justified. Illustrative diagram.
@@ -185,7 +208,7 @@ const math = {
     <h3>LoRA: Parameter-Efficient Fine-Tuning</h3>
     <p>
       Full fine-tuning updates every parameter in the model. For a
-      7B-parameter model, this means updating seven billion numbers : 
+      7B-parameter model, this means updating seven billion numbers &mdash;
       requiring multiple high-end GPUs and risking <strong>catastrophic
       forgetting</strong>, where the model loses general capabilities while
       learning your task.
@@ -199,7 +222,7 @@ const math = {
         (<a href="https://arxiv.org/abs/2106.09685" target="_blank" rel="noopener">Hu et al., 2021</a>)
         that freezes all pre-trained weights and injects small, trainable
         low-rank matrices into the model&rsquo;s attention layers. Instead of
-        updating billions of parameters, LoRA trains tens of millions : 
+        updating billions of parameters, LoRA trains tens of millions &mdash;
         typically less than 1% of the total. This achieves performance
         comparable to full fine-tuning at a fraction of the compute cost.
       </p>
@@ -217,6 +240,255 @@ const math = {
       <p set:html={math.loraUpdate} />
       <p class="formula-block__caption" set:html={math.loraCaption} />
     </div>
+
+    <!-- LoRA Calculator (interactive) -->
+<div class="lora-widget" id="lora-widget">
+  <div class="lora-widget__title">LoRA Parameter Calculator</div>
+  <div class="lora-widget__subtitle">
+    Adjust model size and LoRA rank to see how many parameters you actually train,
+    how much memory you need, and what hardware can run it.
+  </div>
+
+  <div class="lora-presets" id="lora-presets">
+    <button class="lora-pre-btn lora-pre-btn--active" data-idx="0">Qwen 3 4B (Colab T4)</button>
+    <button class="lora-pre-btn" data-idx="1">Gemma 3 12B</button>
+    <button class="lora-pre-btn" data-idx="2">Qwen 3 32B</button>
+    <button class="lora-pre-btn" data-idx="3">Llama 3.3 70B</button>
+    <button class="lora-pre-btn" data-idx="4">DeBERTa (encoder)</button>
+  </div>
+
+  <div class="lora-grid">
+    <!-- Left: Controls -->
+    <div class="lora-controls">
+      <div class="lora-controls__label">Configuration</div>
+
+      <div class="lora-slider">
+        <div class="lora-slider__hdr"><span class="lora-slider__name">Model parameters</span><span class="lora-slider__val" id="lora-disp-params">4B</span></div>
+        <input class="lora-slider__range" type="range" id="lora-sl-params" min="0" max="9" step="1" value="3">
+        <div class="lora-slider__hint" id="lora-hint-params">Qwen 3 4B &mdash; total pre-trained weights (frozen during LoRA)</div>
+      </div>
+
+      <div class="lora-slider">
+        <div class="lora-slider__hdr"><span class="lora-slider__name">LoRA rank (r)</span><span class="lora-slider__val" id="lora-disp-rank">16</span></div>
+        <input class="lora-slider__range" type="range" id="lora-sl-rank" min="0" max="7" step="1" value="2">
+        <div class="lora-slider__hint">Higher rank = more expressiveness but more memory. 8&ndash;32 covers most tasks.</div>
+      </div>
+
+      <div class="lora-slider">
+        <div class="lora-slider__hdr"><span class="lora-slider__name">Hidden dimension (d)</span><span class="lora-slider__val" id="lora-disp-hidden">2560</span></div>
+        <input class="lora-slider__range" type="range" id="lora-sl-hidden" min="0" max="6" step="1" value="2">
+        <div class="lora-slider__hint">Width of the attention layers where LoRA adapters are injected</div>
+      </div>
+
+      <div class="lora-slider">
+        <div class="lora-slider__hdr"><span class="lora-slider__name">Number of layers</span><span class="lora-slider__val" id="lora-disp-layers">36</span></div>
+        <input class="lora-slider__range" type="range" id="lora-sl-layers" min="0" max="6" step="1" value="2">
+        <div class="lora-slider__hint">Transformer blocks; LoRA applied to Q, K, V, O projections in each</div>
+      </div>
+
+      <div class="lora-toggle-row">
+        <div class="lora-toggle-row__left">
+          <span class="lora-toggle-row__name">QLoRA (4-bit quantisation)</span>
+          <span class="lora-toggle-row__hint">Load base weights in 4-bit; adapters stay in 16-bit</span>
+        </div>
+        <label class="lora-switch"><input type="checkbox" id="lora-qlora" checked><span class="lora-switch__track"></span></label>
+      </div>
+
+      <div class="lora-eq" id="lora-eq"></div>
+    </div>
+
+    <!-- Right: Results -->
+    <div class="lora-results">
+      <div class="lora-rcard">
+        <div class="lora-rcard__hdr"><span class="lora-rcard__name">Trainable Parameters</span><span class="lora-rcard__val" id="lora-val-train">11.8M</span></div>
+        <div class="lora-propbar">
+          <div class="lora-propbar__frozen" id="lora-bar-frozen" style="flex:99.5"><span class="lora-propbar__lbl lora-propbar__lbl--frozen" id="lora-lbl-frozen">99.7% frozen</span></div>
+          <div class="lora-propbar__train" id="lora-bar-train" style="flex:0.5"><span class="lora-propbar__lbl lora-propbar__lbl--train" id="lora-lbl-train">0.3%</span></div>
+        </div>
+        <div class="lora-rcard__desc" id="lora-param-desc"></div>
+      </div>
+
+      <div class="lora-rcard">
+        <div class="lora-rcard__hdr"><span class="lora-rcard__name">Estimated VRAM (training)</span><span class="lora-rcard__val" id="lora-val-vram">~6.1 GB</span></div>
+        <div class="lora-rcard__desc" id="lora-vram-desc"></div>
+        <div class="lora-rcard__desc" style="margin-top:0.25rem;font-style:italic;" id="lora-vram-caveat">Assumes batch size 1, sequence length 512. Gradient checkpointing enabled.</div>
+      </div>
+
+      <div class="lora-rcard">
+        <div class="lora-rcard__hdr"><span class="lora-rcard__name">Hardware Feasibility</span></div>
+        <div class="lora-hwlist" id="lora-hwlist"></div>
+      </div>
+
+      <div class="lora-rcard" id="lora-enc-note" style="display:none;">
+        <div class="lora-rcard__desc" style="font-size:0.8rem;color:var(--accent-dark,#1E5A8A);font-weight:500;">
+          <strong>Note:</strong> Encoder models (DeBERTa, BERT) use standard full fine-tuning,
+          not LoRA. All parameters are trainable. The model is small enough that this is
+          fast and cheap &mdash; a few minutes on a single GPU.
+        </div>
+      </div>
+
+      <div class="lora-insight"><div class="lora-insight__text" id="lora-insight-text"></div></div>
+    </div>
+  </div>
+
+  <!-- Methodology -->
+  <details class="lora-method">
+    <summary class="lora-method__toggle">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;transition:transform 0.2s;flex-shrink:0;"><path d="M6 4l4 4-4 4"/></svg>
+      How these estimates are calculated
+    </summary>
+    <div class="lora-method__body">
+      <p>These are <strong>rough planning estimates</strong>, not benchmarked measurements. Actual VRAM depends on your framework (Unsloth, PEFT, Axolotl), batch size, sequence length, gradient checkpointing settings, and other factors. Use these numbers to decide which hardware tier to target, then verify with a short test run.</p>
+      <p><strong>Trainable parameters.</strong> LoRA injects two matrices <code>B (d &times; r)</code> and <code>A (r &times; d)</code> into each target projection. We assume 4 target modules per layer (Q, K, V, O). Total trainable = <code>2 &times; d &times; r &times; 4 &times; num_layers</code>.</p>
+      <p><strong>Base model memory.</strong> fp16/bf16: 2 bytes/param. 4-bit (QLoRA): &asymp;0.55 bytes/param (includes NF4 quantisation metadata).</p>
+      <p><strong>Adapter + optimizer.</strong> LoRA adapters in fp16 (2 bytes/param) plus AdamW states (8 bytes/param) = 10 bytes per trainable parameter.</p>
+      <p><strong>Activations.</strong> QLoRA with gradient checkpointing, bs=1, seq=512: &asymp;<code>total_params_B &times; 0.7</code> GB (capped at 20 GB). fp16 LoRA: &asymp;<code>total_params_B &times; 1.0</code> GB (capped at 30 GB). Heuristics calibrated against <a href="https://github.com/unslothai/unsloth" target="_blank" rel="noopener">Unsloth</a> and <a href="https://github.com/huggingface/peft" target="_blank" rel="noopener">PEFT</a> documentation.</p>
+      <p><strong>Hardware thresholds.</strong> &check; feasible if VRAM &le; 75% of capacity. &bull; tight if &le; 95%. &cross; insufficient above that.</p>
+      <p><strong>Model architectures.</strong> Hidden dimensions and layer counts from published Hugging Face model configs.</p>
+    </div>
+  </details>
+</div>
+
+<style is:inline>
+  .lora-widget__title{font-size:1.05rem;font-weight:700;color:var(--text,#0F1117);margin-bottom:0.15rem;}
+  .lora-widget__subtitle{font-size:0.82rem;color:var(--text-muted,#6B7280);margin-bottom:1.25rem;line-height:1.5;}
+  .lora-presets{display:flex;gap:0.4rem;margin-bottom:1.25rem;flex-wrap:wrap;}
+  .lora-pre-btn{font-family:var(--font-body,sans-serif);font-size:0.78rem;font-weight:600;padding:0.35rem 0.75rem;border-radius:100px;border:1.5px solid var(--border,#E2E6EE);background:var(--surface,#fff);color:var(--text-sec,#3D4455);cursor:pointer;transition:all 0.15s;white-space:nowrap;}
+  .lora-pre-btn:hover{border-color:var(--accent,#2D8ABF);color:var(--accent,#2D8ABF);}
+  .lora-pre-btn--active{border-color:var(--accent,#2D8ABF);background:var(--accent,#2D8ABF);color:#fff;}
+  .lora-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;align-items:start;}
+  @media(max-width:700px){.lora-grid{grid-template-columns:1fr;}}
+  .lora-controls{background:var(--surface,#fff);border:1px solid var(--border,#E2E6EE);border-radius:8px;padding:1.25rem;display:flex;flex-direction:column;gap:1.1rem;}
+  .lora-controls__label{font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted,#6B7280);margin-bottom:-0.3rem;}
+  .lora-slider{display:flex;flex-direction:column;gap:0.3rem;}
+  .lora-slider__hdr{display:flex;justify-content:space-between;align-items:baseline;}
+  .lora-slider__name{font-size:0.82rem;font-weight:600;color:var(--text-sec,#3D4455);}
+  .lora-slider__val{font-family:var(--font-mono,monospace);font-size:0.88rem;font-weight:600;color:var(--accent,#2D8ABF);}
+  .lora-slider__range{-webkit-appearance:none;appearance:none;width:100%;height:6px;background:var(--surface,#F2F4F8);border-radius:3px;outline:none;border:1px solid var(--border,#E2E6EE);cursor:pointer;}
+  .lora-slider__range::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--accent,#2D8ABF);border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.2);cursor:pointer;}
+  .lora-slider__range::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--accent,#2D8ABF);border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.2);cursor:pointer;}
+  .lora-slider__hint{font-size:0.7rem;color:var(--text-dim,#9CA3AF);line-height:1.4;}
+  .lora-toggle-row{display:flex;align-items:center;justify-content:space-between;padding:0.55rem 0;border-top:1px solid var(--border,#E2E6EE);}
+  .lora-toggle-row__left{display:flex;flex-direction:column;}
+  .lora-toggle-row__name{font-size:0.82rem;font-weight:600;color:var(--text-sec,#3D4455);}
+  .lora-toggle-row__hint{font-size:0.7rem;color:var(--text-dim,#9CA3AF);}
+  .lora-switch{position:relative;width:40px;height:22px;flex-shrink:0;}
+  .lora-switch input{opacity:0;width:0;height:0;}
+  .lora-switch__track{position:absolute;inset:0;background:var(--border,#CDD3DE);border-radius:11px;cursor:pointer;transition:background 0.2s;}
+  .lora-switch__track::after{content:'';position:absolute;width:16px;height:16px;left:3px;top:3px;background:#fff;border-radius:50%;box-shadow:0 1px 3px rgba(0,0,0,0.2);transition:transform 0.2s;}
+  .lora-switch input:checked+.lora-switch__track{background:var(--accent,#2D8ABF);}
+  .lora-switch input:checked+.lora-switch__track::after{transform:translateX(18px);}
+  .lora-eq{background:var(--surface,#F4F6FA);border:1px solid var(--border,#E2E6EE);border-radius:6px;padding:0.7rem 0.8rem;text-align:center;margin-top:0.2rem;}
+  .lora-eq__line{font-family:var(--font-mono,monospace);font-size:0.78rem;color:var(--text-sec,#3D4455);line-height:1.7;}
+  .lora-eq .eq-frozen{color:var(--text-dim,#9CA3AF);}
+  .lora-eq .eq-trainable{color:var(--accent,#2D8ABF);font-weight:600;}
+  .lora-eq .eq-dim{color:var(--text-muted,#6B7280);}
+  .lora-results{display:flex;flex-direction:column;gap:0.75rem;}
+  .lora-rcard{background:var(--surface,#fff);border:1px solid var(--border,#E2E6EE);border-radius:8px;padding:0.85rem 1rem;}
+  .lora-rcard__hdr{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:0.15rem;}
+  .lora-rcard__name{font-size:0.78rem;font-weight:700;color:var(--text-sec,#3D4455);}
+  .lora-rcard__val{font-family:var(--font-mono,monospace);font-size:1.2rem;font-weight:700;color:var(--text,#0F1117);}
+  .lora-rcard__desc{font-size:0.72rem;color:var(--text-muted,#6B7280);line-height:1.4;}
+  .lora-propbar{display:flex;height:28px;border-radius:6px;overflow:hidden;border:1px solid var(--border,#E2E6EE);margin-top:0.15rem;}
+  .lora-propbar__frozen{background:var(--surface,#F2F4F8);display:flex;align-items:center;justify-content:center;transition:flex 0.3s;min-width:0;overflow:hidden;}
+  .lora-propbar__train{background:var(--accent,#2D8ABF);display:flex;align-items:center;justify-content:center;transition:flex 0.3s;min-width:0;overflow:hidden;}
+  .lora-propbar__lbl{font-size:0.65rem;font-weight:600;white-space:nowrap;padding:0 0.4rem;}
+  .lora-propbar__lbl--frozen{color:var(--text-dim,#9CA3AF);}
+  .lora-propbar__lbl--train{color:#fff;}
+  .lora-hwlist{display:flex;flex-direction:column;gap:0.35rem;margin-top:0.25rem;}
+  .lora-hw{display:flex;align-items:center;gap:0.5rem;font-size:0.78rem;color:var(--text-sec,#3D4455);padding:0.3rem 0.5rem;border-radius:6px;background:var(--surface,#F4F6FA);}
+  .lora-hw__icon{width:16px;height:16px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+  .lora-hw__icon--yes{background:#dcfce7;color:#16a34a;}
+  .lora-hw__icon--no{background:#fee2e2;color:#dc2626;}
+  .lora-hw__icon--maybe{background:#fef3c7;color:#d97706;}
+  .lora-hw__icon svg{width:10px;height:10px;}
+  .lora-hw__name{font-weight:600;min-width:120px;}
+  .lora-hw__vram{font-family:var(--font-mono,monospace);font-size:0.72rem;color:var(--text-muted,#6B7280);}
+  .lora-insight{background:var(--blue-9,#E8EEF6);border-left:3px solid var(--accent,#2D8ABF);border-radius:0 8px 8px 0;padding:0.8rem 1rem;}
+  .lora-insight__text{font-size:0.78rem;color:var(--accent-dark,#1E5A8A);line-height:1.55;font-weight:500;}
+  .lora-insight__text strong{font-weight:700;}
+  .lora-method{margin-top:1rem;border:1px solid var(--border,#E2E6EE);border-radius:8px;background:var(--surface,#fff);overflow:hidden;}
+  .lora-method__toggle{display:flex;align-items:center;gap:0.4rem;width:100%;padding:0.65rem 1rem;border:none;background:none;cursor:pointer;font-family:var(--font-body,sans-serif);font-size:0.78rem;font-weight:600;color:var(--text-muted,#6B7280);text-align:left;}
+  .lora-method__toggle:hover{color:var(--text-sec,#3D4455);}
+  .lora-method[open] .lora-method__toggle svg{transform:rotate(90deg);}
+  .lora-method__body{padding:0 1rem 0.85rem;font-size:0.74rem;color:var(--text-muted,#6B7280);line-height:1.65;}
+  .lora-method__body p{margin-bottom:0.5rem;}
+  .lora-method__body code{font-family:var(--font-mono,monospace);font-size:0.68rem;background:var(--surface,#F4F6FA);padding:0.1rem 0.3rem;border-radius:3px;color:var(--text-sec,#3D4455);}
+  .lora-method__body strong{color:var(--text-sec,#3D4455);font-weight:600;}
+</style>
+
+<script is:inline>
+(function(){
+  var $=function(id){return document.getElementById(id)};
+  var paramSteps=[
+    {label:'44M',value:0.044e9,note:'DeBERTaV3-small',hidden:768,layers:6},
+    {label:'184M',value:0.184e9,note:'DeBERTaV3-base',hidden:768,layers:12},
+    {label:'0.6B',value:0.6e9,note:'Qwen 3 0.6B',hidden:1024,layers:28},
+    {label:'4B',value:4e9,note:'Qwen 3 4B',hidden:2560,layers:36},
+    {label:'8B',value:8e9,note:'Qwen 3 8B',hidden:4096,layers:36},
+    {label:'12B',value:12e9,note:'Gemma 3 12B',hidden:3840,layers:48},
+    {label:'14B',value:14e9,note:'Qwen 3 14B',hidden:5120,layers:40},
+    {label:'27B',value:27e9,note:'Gemma 3 27B',hidden:4608,layers:62},
+    {label:'32B',value:32e9,note:'Qwen 3 32B',hidden:5120,layers:64},
+    {label:'70B',value:70e9,note:'Llama 3.3 70B',hidden:8192,layers:80}
+  ];
+  var rankSteps=[4,8,16,32,64,128,256,512];
+  var hiddenSteps=[768,1024,2560,3840,4096,5120,8192];
+  var layerOpts=[6,12,28,36,40,48,64,80];
+  var presets=[
+    {params:3,rank:2,qlora:true,insight:'<strong>Qwen 3 4B with QLoRA rank 16</strong> fits comfortably on a free Colab T4 (15 GB). You train ~0.3% of parameters. The adapter file is small enough to email. This is the setup used in the course notebook.'},
+    {params:5,rank:2,qlora:true,insight:'<strong>Gemma 3 12B</strong> offers a strong jump in reasoning capability. With QLoRA it fits on an A100 or a high-end consumer GPU. Rank 16 is usually sufficient for classification tasks.'},
+    {params:8,rank:2,qlora:true,insight:'<strong>Qwen 3 32B</strong> is a strong choice for complex annotation tasks. Requires a 40+ GB GPU even with QLoRA. Consider whether the quality gain justifies the hardware step-up.'},
+    {params:9,rank:2,qlora:true,insight:'<strong>Llama 3.3 70B</strong> requires serious hardware even with 4-bit quantisation. For most social science classification, a 4\u201314B model with LoRA will be more practical.'},
+    {params:1,rank:1,qlora:false,insight:'<strong>DeBERTaV3-base (184M params)</strong> uses standard full fine-tuning \u2014 no LoRA needed. All 184M parameters are trainable, yet the model fits in ~2 GB VRAM. For fixed-category classification, this is typically the best choice.'}
+  ];
+  var hardware=[{name:'Colab T4 (free)',vram:15},{name:'RTX 3090 / 4090',vram:24},{name:'Colab A100 (Pro)',vram:40},{name:'A100 80 GB (cloud)',vram:80},{name:'2\u00d7 A100 80 GB',vram:160}];
+  var sl={params:$('lora-sl-params'),rank:$('lora-sl-rank')};
+  var hidSl=$('lora-sl-hidden'),laySl=$('lora-sl-layers'),qlora=$('lora-qlora');
+  function syncArch(pi){
+    var m=paramSteps[pi];var bH=0,bL=0;
+    hiddenSteps.forEach(function(h,i){if(Math.abs(h-m.hidden)<Math.abs(hiddenSteps[bH]-m.hidden))bH=i;});
+    layerOpts.forEach(function(l,i){if(Math.abs(l-m.layers)<Math.abs(layerOpts[bL]-m.layers))bL=i;});
+    hidSl.value=bH;laySl.value=bL;
+  }
+  function fN(n){if(n>=1e9)return(n/1e9).toFixed(1)+'B';if(n>=1e6)return(n/1e6).toFixed(1)+'M';if(n>=1e3)return(n/1e3).toFixed(1)+'K';return n.toString();}
+  function update(ins){
+    var pi=parseInt(sl.params.value),ri=parseInt(sl.rank.value),hi=parseInt(hidSl.value),li=parseInt(laySl.value);
+    var mod=paramSteps[pi],r=rankSteps[ri],h=hiddenSteps[hi],ly=layerOpts[li],q=qlora.checked,isEnc=mod.value<0.5e9;
+    $('lora-disp-params').textContent=mod.label;$('lora-disp-rank').textContent=r;$('lora-disp-hidden').textContent=h;$('lora-disp-layers').textContent=ly;
+    $('lora-hint-params').textContent=mod.note+' \u2014 total pre-trained weights'+(isEnc?'':' (frozen during LoRA)');
+    var tpl=2*h*r*4,tt=isEnc?mod.value:tpl*ly,tp=(tt/mod.value)*100,red=mod.value/tt;
+    var bV,aV,actV;
+    if(isEnc){bV=(mod.value*2)/1e9;aV=(mod.value*10)/1e9;actV=0.5;}
+    else if(q){bV=(mod.value*0.55)/1e9;aV=(tt*10)/1e9;actV=Math.min(mod.value/1e9*0.7,20);}
+    else{bV=(mod.value*2)/1e9;aV=(tt*10)/1e9;actV=Math.min(mod.value/1e9*1.0,30);}
+    var totV=bV+aV+actV;var adpMB=isEnc?0:(tt*2)/1e6;
+    $('lora-val-train').textContent=isEnc?fN(mod.value)+' (all)':fN(tt);
+    var fp=isEnc?0:100-tp,trp=isEnc?100:tp;
+    $('lora-bar-frozen').style.flex=fp;$('lora-bar-train').style.flex=Math.max(trp,0.4);
+    $('lora-lbl-frozen').textContent=isEnc?'':fp.toFixed(1)+'% frozen';
+    $('lora-lbl-train').textContent=isEnc?'100% trainable':trp.toFixed(2)+'%';
+    $('lora-param-desc').textContent=isEnc?'Full fine-tuning: all '+fN(mod.value)+' parameters are updated.':fN(tt)+' trainable of '+fN(mod.value)+' total \u2014 a '+Math.round(red)+'\u00d7 reduction. Adapter file: ~'+Math.round(adpMB)+' MB.';
+    $('lora-val-vram').textContent='~'+totV.toFixed(1)+' GB';
+    if(isEnc){$('lora-vram-desc').textContent='Model (fp16): '+bV.toFixed(1)+' GB \u00b7 Optimizer states: '+aV.toFixed(1)+' GB \u00b7 Activations: ~'+actV.toFixed(1)+' GB';$('lora-vram-caveat').textContent='Encoder fine-tuning. Batch size 16, sequence length 512 fits easily.';}
+    else{$('lora-vram-desc').textContent='Base model ('+(q?'4-bit':'fp16')+'): '+bV.toFixed(1)+' GB \u00b7 Adapters + optimizer: '+aV.toFixed(1)+' GB \u00b7 Activations: ~'+actV.toFixed(1)+' GB';$('lora-vram-caveat').textContent='Assumes batch size 1, sequence length 512, gradient checkpointing enabled.';}
+    var hwH='';hardware.forEach(function(hw){var s,ic;if(totV<=hw.vram*0.75){s='yes';ic='<svg viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';}else if(totV<=hw.vram*0.95){s='maybe';ic='<svg viewBox="0 0 12 12"><circle cx="6" cy="6" r="1.5" fill="currentColor"/></svg>';}else{s='no';ic='<svg viewBox="0 0 12 12"><path d="M3 3l6 6M9 3l-6 6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>';}hwH+='<div class="lora-hw"><div class="lora-hw__icon lora-hw__icon--'+s+'">'+ic+'</div><span class="lora-hw__name">'+hw.name+'</span><span class="lora-hw__vram">'+hw.vram+' GB</span></div>';});
+    $('lora-hwlist').innerHTML=hwH;
+    $('lora-enc-note').style.display=isEnc?'block':'none';
+    if(isEnc){$('lora-eq').innerHTML='<div class="lora-eq__line"><span class="eq-trainable">All weights trainable</span> <span class="eq-dim">('+fN(mod.value)+' params)</span></div><div class="lora-eq__line" style="font-size:0.7rem;color:var(--text-dim,#9CA3AF);margin-top:0.2rem;">Standard fine-tuning \u2014 no adapter decomposition</div>';}
+    else{$('lora-eq').innerHTML='<div class="lora-eq__line"><span class="eq-frozen">W</span><span class="eq-dim">('+h+'\u00d7'+h+')</span> + <span class="eq-trainable">B</span><span class="eq-dim">('+h+'\u00d7'+r+')</span> \u00d7 <span class="eq-trainable">A</span><span class="eq-dim">('+r+'\u00d7'+h+')</span></div><div class="lora-eq__line" style="font-size:0.7rem;color:var(--text-dim,#9CA3AF);margin-top:0.2rem;">\u00d7 4 projections (Q, K, V, O) \u00d7 '+ly+' layers</div>';}
+    if(ins){$('lora-insight-text').innerHTML=ins;}
+  }
+  var btns=document.querySelectorAll('.lora-pre-btn');
+  btns.forEach(function(btn){btn.addEventListener('click',function(){btns.forEach(function(b){b.classList.remove('lora-pre-btn--active');});btn.classList.add('lora-pre-btn--active');var p=presets[parseInt(btn.dataset.idx)];sl.params.value=p.params;sl.rank.value=p.rank;qlora.checked=p.qlora;syncArch(p.params);update(p.insight);});});
+  sl.params.addEventListener('input',function(){btns.forEach(function(b){b.classList.remove('lora-pre-btn--active');});syncArch(parseInt(sl.params.value));$('lora-insight-text').innerHTML='Custom configuration. Adjust the sliders to explore the parameter space.';update();});
+  sl.rank.addEventListener('input',function(){btns.forEach(function(b){b.classList.remove('lora-pre-btn--active');});$('lora-insight-text').innerHTML='Custom configuration.';update();});
+  hidSl.addEventListener('input',function(){btns.forEach(function(b){b.classList.remove('lora-pre-btn--active');});$('lora-insight-text').innerHTML='Custom configuration. Note: changing hidden dimension independently creates a hypothetical scenario.';update();});
+  laySl.addEventListener('input',function(){btns.forEach(function(b){b.classList.remove('lora-pre-btn--active');});$('lora-insight-text').innerHTML='Custom configuration. Note: changing layer count independently creates a hypothetical scenario.';update();});
+  qlora.addEventListener('change',function(){btns.forEach(function(b){b.classList.remove('lora-pre-btn--active');});$('lora-insight-text').innerHTML=qlora.checked?'QLoRA enabled \u2014 base model loads in 4-bit, reducing memory by ~75%.':'QLoRA disabled \u2014 base model loads in fp16. More memory required.';update();});
+  syncArch(3);update(presets[0].insight);
+})();
+</script>
 
     <!-- LoRA Architecture Diagram -->
     <div class="visual-diagram">
@@ -283,11 +555,11 @@ const math = {
 
     <h3>Encoder Models for Classification</h3>
     <p>
-      Everything covered so far: GPT, Claude, Llama, Qwen : 
+      Everything covered so far: GPT, Claude, Llama, Qwen &mdash;
       uses a <strong>decoder-only</strong> architecture. These models read
       text left to right, generating one token at a time. They are designed
       for generation: writing text, following instructions, answering
-      questions. But for <strong>pure classification</strong> : 
+      questions. But for <strong>pure classification</strong> &mdash;
       assigning a fixed label to a piece of text: a different
       architecture is often the better choice.
     </p>
@@ -319,8 +591,8 @@ const math = {
     <p>
       The classification mechanism is straightforward. The encoder processes
       the input and produces a contextualised vector for each token. A
-      special <code>[CLS]</code> token: prepended to every input
-     : aggregates information from the full sequence. A single linear
+      special <code>[CLS]</code> token &mdash; prepended to every input
+      &mdash; aggregates information from the full sequence. A single linear
       layer maps this vector to a probability distribution over the label
       set.
     </p>
@@ -334,46 +606,29 @@ const math = {
     <p>
       <strong>BERT</strong>
       (<a href="https://arxiv.org/abs/1810.04805" target="_blank" rel="noopener">Devlin et al., 2019</a>)
-      established the encoder paradigm. It introduced <em>masked language
-      modelling</em>: randomly mask 15% of tokens and train the model to
-      predict them from the surrounding context. This bidirectional
+      established the encoder paradigm by training a model to predict randomly
+      masked tokens from their surrounding context. This bidirectional
       pre-training produced representations that dramatically outperformed
-      previous methods on classification, question answering, and other
-      understanding tasks. BERT was, for several years, the standard tool
-      for text classification in NLP research and social science.
-    </p>
-    <p>
+      previous methods on classification tasks.
       <strong>RoBERTa</strong>
       (<a href="https://arxiv.org/abs/1907.11692" target="_blank" rel="noopener">Liu et al., 2019</a>)
-      showed that BERT was substantially undertrained. By training longer,
-      on more data, with larger batches, and with a refined masking strategy,
-      RoBERTa achieved considerable improvements without changing the
-      architecture. The lesson: training procedure matters as much as
-      architecture.
+      showed that BERT was substantially undertrained: training longer, on
+      more data, and with larger batches achieved considerable improvements
+      without changing the architecture.
     </p>
     <p>
       <strong>DeBERTa</strong>
       (<a href="https://arxiv.org/abs/2006.03654" target="_blank" rel="noopener">He et al., 2021</a>)
-      introduced two architectural innovations.
-      <em>Disentangled attention</em> separates content and position into
-      independent vectors, allowing the model to compute content-to-content,
-      content-to-position, and position-to-content attention scores
-      separately. This finer-grained attention captures more nuanced
-      relationships. The <em>enhanced mask decoder</em> incorporates
-      absolute position information at the prediction stage, addressing an
-      ambiguity limitation in BERT&rsquo;s approach.
-    </p>
-    <p>
+      introduced <em>disentangled attention</em>, separating content and
+      position into independent vectors for finer-grained representations.
       <strong>DeBERTaV3</strong>
       (<a href="https://arxiv.org/abs/2111.09543" target="_blank" rel="noopener">He et al., 2023</a>)
-      replaced masked language modelling with ELECTRA-style pre-training,
-      a more sample-efficient approach. The result:
+      switched to a more sample-efficient pre-training method. The result:
       <code>deberta-v3-base</code> (184M parameters) and
-      <code>deberta-v3-small</code> (44M parameters) currently represent
-      the best general-purpose encoder models for classification. A 2025
-      comparison found that DeBERTaV3 remains superior to the newer
-      ModernBERT in sample efficiency and overall benchmark performance,
-      though ModernBERT offers advantages in long-context support.
+      <code>deberta-v3-small</code> (44M parameters) are currently the best
+      general-purpose encoder models for classification. When you see
+      &ldquo;fine-tuned BERT&rdquo; in recent social science papers, the model
+      used is almost always a DeBERTa variant.
     </p>
 
     <h4>Encoder vs. Decoder: When to Use Each</h4>
@@ -466,8 +721,8 @@ const math = {
       (hundreds to thousands of examples), you need fast inference (thousands
       of texts per minute), and you do not need the model to generate free
       text. For most annotation tasks in computational social science
-     : sentiment analysis, stance detection, topic labeling, framing
-      analysis: a fine-tuned DeBERTa is likely the best choice in
+      &mdash; sentiment analysis, stance detection, topic labeling, framing
+      analysis &mdash; a fine-tuned DeBERTa is likely the best choice in
       terms of accuracy per compute dollar.
     </p>
     <p>
@@ -518,10 +773,29 @@ const math = {
     <p>
       <strong>Evaluation:</strong> Always evaluate on a held-out test set
       that the model has never seen during training <em>or</em> validation.
-      Report per-class precision, recall, and F1: not just overall
+      Report per-class precision, recall, and F1 &mdash; not just overall
       accuracy. A model with 90% accuracy may achieve 95% on the majority
       class and 60% on the minority class, which is unacceptable for most
       research purposes.
+    </p>
+    <p>
+      <strong>The prompt&ndash;then&ndash;fine-tune loop:</strong> In
+      practice, prompting and fine-tuning are not alternatives &mdash; they
+      are stages. You develop your classification scheme via prompting
+      (Day&nbsp;2), validate it, identify systematic errors, and then
+      use the model&rsquo;s own correct outputs &mdash; verified against
+      your gold standard &mdash; as training data for fine-tuning. This
+      iterative loop is often more practical than manually labeling
+      thousands of examples from scratch.
+    </p>
+    <p>
+      <strong>Label noise:</strong> When your training data comes from
+      human coders (or from the prompt&ndash;then&ndash;fine-tune loop
+      above), some labels will be wrong. Fine-tuning amplifies these
+      errors: the model learns to reproduce the mistakes in your training
+      set with high confidence. Clean your training data carefully, and
+      treat suspiciously high training accuracy as a warning sign rather
+      than a success.
     </p>
 
     <div class="stop-and-think">
@@ -646,10 +920,13 @@ const math = {
     <h3>Structured Outputs</h3>
     <p>
       When building classification pipelines, you need machine-parseable
-      output: not free-form text. Asking a model to &ldquo;respond
-      with JSON&rdquo; usually works for large models but can produce
-      malformed output from smaller ones (a missing comma, an extra field,
-      explanatory text outside the JSON).
+      output &mdash; not free-form text. Without constraints, a model asked
+      to classify a tweet might return <code>{'{"label": "support"}'}</code> for
+      one text, then <code>The sentiment is positive</code> for the next,
+      then <code>I'd classify this as "support" but with some caveats...</code>
+      for a third. At scale, these inconsistencies corrupt your data
+      silently: your parser extracts a label from the first response, throws
+      an exception on the second, and misparses the third.
     </p>
 
     <div class="definition-box">
@@ -714,20 +991,242 @@ const math = {
       tokens.
     </p>
 
-    <!-- Cost Comparison Explorer (interactive) -->
-    <div class="attention-explorer" id="cost-explorer">
-      <div class="attention-explorer__header">
-        <button class="attention-explorer__sentence-btn attention-explorer__sentence-btn--active" data-panel="0">Budget</button>
-        <button class="attention-explorer__sentence-btn" data-panel="1">Mid-Range</button>
-        <button class="attention-explorer__sentence-btn" data-panel="2">Frontier</button>
+    <!-- Cost Estimator (interactive) -->
+<div class="ce-widget" id="ce-widget">
+  <div class="ce-widget__title">Classification Cost Estimator</div>
+  <div class="ce-widget__subtitle">
+    Set your corpus parameters, then compare costs across model tiers.
+    All estimates assume a classification task (short output).
+  </div>
+
+  <div class="ce-presets" id="ce-presets">
+    <button class="ce-pre-btn ce-pre-btn--active" data-idx="0">Pilot (1K tweets)</button>
+    <button class="ce-pre-btn" data-idx="1">Medium (50K articles)</button>
+    <button class="ce-pre-btn" data-idx="2">Large (500K speeches)</button>
+    <button class="ce-pre-btn" data-idx="3">Massive (2M posts)</button>
+  </div>
+
+  <div class="ce-grid">
+    <!-- Left: Controls -->
+    <div class="ce-controls">
+      <div class="ce-controls__label">Your corpus</div>
+
+      <div class="ce-input">
+        <div class="ce-input__hdr"><span class="ce-input__name">Texts to classify</span><span class="ce-input__val" id="ce-disp-corpus">1,000</span></div>
+        <input class="ce-input__range" type="range" id="ce-sl-corpus" min="0" max="12" step="1" value="2">
       </div>
-      <svg id="cost-explorer-svg" viewBox="0 0 520 260" style="width: 100%; max-width: 520px; display: block; margin: 0 auto;"></svg>
-      <p class="attention-explorer__insight" id="cost-explorer-insight">
-        Estimated cost per 10,000 classifications assuming ~150 input tokens
-        and ~5 output tokens per text. Prices as of early 2025; check
-        provider pricing pages for current rates.
-      </p>
+
+      <div class="ce-input">
+        <div class="ce-input__hdr"><span class="ce-input__name">Avg. text length</span><span class="ce-input__val" id="ce-disp-textlen">50 tokens</span></div>
+        <input class="ce-input__range" type="range" id="ce-sl-textlen" min="0" max="6" step="1" value="1">
+        <div class="ce-input__hint">A tweet is ~30&ndash;50 tokens; a news paragraph is ~100&ndash;200</div>
+      </div>
+
+      <div class="ce-input">
+        <div class="ce-input__hdr"><span class="ce-input__name">Prompt overhead</span><span class="ce-input__val" id="ce-disp-prompt">100 tokens</span></div>
+        <input class="ce-input__range" type="range" id="ce-sl-prompt" min="0" max="5" step="1" value="1">
+        <div class="ce-input__hint">System prompt + instructions. Few-shot examples add more.</div>
+      </div>
+
+      <div class="ce-input">
+        <div class="ce-input__hdr"><span class="ce-input__name">Output length</span><span class="ce-input__val" id="ce-disp-output">10 tokens</span></div>
+        <input class="ce-input__range" type="range" id="ce-sl-output" min="0" max="4" step="1" value="1">
+        <div class="ce-input__hint">Label only &asymp; 5; label + brief CoT &asymp; 50&ndash;100</div>
+      </div>
+
+      <div class="ce-toggle-row">
+        <div class="ce-toggle-row__left">
+          <span class="ce-toggle-row__name">Batch API (50% off)</span>
+          <span class="ce-toggle-row__hint">Anthropic / OpenAI / Google batch endpoints</span>
+        </div>
+        <label class="ce-switch"><input type="checkbox" id="ce-batch"><span class="ce-switch__track"></span></label>
+      </div>
+
+      <div class="ce-summary" id="ce-summary">
+        <div class="ce-sum-line"><span>Input tokens / text</span><span id="ce-sum-in">150</span></div>
+        <div class="ce-sum-line"><span>Output tokens / text</span><span id="ce-sum-out">10</span></div>
+        <div class="ce-sum-line"><span>Total input tokens</span><span id="ce-sum-tot-in">150K</span></div>
+        <div class="ce-sum-line"><span>Total output tokens</span><span id="ce-sum-tot-out">10K</span></div>
+      </div>
     </div>
+
+    <!-- Right: Results -->
+    <div class="ce-results" id="ce-results">
+      <div class="ce-results__label">Cost comparison</div>
+    </div>
+  </div>
+
+  <div class="ce-insight-box" style="margin-top:0.75rem;">
+    <div class="ce-insight__text" id="ce-insight-text">
+      For a pilot study of <strong>1,000 tweets</strong>, every model is effectively free (under $1).
+      Cost only becomes a factor at 50K+ texts with mid-range or frontier models.
+    </div>
+  </div>
+
+  <!-- Methodology -->
+  <details class="ce-method">
+    <summary class="ce-method__toggle">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;transition:transform 0.2s;flex-shrink:0;"><path d="M6 4l4 4-4 4"/></svg>
+      How these estimates are calculated
+    </summary>
+    <div class="ce-method__body">
+      <p><strong>Pricing data.</strong> All per-token prices are from each provider&rsquo;s published pricing pages as of March 2026. Prices change frequently &mdash; verify against the provider&rsquo;s current page before budgeting a real project.</p>
+      <table class="ce-method-table">
+        <tr><th>Model</th><th>Provider</th><th>Input ($/1M)</th><th>Output ($/1M)</th><th>Source</th></tr>
+        <tr><td>Gemini 2.5 Flash</td><td>Google</td><td>$0.15</td><td>$0.60</td><td>ai.google.dev/pricing</td></tr>
+        <tr><td>GPT-5.4 nano</td><td>OpenAI</td><td>$0.20</td><td>$1.25</td><td>openai.com/api/pricing</td></tr>
+        <tr><td>Gemini 3 Flash</td><td>Google</td><td>$0.50</td><td>$3.00</td><td>ai.google.dev/pricing</td></tr>
+        <tr><td>GPT-5.4 mini</td><td>OpenAI</td><td>$0.75</td><td>$4.50</td><td>openai.com/api/pricing</td></tr>
+        <tr><td>Haiku 4.5</td><td>Anthropic</td><td>$1.00</td><td>$5.00</td><td>anthropic.com/pricing</td></tr>
+        <tr><td>Gemini 2.5 Pro</td><td>Google</td><td>$1.25</td><td>$10.00</td><td>ai.google.dev/pricing</td></tr>
+        <tr><td>GPT-5.4</td><td>OpenAI</td><td>$2.50</td><td>$15.00</td><td>openai.com/api/pricing</td></tr>
+        <tr><td>Sonnet 4.6</td><td>Anthropic</td><td>$3.00</td><td>$15.00</td><td>anthropic.com/pricing</td></tr>
+        <tr><td>Opus 4.6</td><td>Anthropic</td><td>$5.00</td><td>$25.00</td><td>anthropic.com/pricing</td></tr>
+        <tr><td>Self-hosted (8B)</td><td>You</td><td colspan="2">~$1.50/hr GPU rental</td><td>Lambda, RunPod</td></tr>
+      </table>
+      <p><strong>Cost formula.</strong> <code>cost = (input_tokens &times; input_price + output_tokens &times; output_price) / 1,000,000</code>, summed over all texts. Batch API toggle halves the cost (all three major providers offer ~50% batch discounts).</p>
+      <p><strong>Processing time.</strong> Rough estimates assuming async requests with concurrency 20&ndash;50. Budget models are typically 2&ndash;5&times; faster than frontier models. Batch API returns within 24 hours.</p>
+      <p><strong>Self-hosted estimate.</strong> Based on renting a single A100 80 GB at ~$1.50/hour (Lambda / RunPod spot pricing). Throughput for an 8B model with vLLM: &asymp;50 classifications/sec for short inputs.</p>
+    </div>
+  </details>
+</div>
+
+<style is:inline>
+  .ce-widget{--ce-green:#16a34a;--ce-green-lt:#dcfce7;--ce-red:#dc2626;--ce-red-lt:#fee2e2;--ce-amber:#d97706;--ce-amber-lt:#fef3c7;}
+  .ce-widget__title{font-size:1.05rem;font-weight:700;color:var(--text,#0F1117);margin-bottom:0.15rem;}
+  .ce-widget__subtitle{font-size:0.82rem;color:var(--text-muted,#6B7280);margin-bottom:1.25rem;line-height:1.5;}
+  .ce-presets{display:flex;gap:0.4rem;margin-bottom:1.25rem;flex-wrap:wrap;}
+  .ce-pre-btn{font-family:var(--font-body,sans-serif);font-size:0.78rem;font-weight:600;padding:0.35rem 0.75rem;border-radius:100px;border:1.5px solid var(--border,#E2E6EE);background:var(--surface,#fff);color:var(--text-sec,#3D4455);cursor:pointer;transition:all 0.15s;white-space:nowrap;}
+  .ce-pre-btn:hover{border-color:var(--accent,#2D8ABF);color:var(--accent,#2D8ABF);}
+  .ce-pre-btn--active{border-color:var(--accent,#2D8ABF);background:var(--accent,#2D8ABF);color:#fff;}
+  .ce-grid{display:grid;grid-template-columns:280px 1fr;gap:1.25rem;align-items:start;}
+  @media(max-width:740px){.ce-grid{grid-template-columns:1fr;}}
+  .ce-controls{background:var(--surface,#fff);border:1px solid var(--border,#E2E6EE);border-radius:8px;padding:1.15rem;display:flex;flex-direction:column;gap:1rem;}
+  .ce-controls__label{font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted,#6B7280);margin-bottom:-0.2rem;}
+  .ce-input{display:flex;flex-direction:column;gap:0.25rem;}
+  .ce-input__hdr{display:flex;justify-content:space-between;align-items:baseline;}
+  .ce-input__name{font-size:0.82rem;font-weight:600;color:var(--text-sec,#3D4455);}
+  .ce-input__val{font-family:var(--font-mono,monospace);font-size:0.85rem;font-weight:600;color:var(--accent,#2D8ABF);}
+  .ce-input__range{-webkit-appearance:none;appearance:none;width:100%;height:6px;background:var(--surface,#F2F4F8);border-radius:3px;outline:none;border:1px solid var(--border,#E2E6EE);cursor:pointer;}
+  .ce-input__range::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--accent,#2D8ABF);border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.2);cursor:pointer;}
+  .ce-input__range::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--accent,#2D8ABF);border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.2);cursor:pointer;}
+  .ce-input__hint{font-size:0.7rem;color:var(--text-dim,#9CA3AF);line-height:1.4;}
+  .ce-toggle-row{display:flex;align-items:center;justify-content:space-between;padding:0.5rem 0;border-top:1px solid var(--border,#E2E6EE);}
+  .ce-toggle-row__left{display:flex;flex-direction:column;}
+  .ce-toggle-row__name{font-size:0.82rem;font-weight:600;color:var(--text-sec,#3D4455);}
+  .ce-toggle-row__hint{font-size:0.7rem;color:var(--text-dim,#9CA3AF);}
+  .ce-switch{position:relative;width:40px;height:22px;flex-shrink:0;}
+  .ce-switch input{opacity:0;width:0;height:0;}
+  .ce-switch__track{position:absolute;inset:0;background:var(--border,#CDD3DE);border-radius:11px;cursor:pointer;transition:background 0.2s;}
+  .ce-switch__track::after{content:'';position:absolute;width:16px;height:16px;left:3px;top:3px;background:#fff;border-radius:50%;box-shadow:0 1px 3px rgba(0,0,0,0.2);transition:transform 0.2s;}
+  .ce-switch input:checked+.ce-switch__track{background:var(--accent,#2D8ABF);}
+  .ce-switch input:checked+.ce-switch__track::after{transform:translateX(18px);}
+  .ce-summary{background:var(--surface,#F4F6FA);border:1px solid var(--border,#E2E6EE);border-radius:6px;padding:0.65rem 0.75rem;}
+  .ce-sum-line{font-size:0.75rem;color:var(--text-sec,#3D4455);display:flex;justify-content:space-between;line-height:1.7;}
+  .ce-sum-line span:last-child{font-family:var(--font-mono,monospace);font-weight:600;font-size:0.73rem;}
+  .ce-results{display:flex;flex-direction:column;gap:0.6rem;}
+  .ce-results__label{font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted,#6B7280);}
+  .ce-mrow{background:var(--surface,#fff);border:1px solid var(--border,#E2E6EE);border-radius:8px;padding:0.7rem 0.9rem;display:grid;grid-template-columns:1fr auto;gap:0.3rem 1rem;align-items:start;transition:border-color 0.15s;}
+  .ce-mrow:hover{border-color:var(--border,#CDD3DE);}
+  .ce-mrow--hl{border-color:var(--accent,#2D8ABF);background:linear-gradient(to right,rgba(45,106,191,0.03),transparent);}
+  .ce-mrow__top{display:flex;align-items:baseline;gap:0.5rem;}
+  .ce-mrow__name{font-size:0.85rem;font-weight:700;color:var(--text,#0F1117);}
+  .ce-mrow__prov{font-size:0.7rem;color:var(--text-dim,#9CA3AF);font-weight:500;}
+  .ce-mrow__tier{font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;padding:0.1rem 0.4rem;border-radius:100px;white-space:nowrap;}
+  .ce-mrow__tier--budget{background:var(--ce-green-lt);color:var(--ce-green);}
+  .ce-mrow__tier--mid{background:var(--blue-9,#E8EEF6);color:var(--accent,#2D8ABF);}
+  .ce-mrow__tier--frontier{background:var(--ce-amber-lt);color:var(--ce-amber);}
+  .ce-mrow__tier--self{background:var(--surface,#F4F6FA);color:var(--text-muted,#6B7280);border:1px solid var(--border,#E2E6EE);}
+  .ce-mrow__cost{font-family:var(--font-mono,monospace);font-size:1.15rem;font-weight:700;color:var(--text,#0F1117);text-align:right;white-space:nowrap;}
+  .ce-mrow__details{grid-column:1/-1;display:flex;gap:1.2rem;flex-wrap:wrap;}
+  .ce-mrow__detail{font-size:0.72rem;color:var(--text-muted,#6B7280);}
+  .ce-mrow__detail span{font-family:var(--font-mono,monospace);font-weight:600;color:var(--text-sec,#3D4455);font-size:0.7rem;}
+  .ce-costbar{grid-column:1/-1;height:5px;background:var(--surface,#F2F4F8);border-radius:3px;overflow:hidden;margin-top:0.1rem;}
+  .ce-costbar__fill{height:100%;border-radius:3px;transition:width 0.35s;}
+  .ce-costbar__fill--budget{background:var(--ce-green);}
+  .ce-costbar__fill--mid{background:var(--accent,#2D8ABF);}
+  .ce-costbar__fill--frontier{background:var(--ce-amber);}
+  .ce-costbar__fill--self{background:var(--text-dim,#9CA3AF);}
+  .ce-insight-box{background:var(--blue-9,#E8EEF6);border-left:3px solid var(--accent,#2D8ABF);border-radius:0 8px 8px 0;padding:0.8rem 1rem;}
+  .ce-insight__text{font-size:0.78rem;color:var(--accent-dark,#1E5A8A);line-height:1.55;font-weight:500;}
+  .ce-insight__text strong{font-weight:700;}
+  .ce-method{margin-top:1rem;border:1px solid var(--border,#E2E6EE);border-radius:8px;background:var(--surface,#fff);overflow:hidden;}
+  .ce-method__toggle{display:flex;align-items:center;gap:0.4rem;width:100%;padding:0.65rem 1rem;border:none;background:none;cursor:pointer;font-family:var(--font-body,sans-serif);font-size:0.78rem;font-weight:600;color:var(--text-muted,#6B7280);text-align:left;}
+  .ce-method__toggle:hover{color:var(--text-sec,#3D4455);}
+  .ce-method[open] .ce-method__toggle svg{transform:rotate(90deg);}
+  .ce-method__body{padding:0 1rem 0.85rem;font-size:0.74rem;color:var(--text-muted,#6B7280);line-height:1.65;}
+  .ce-method__body p{margin-bottom:0.5rem;}
+  .ce-method__body code{font-family:var(--font-mono,monospace);font-size:0.68rem;background:var(--surface,#F4F6FA);padding:0.1rem 0.3rem;border-radius:3px;color:var(--text-sec,#3D4455);}
+  .ce-method__body strong{color:var(--text-sec,#3D4455);font-weight:600;}
+  .ce-method-table{width:100%;border-collapse:collapse;margin:0.5rem 0;font-size:0.72rem;}
+  .ce-method-table th{text-align:left;font-weight:600;color:var(--text-sec,#3D4455);padding:0.3rem 0.5rem;border-bottom:1px solid var(--border,#E2E6EE);background:var(--surface,#F4F6FA);}
+  .ce-method-table td{padding:0.3rem 0.5rem;border-bottom:1px solid var(--border,#E2E6EE);color:var(--text-sec,#3D4455);}
+</style>
+
+<script is:inline>
+(function(){
+  var $=function(id){return document.getElementById(id)};
+  var corpusSteps=[100,500,1000,5000,10000,50000,100000,250000,500000,1000000,2000000,5000000,10000000];
+  var textLenSteps=[30,50,100,200,400,800,1500];
+  var promptSteps=[50,100,200,400,800,1500];
+  var outputSteps=[5,10,50,100,200];
+  var models=[
+    {name:'Gemini 2.5 Flash',provider:'Google',tier:'budget',inP:0.15,outP:0.60,speed:200},
+    {name:'GPT-5.4 nano',provider:'OpenAI',tier:'budget',inP:0.20,outP:1.25,speed:200},
+    {name:'Gemini 3 Flash',provider:'Google',tier:'budget',inP:0.50,outP:3.00,speed:150},
+    {name:'GPT-5.4 mini',provider:'OpenAI',tier:'mid',inP:0.75,outP:4.50,speed:120},
+    {name:'Haiku 4.5',provider:'Anthropic',tier:'mid',inP:1.00,outP:5.00,speed:120},
+    {name:'Gemini 2.5 Pro',provider:'Google',tier:'mid',inP:1.25,outP:10.00,speed:60},
+    {name:'GPT-5.4',provider:'OpenAI',tier:'frontier',inP:2.50,outP:15.00,speed:40},
+    {name:'Sonnet 4.6',provider:'Anthropic',tier:'frontier',inP:3.00,outP:15.00,speed:40},
+    {name:'Opus 4.6',provider:'Anthropic',tier:'frontier',inP:5.00,outP:25.00,speed:20},
+    {name:'Self-hosted 8B',provider:'vLLM + A100',tier:'self',inP:0,outP:0,speed:50,gpuH:1.50}
+  ];
+  var presetData=[
+    {corpus:2,textlen:1,prompt:1,output:1,batch:false,insight:'For a pilot study of <strong>1,000 tweets</strong>, every model is effectively free (under $1). Cost only becomes a factor at 50K+ texts with mid-range or frontier models. Start cheap, validate, then scale.'},
+    {corpus:5,textlen:2,prompt:2,output:1,batch:true,insight:'<strong>50,000 news articles</strong> with a mid-range model costs $15\u201360. This is where the batch API discount (50%) starts to matter. Budget models handle this for under $5.'},
+    {corpus:8,textlen:3,prompt:2,output:2,batch:true,insight:'<strong>500,000 parliamentary speeches</strong> are long texts \u2014 the per-text input token count is high. At this scale, model choice is a serious budget decision. Self-hosting breaks even quickly against mid-range APIs.'},
+    {corpus:10,textlen:1,prompt:1,output:0,batch:true,insight:'<strong>2 million social media posts</strong> is a large-scale CSS project. At this volume, even budget APIs cost $20\u201380. Self-hosting on a rented GPU becomes the clear winner unless you need frontier-model quality.'}
+  ];
+  var sls={corpus:$('ce-sl-corpus'),textlen:$('ce-sl-textlen'),prompt:$('ce-sl-prompt'),output:$('ce-sl-output')};
+  var batchT=$('ce-batch');
+  function fK(n){if(n>=1e9)return(n/1e9).toFixed(1)+'B';if(n>=1e6)return(n/1e6).toFixed(1)+'M';if(n>=1e3)return(n/1e3).toFixed(0)+'K';return n.toString();}
+  function fC(n){if(n>=1e6)return(n/1e6).toFixed(n>=10e6?0:1)+'M';if(n>=1e3)return(n/1e3).toFixed(0)+'K';return n.toString();}
+  function fCost(c){if(c<0.01)return'<$0.01';if(c<1)return'$'+c.toFixed(2);if(c<100)return'$'+c.toFixed(1);if(c<10000)return'$'+Math.round(c).toLocaleString();return'$'+(c/1000).toFixed(1)+'K';}
+  function fTime(t,s){var sec=t/s;if(sec<60)return'<1 min';if(sec<3600)return Math.round(sec/60)+' min';if(sec<86400)return(sec/3600).toFixed(1)+' hrs';return(sec/86400).toFixed(1)+' days';}
+  function update(ins){
+    var corpus=corpusSteps[parseInt(sls.corpus.value)],tl=textLenSteps[parseInt(sls.textlen.value)],pr=promptSteps[parseInt(sls.prompt.value)],out=outputSteps[parseInt(sls.output.value)],batch=batchT.checked;
+    var inPt=pr+tl,totIn=corpus*inPt,totOut=corpus*out;
+    $('ce-disp-corpus').textContent=fC(corpus);$('ce-disp-textlen').textContent=tl+' tokens';$('ce-disp-prompt').textContent=pr+' tokens';$('ce-disp-output').textContent=out+' tokens';
+    $('ce-sum-in').textContent=inPt.toLocaleString();$('ce-sum-out').textContent=out.toLocaleString();$('ce-sum-tot-in').textContent=fK(totIn);$('ce-sum-tot-out').textContent=fK(totOut);
+    var results=models.map(function(m){var cost;if(m.tier==='self'){cost=(corpus/m.speed/3600)*m.gpuH;}else{cost=(totIn*m.inP+totOut*m.outP)/1e6;if(batch)cost*=0.5;}return{name:m.name,provider:m.provider,tier:m.tier,cost:cost,time:fTime(corpus,m.speed),gpuH:m.gpuH?((corpus/m.speed/3600)*1).toFixed(1):null};});
+    var maxC=Math.max.apply(null,results.map(function(r){return r.cost;}))||0.01;
+    var panel=$('ce-results');var html='<div class="ce-results__label">Cost comparison</div>';
+    var tierLabel={budget:'Budget',mid:'Mid-range',frontier:'Frontier',self:'Self-hosted'};
+    results.forEach(function(r,i){
+      var pct=Math.max((r.cost/maxC)*100,1);var cpt=r.cost/corpus;var hl=r.tier==='budget'&&i===0?' ce-mrow--hl':'';
+      html+='<div class="ce-mrow'+hl+'">';
+      html+='<div class="ce-mrow__top"><span class="ce-mrow__name">'+r.name+'</span><span class="ce-mrow__prov">'+r.provider+'</span><span class="ce-mrow__tier ce-mrow__tier--'+r.tier+'">'+tierLabel[r.tier]+'</span></div>';
+      html+='<div class="ce-mrow__cost">'+fCost(r.cost)+'</div>';
+      html+='<div class="ce-mrow__details">';
+      html+='<div class="ce-mrow__detail">per text: <span>'+(cpt<0.0001?'<$0.0001':'$'+cpt.toFixed(4))+'</span></div>';
+      html+='<div class="ce-mrow__detail">est. time: <span>'+r.time+'</span></div>';
+      if(r.tier!=='self'&&batch)html+='<div class="ce-mrow__detail" style="color:var(--ce-green);">batch discount applied</div>';
+      if(r.gpuH)html+='<div class="ce-mrow__detail">GPU hours: <span>'+r.gpuH+'h</span></div>';
+      html+='</div>';
+      html+='<div class="ce-costbar"><div class="ce-costbar__fill ce-costbar__fill--'+r.tier+'" style="width:'+pct+'%"></div></div>';
+      html+='</div>';
+    });
+    panel.innerHTML=html;
+    if(ins){$('ce-insight-text').innerHTML=ins;}
+  }
+  var btns=document.querySelectorAll('.ce-pre-btn');
+  btns.forEach(function(btn){btn.addEventListener('click',function(){btns.forEach(function(b){b.classList.remove('ce-pre-btn--active');});btn.classList.add('ce-pre-btn--active');var p=presetData[parseInt(btn.dataset.idx)];sls.corpus.value=p.corpus;sls.textlen.value=p.textlen;sls.prompt.value=p.prompt;sls.output.value=p.output;batchT.checked=p.batch;update(p.insight);});});
+  Object.values(sls).forEach(function(s){s.addEventListener('input',function(){btns.forEach(function(b){b.classList.remove('ce-pre-btn--active');});$('ce-insight-text').innerHTML='Custom configuration. Adjust the sliders to match your research project.';update();});});
+  batchT.addEventListener('change',function(){btns.forEach(function(b){b.classList.remove('ce-pre-btn--active');});$('ce-insight-text').innerHTML=batchT.checked?'Batch API enabled \u2014 costs halved. Results within 24 hours.':'Batch API disabled \u2014 standard pricing applies.';update();});
+  update(presetData[0].insight);
+})();
+</script>
 
     <p>
       For research budgeting: estimate your corpus size, multiply by the
@@ -777,7 +1276,7 @@ const math = {
       achieves even higher throughput through <em>RadixAttention</em>, which
       automatically discovers and reuses shared prefixes across requests.
       When many requests share the same system prompt or instruction prefix
-     : as in classification pipelines: SGLang can be
+      &mdash; as in classification pipelines &mdash; SGLang can be
       significantly faster than vLLM. Benchmarks show 29% higher throughput
       for standard serving and up to 4.6&times; faster for concurrent
       requests.
@@ -788,8 +1287,8 @@ const math = {
       Docker-like interface: install, pull a model, and run it with a single
       command. Ollama is the right choice for researchers who want to
       experiment with local models without managing GPU infrastructure.
-      It runs on consumer hardware: including Apple Silicon laptops
-     : though throughput is substantially lower than dedicated GPU
+      It runs on consumer hardware &mdash; including Apple Silicon laptops
+      &mdash; though throughput is substantially lower than dedicated GPU
       serving.
     </p>
 
@@ -853,7 +1352,7 @@ const math = {
         <div>
           <p>
             Three viable approaches: (1) Fine-tune a DeBERTa model locally
-           : it runs on a single GPU or even CPU for inference, and
+            &mdash; it runs on a single GPU or even CPU for inference, and
             your data never leaves your machine. (2) Self-host an open-weight
             decoder model (e.g., Llama 3 via vLLM or Ollama) on your
             university&rsquo;s GPU cluster. (3) Use a provider that offers
@@ -944,7 +1443,7 @@ const math = {
 
     <h3>Cohen&rsquo;s Kappa: Beyond Accuracy</h3>
     <p>
-      Raw accuracy: the percentage of correct classifications : 
+      Raw accuracy: the percentage of correct classifications &mdash;
       is the most intuitive metric but also the most misleading. If 80% of
       your corpus expresses &ldquo;support&rdquo; and a model labels
       everything as &ldquo;support,&rdquo; it achieves 80% accuracy while
@@ -1006,12 +1505,252 @@ const math = {
       <p class="formula-block__caption" set:html={math.krippendorffCaption} />
     </div>
 
+    <!-- Confusion Matrix Explorer (interactive) -->
+<div class="cm-widget" id="cm-widget">
+  <div class="cm-widget__title">Confusion Matrix Explorer</div>
+  <div class="cm-widget__subtitle">
+    Edit the cells to see how accuracy, Cohen&rsquo;s &kappa;, and per-class F1 respond.
+    Try the scenarios to discover when accuracy misleads.
+  </div>
+
+  <div class="cm-scenarios" id="cm-scenarios">
+    <button class="cm-scen-btn cm-scen-btn--active" data-idx="0">Good classifier</button>
+    <button class="cm-scen-btn" data-idx="1">Accuracy trap</button>
+    <button class="cm-scen-btn" data-idx="2">Biased toward positive</button>
+    <button class="cm-scen-btn" data-idx="3">Minority class failure</button>
+    <button class="cm-scen-btn" data-idx="4">Random baseline</button>
+  </div>
+
+  <div class="cm-grid">
+    <!-- Left: Matrix -->
+    <div class="cm-panel">
+      <div class="cm-panel__label">Predicted vs. Actual</div>
+      <div class="cm-matrix">
+        <div class="cm-corner"></div>
+        <div class="cm-colhdr">Predicted<br>Positive</div>
+        <div class="cm-colhdr">Predicted<br>Negative</div>
+
+        <div class="cm-rowhdr"><div style="text-align:right;">Actual<br>Positive</div></div>
+        <div class="cm-cell cm-cell--tp">
+          <div class="cm-cell__label" style="color:var(--cm-green);">TP</div>
+          <input class="cm-cell__input" type="number" id="cm-tp" min="0" max="9999" value="80">
+          <div class="cm-cell__desc">Correct positive</div>
+        </div>
+        <div class="cm-cell cm-cell--fn">
+          <div class="cm-cell__label" style="color:var(--cm-red);">FN</div>
+          <input class="cm-cell__input" type="number" id="cm-fn" min="0" max="9999" value="20">
+          <div class="cm-cell__desc">Missed positive</div>
+        </div>
+
+        <div class="cm-rowhdr"><div style="text-align:right;">Actual<br>Negative</div></div>
+        <div class="cm-cell cm-cell--fp">
+          <div class="cm-cell__label" style="color:var(--cm-red);">FP</div>
+          <input class="cm-cell__input" type="number" id="cm-fp" min="0" max="9999" value="15">
+          <div class="cm-cell__desc">False alarm</div>
+        </div>
+        <div class="cm-cell cm-cell--tn">
+          <div class="cm-cell__label" style="color:var(--cm-green);">TN</div>
+          <input class="cm-cell__input" type="number" id="cm-tn" min="0" max="9999" value="85">
+          <div class="cm-cell__desc">Correct negative</div>
+        </div>
+      </div>
+
+      <div class="cm-totals">
+        <div class="cm-total"><span>Total samples</span><span class="cm-total__val" id="cm-total-n">200</span></div>
+        <div class="cm-total"><span>Class balance</span><span class="cm-total__val" id="cm-balance">50 / 50%</span></div>
+      </div>
+    </div>
+
+    <!-- Right: Metrics -->
+    <div class="cm-metrics">
+      <div class="cm-card" id="cm-card-acc">
+        <div class="cm-card__hdr">
+          <span class="cm-card__name">Accuracy <span class="cm-badge" id="cm-badge">&TriangleLeft; misleading</span></span>
+          <span class="cm-card__val" id="cm-val-acc">0.825</span>
+        </div>
+        <div class="cm-bar"><div class="cm-bar__fill" id="cm-bar-acc" style="width:82.5%"></div></div>
+        <div class="cm-card__formula" id="cm-formula-acc">(80 + 85) / 200</div>
+      </div>
+
+      <div class="cm-card">
+        <div class="cm-card__hdr">
+          <span class="cm-card__name">Cohen&rsquo;s &kappa;</span>
+          <span class="cm-card__val" id="cm-val-kap">0.650</span>
+        </div>
+        <div class="cm-bar"><div class="cm-bar__fill" id="cm-bar-kap" style="width:65%"></div></div>
+        <div class="cm-card__desc" id="cm-kap-interp">Substantial agreement</div>
+        <div class="cm-card__formula" id="cm-formula-kap">(p_o &minus; p_e) / (1 &minus; p_e)</div>
+      </div>
+
+      <div class="cm-card">
+        <div class="cm-card__hdr"><span class="cm-card__name">Per-Class F1</span></div>
+        <div class="cm-class-grid">
+          <div class="cm-class">
+            <div class="cm-class__label">Positive class</div>
+            <div class="cm-class__row"><span>Precision</span><span id="cm-pos-prec">0.842</span></div>
+            <div class="cm-class__row"><span>Recall</span><span id="cm-pos-rec">0.800</span></div>
+            <div class="cm-class__row"><span><strong>F1</strong></span><span id="cm-pos-f1"><strong>0.821</strong></span></div>
+          </div>
+          <div class="cm-class">
+            <div class="cm-class__label">Negative class</div>
+            <div class="cm-class__row"><span>Precision</span><span id="cm-neg-prec">0.810</span></div>
+            <div class="cm-class__row"><span>Recall</span><span id="cm-neg-rec">0.850</span></div>
+            <div class="cm-class__row"><span><strong>F1</strong></span><span id="cm-neg-f1"><strong>0.829</strong></span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cm-insight" id="cm-insight">
+        <div class="cm-insight__text" id="cm-insight-text">
+          A balanced dataset with a reasonable classifier. Accuracy and &kappa; tell a consistent story here. Try <strong>&ldquo;Accuracy trap&rdquo;</strong> to see when they diverge.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style is:inline>
+  .cm-widget {
+    --cm-green: #16a34a;
+    --cm-green-lt: #dcfce7;
+    --cm-green-bg: #f0fdf4;
+    --cm-red: #dc2626;
+    --cm-red-lt: #fee2e2;
+    --cm-red-bg: #fef2f2;
+    --cm-amber: #d97706;
+    --cm-amber-lt: #fef3c7;
+  }
+  .cm-widget__title { font-size:1.05rem; font-weight:700; color:var(--text,#0F1117); margin-bottom:0.15rem; }
+  .cm-widget__subtitle { font-size:0.82rem; color:var(--text-muted,#6B7280); margin-bottom:1.25rem; line-height:1.5; }
+  .cm-scenarios { display:flex; gap:0.4rem; margin-bottom:1.25rem; flex-wrap:wrap; }
+  .cm-scen-btn {
+    font-family:var(--font-body,sans-serif); font-size:0.78rem; font-weight:600;
+    padding:0.35rem 0.75rem; border-radius:100px; border:1.5px solid var(--border,#E2E6EE);
+    background:var(--surface,#fff); color:var(--text-sec,#3D4455); cursor:pointer;
+    transition:all 0.15s; white-space:nowrap;
+  }
+  .cm-scen-btn:hover { border-color:var(--accent,#2D8ABF); color:var(--accent,#2D8ABF); }
+  .cm-scen-btn--active { border-color:var(--accent,#2D8ABF); background:var(--accent,#2D8ABF); color:#fff; }
+  .cm-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.25rem; align-items:start; }
+  @media(max-width:700px){ .cm-grid{grid-template-columns:1fr;} }
+  .cm-panel { background:var(--surface,#fff); border:1px solid var(--border,#E2E6EE); border-radius:8px; padding:1.25rem; }
+  .cm-panel__label { font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-muted,#6B7280); margin-bottom:0.75rem; }
+  .cm-matrix { display:grid; grid-template-columns:auto 1fr 1fr; grid-template-rows:auto 1fr 1fr; gap:0; }
+  .cm-corner {}
+  .cm-colhdr { text-align:center; font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-muted,#6B7280); padding:0 0.25rem 0.5rem; }
+  .cm-rowhdr { display:flex; align-items:center; justify-content:flex-end; padding-right:0.6rem; font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-muted,#6B7280); }
+  .cm-cell { position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:0.75rem 0.5rem; border:1px solid var(--border,#E2E6EE); min-height:90px; }
+  .cm-cell--tp { background:var(--cm-green-bg); border-color:#bbf7d0; border-radius:8px 0 0 0; }
+  .cm-cell--fn { background:var(--cm-red-bg); border-color:#fecaca; border-radius:0 8px 0 0; }
+  .cm-cell--fp { background:var(--cm-red-bg); border-color:#fecaca; border-radius:0 0 0 8px; }
+  .cm-cell--tn { background:var(--cm-green-bg); border-color:#bbf7d0; border-radius:0 0 8px 0; }
+  .cm-cell__label { font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:0.3rem; }
+  .cm-cell__input {
+    font-family:var(--font-mono,monospace); font-size:1.35rem; font-weight:600; text-align:center;
+    width:80px; border:1.5px solid var(--border,#E2E6EE); border-radius:6px; padding:0.25rem 0.1rem;
+    background:var(--surface,#fff); color:var(--text,#0F1117); outline:none; transition:border-color 0.15s,box-shadow 0.15s;
+  }
+  .cm-cell__input:focus { border-color:var(--accent,#2D8ABF); box-shadow:0 0 0 3px rgba(45,106,191,0.12); }
+  .cm-cell__desc { font-size:0.68rem; color:var(--text-dim,#9CA3AF); margin-top:0.2rem; text-align:center; }
+  .cm-totals { display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; margin-top:0.75rem; padding-top:0.75rem; border-top:1px solid var(--border,#E2E6EE); }
+  .cm-total { display:flex; justify-content:space-between; align-items:center; font-size:0.78rem; color:var(--text-sec,#3D4455); }
+  .cm-total__val { font-family:var(--font-mono,monospace); font-weight:600; font-size:0.82rem; }
+  .cm-metrics { display:flex; flex-direction:column; gap:0.75rem; }
+  .cm-card { background:var(--surface,#fff); border:1px solid var(--border,#E2E6EE); border-radius:8px; padding:1rem 1.15rem; }
+  .cm-card__hdr { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:0.3rem; }
+  .cm-card__name { font-size:0.78rem; font-weight:700; color:var(--text-sec,#3D4455); }
+  .cm-card__val { font-family:var(--font-mono,monospace); font-size:1.3rem; font-weight:700; color:var(--text,#0F1117); transition:color 0.2s; }
+  .cm-card__val--good { color:var(--cm-green)!important; }
+  .cm-card__val--ok { color:var(--cm-amber)!important; }
+  .cm-card__val--bad { color:var(--cm-red)!important; }
+  .cm-bar { height:6px; background:var(--surface,#F2F4F8); border-radius:3px; overflow:hidden; margin:0.4rem 0; border:1px solid var(--border,#E2E6EE); }
+  .cm-bar__fill { height:100%; border-radius:3px; transition:width 0.35s,background-color 0.2s; }
+  .cm-bar__fill--good { background:var(--cm-green); }
+  .cm-bar__fill--ok { background:var(--cm-amber); }
+  .cm-bar__fill--bad { background:var(--cm-red); }
+  .cm-card__desc { font-size:0.72rem; color:var(--text-muted,#6B7280); line-height:1.45; }
+  .cm-card__formula { font-family:var(--font-mono,monospace); font-size:0.68rem; color:var(--text-dim,#9CA3AF); margin-top:0.2rem; }
+  .cm-class-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; margin-top:0.4rem; }
+  .cm-class { background:var(--surface,#F4F6FA); border-radius:6px; padding:0.5rem 0.65rem; }
+  .cm-class__label { font-size:0.68rem; font-weight:600; color:var(--text-muted,#6B7280); margin-bottom:0.15rem; }
+  .cm-class__row { display:flex; justify-content:space-between; font-size:0.72rem; color:var(--text-sec,#3D4455); line-height:1.6; }
+  .cm-class__row span:last-child { font-family:var(--font-mono,monospace); font-weight:600; }
+  .cm-insight { background:var(--blue-9,#E8EEF6); border-left:3px solid var(--accent,#2D8ABF); border-radius:0 8px 8px 0; padding:0.8rem 1rem; }
+  .cm-insight__text { font-size:0.78rem; color:var(--accent-dark,#1E5A8A); line-height:1.55; font-weight:500; }
+  .cm-insight__text strong { font-weight:700; }
+  .cm-badge {
+    display:inline-flex; align-items:center; gap:0.3rem; font-size:0.68rem; font-weight:700;
+    color:var(--cm-amber); background:var(--cm-amber-lt); padding:0.15rem 0.5rem; border-radius:100px;
+    margin-left:0.5rem; opacity:0; transition:opacity 0.3s;
+  }
+  .cm-badge--visible { opacity:1; }
+</style>
+
+<script is:inline>
+(function(){
+  var $=function(id){return document.getElementById(id)};
+  var scenarios=[
+    {tp:80,fn:20,fp:15,tn:85,insight:'A balanced dataset with a reasonable classifier. Accuracy and \u03ba tell a consistent story here. Try <strong>\u201cAccuracy trap\u201d</strong> to see when they diverge.'},
+    {tp:90,fn:10,fp:90,tn:810,insight:'<strong>The accuracy trap.</strong> 90% accuracy looks great \u2014 but the model just labels almost everything as negative. \u03ba plummets because the \u201caccuracy\u201d is almost entirely driven by the 900 actual negatives. The model finds only 50% of positives. This is the most common way accuracy misleads in social science: imbalanced classes + a lazy model.'},
+    {tp:85,fn:15,fp:60,tn:40,insight:'<strong>Sycophancy in action.</strong> The model over-predicts the positive class \u2014 a common RLHF artefact. Positive recall is high (0.85) but negative recall is low (0.40). If you\u2019re measuring public support for a policy, this model inflates your estimate.'},
+    {tp:92,fn:8,fp:45,tn:55,insight:'<strong>Minority class failure.</strong> The model handles the majority class well (positive F1 is high), but performs poorly on the minority class. Per-class F1 reveals what overall accuracy hides.'},
+    {tp:50,fn:50,fp:50,tn:50,insight:'<strong>Random baseline.</strong> Each cell is equal \u2014 the model assigns labels at random. Accuracy is 50%, and \u03ba is exactly 0 (agreement no better than chance).'}
+  ];
+  var inp={tp:$('cm-tp'),fn:$('cm-fn'),fp:$('cm-fp'),tn:$('cm-tn')};
+  function gv(){return{tp:Math.max(0,parseInt(inp.tp.value)||0),fn:Math.max(0,parseInt(inp.fn.value)||0),fp:Math.max(0,parseInt(inp.fp.value)||0),tn:Math.max(0,parseInt(inp.tn.value)||0)};}
+  function compute(v){
+    var n=v.tp+v.fn+v.fp+v.tn;if(n===0)return null;
+    var acc=(v.tp+v.tn)/n;
+    var pY=((v.tp+v.fp)/n)*((v.tp+v.fn)/n);var pN=((v.tn+v.fn)/n)*((v.tn+v.fp)/n);var pe=pY+pN;
+    var kap=pe===1?1:(acc-pe)/(1-pe);
+    var pp=(v.tp+v.fp)>0?v.tp/(v.tp+v.fp):0;var pr=(v.tp+v.fn)>0?v.tp/(v.tp+v.fn):0;var pf=(pp+pr)>0?2*pp*pr/(pp+pr):0;
+    var np=(v.tn+v.fn)>0?v.tn/(v.tn+v.fn):0;var nr=(v.tn+v.fp)>0?v.tn/(v.tn+v.fp):0;var nf=(np+nr)>0?2*np*nr/(np+nr):0;
+    var ap=v.tp+v.fn;var br=n>0?Math.round(100*ap/n):50;
+    return{n:n,acc:acc,kap:kap,po:acc,pe:pe,pp:pp,pr:pr,pf:pf,np:np,nr:nr,nf:nf,br:br};
+  }
+  function cc(v,t){return v>=t[0]?'good':v>=t[1]?'ok':'bad';}
+  function ki(k){if(k>=0.80)return'Almost perfect agreement';if(k>=0.60)return'Substantial agreement';if(k>=0.40)return'Moderate agreement';if(k>=0.20)return'Fair agreement';if(k>=0)return'Slight agreement';return'Systematic disagreement';}
+  function f(v,d){return(v==null||isNaN(v))?'\u2014':v.toFixed(d||3);}
+  function update(ins){
+    var v=gv();var m=compute(v);if(!m)return;
+    $('cm-total-n').textContent=m.n;
+    $('cm-balance').textContent=m.br+' / '+(100-m.br)+'%';
+    var ac=cc(m.acc,[0.8,0.6]);
+    $('cm-val-acc').textContent=f(m.acc);$('cm-val-acc').className='cm-card__val cm-card__val--'+ac;
+    $('cm-bar-acc').style.width=(m.acc*100)+'%';$('cm-bar-acc').className='cm-bar__fill cm-bar__fill--'+ac;
+    $('cm-formula-acc').textContent='('+v.tp+' + '+v.tn+') / '+m.n;
+    var kc=cc(m.kap,[0.6,0.4]);
+    $('cm-val-kap').textContent=f(m.kap);$('cm-val-kap').className='cm-card__val cm-card__val--'+kc;
+    $('cm-bar-kap').style.width=Math.max(0,m.kap*100)+'%';$('cm-bar-kap').className='cm-bar__fill cm-bar__fill--'+kc;
+    $('cm-kap-interp').textContent=ki(m.kap);
+    $('cm-formula-kap').textContent='('+f(m.po,2)+' \u2212 '+f(m.pe,2)+') / (1 \u2212 '+f(m.pe,2)+')';
+    var dv=m.acc-m.kap;var b=$('cm-badge');
+    if(dv>0.25&&m.acc>0.7){b.classList.add('cm-badge--visible');}else{b.classList.remove('cm-badge--visible');}
+    $('cm-pos-prec').textContent=f(m.pp);$('cm-pos-rec').textContent=f(m.pr);$('cm-pos-f1').innerHTML='<strong>'+f(m.pf)+'</strong>';
+    $('cm-neg-prec').textContent=f(m.np);$('cm-neg-rec').textContent=f(m.nr);$('cm-neg-f1').innerHTML='<strong>'+f(m.nf)+'</strong>';
+    if(ins){$('cm-insight-text').innerHTML=ins;}
+  }
+  var btns=document.querySelectorAll('.cm-scen-btn');
+  btns.forEach(function(btn){btn.addEventListener('click',function(){
+    btns.forEach(function(b){b.classList.remove('cm-scen-btn--active');});
+    btn.classList.add('cm-scen-btn--active');
+    var s=scenarios[parseInt(btn.dataset.idx)];
+    inp.tp.value=s.tp;inp.fn.value=s.fn;inp.fp.value=s.fp;inp.tn.value=s.tn;update(s.insight);
+  });});
+  Object.values(inp).forEach(function(i){i.addEventListener('input',function(){
+    btns.forEach(function(b){b.classList.remove('cm-scen-btn--active');});
+    $('cm-insight-text').innerHTML='Editing manually. Watch how the metrics respond to your changes.';update();
+  });});
+  update(scenarios[0].insight);
+})();
+</script>
+
     <h3>Qualitative Error Analysis</h3>
     <p>
       Aggregate metrics tell you <em>how much</em> the model gets wrong.
-      They do not tell you <em>why</em>. Qualitative error analysis : 
+      They do not tell you <em>why</em>. Qualitative error analysis &mdash;
       reading through misclassified texts and categorising the failure
-      modes: is essential for diagnosis and improvement.
+      modes &mdash; is essential for diagnosis and improvement.
     </p>
     <p>
       Five error patterns recur across LLM classification tasks:
@@ -1034,7 +1773,7 @@ const math = {
     <p>
       <strong>Ambiguity:</strong> Texts that are genuinely too short or
       context-dependent to classify reliably. These are not model failures
-     : they reflect real uncertainty in the data. Consider adding an
+      &mdash; they reflect real uncertainty in the data. Consider adding an
       &ldquo;ambiguous&rdquo; or &ldquo;uncertain&rdquo; category rather
       than forcing a binary choice.
     </p>
@@ -1074,7 +1813,7 @@ const math = {
             or sarcastic few-shot examples. Indirect reporting (20%)
             suggests clarifying the instruction to target author stance
             specifically. The ambiguous cases (20%) may be irreducible
-           : consider an &ldquo;uncertain&rdquo; category. The key
+            &mdash; consider an &ldquo;uncertain&rdquo; category. The key
             insight: not all errors are equal. Prioritise fixes that address
             the most common pattern first.
           </p>
@@ -1123,6 +1862,17 @@ const math = {
       provider in your methods section. Open-weight models avoid this issue
       entirely.
     </p>
+    <p>
+      <strong>Distribution shift:</strong> A model validated on one subset
+      of your corpus may perform differently on texts from a different time
+      period, source, or domain. A classifier trained on 2020 tweets may
+      struggle with 2024 tweets that use different slang, reference
+      different events, or adopt different rhetorical conventions. If your
+      corpus spans multiple sources or time periods, validate on each
+      stratum separately. This is arguably the most common real-world
+      failure mode &mdash; and the one most often overlooked because
+      aggregate metrics can mask stratum-specific degradation.
+    </p>
 
     <h3>Building a Validation Plan</h3>
     <p>
@@ -1135,7 +1885,7 @@ const math = {
       random sample of your corpus. For binary classification, 200&ndash;500
       texts typically provides stable kappa estimates. Use stratified
       sampling if your corpus has known subgroups (e.g., different sources,
-      time periods, or topics). Include edge cases deliberately : 
+      time periods, or topics). Include edge cases deliberately &mdash;
       they are what differentiate good classifiers from mediocre ones.
     </p>
     <p>
@@ -1244,7 +1994,7 @@ const math = {
             (e.g., 90% of texts are positive) could mean the model is barely
             outperforming a naive &ldquo;always predict positive&rdquo;
             baseline. Kappa corrects for this. Second, accuracy does not
-            reveal whether errors are concentrated in one class : 
+            reveal whether errors are concentrated in one class &mdash;
             per-class F1 does. Third, without knowing the human inter-coder
             agreement, 94% may or may not be close to the ceiling. If humans
             agree at 96%, the model is near optimal. If humans agree at 94%,
@@ -1262,7 +2012,7 @@ const math = {
         <strong>Cohen&rsquo;s kappa</strong> (not just accuracy), report
         <strong>per-class F1</strong>, and analyse errors
         <strong>qualitatively</strong>. Know your ceiling by measuring
-        human&ndash;human agreement. Watch for systematic biases : 
+        human&ndash;human agreement. Watch for systematic biases &mdash;
         positional, sycophancy, cultural, temporal: that corrupt
         aggregate statistics even when per-text accuracy appears adequate.
         Document every methodological choice. This applies whether you use
@@ -1285,16 +2035,15 @@ const math = {
        SECTION 4: SOCIAL SCIENCE APPLICATIONS
        =================================================================== -->
   <section id="social-science">
-    <h2>Social Science Applications</h2>
+    <h2>Putting It Together</h2>
     <p>
-      The tools covered in this module: fine-tuning, scaled
-      deployment, and rigorous validation: are the infrastructure
-      that makes LLM-based research viable. This section highlights key
-      papers that demonstrate how researchers are deploying these techniques
-      and the methodological lessons they have learned.
+      The tools covered today &mdash; fine-tuning, scaled deployment, and
+      rigorous validation &mdash; are the infrastructure that makes
+      LLM-based research viable. This section connects them through the
+      key literature.
     </p>
 
-    <h3>LLM-Based Annotation at Scale</h3>
+    <h3>Key Papers</h3>
 
     <div class="course-note">
       <svg class="course-note__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1303,71 +2052,13 @@ const math = {
       <p>
         <strong>Ornstein et al. (2023),</strong>
         <a href="https://doi.org/10.1017/pan.2024.2" target="_blank" rel="noopener"><em>How to Train Your Stochastic Parrot: Large Language Models for Political Texts.</em></a>
-        A practical guide to building LLM annotation pipelines at scale.
-        Demonstrates how LLMs become transformative for social science by
-        enabling the processing of corpora that would take human coders
-        years. The paper provides concrete guidance on prompt design,
-        validation workflows, and cost management: the exact
-        topics covered in this module.
+        The closest thing to a practitioner&rsquo;s handbook for the full
+        pipeline covered in this module. Covers prompt design, validation
+        workflows, cost management, and the transition from interactive
+        exploration to research-grade annotation. If you read one paper
+        from today&rsquo;s session, make it this one.
       </p>
     </div>
-
-    <h3>Fine-Tuning vs. Prompting: When Each Wins</h3>
-
-    <div class="course-note">
-      <svg class="course-note__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
-      </svg>
-      <p>
-        <strong>Widmann &amp; Wich (2023),</strong>
-        <a href="https://doi.org/10.1017/psrm.2023.43" target="_blank" rel="noopener"><em>Creating and Comparing Dictionary, Word Embedding, and Transformer-Based Sentiment Analysis Tools.</em></a>
-        Political Analysis. Systematically compares fine-tuned encoder models
-        (BERT family) against prompted LLMs for sentiment classification.
-        The finding: fine-tuned encoders remain state-of-the-art for many
-        classification tasks, sometimes outperforming models orders of
-        magnitude larger. This supports the encoder-vs-decoder guidance in
-        this module: for fixed-category classification with labeled data,
-        smaller fine-tuned models are often the better choice.
-      </p>
-    </div>
-
-    <h3>The Validation Imperative</h3>
-
-    <div class="course-note">
-      <svg class="course-note__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
-      </svg>
-      <p>
-        <strong>Pangakis, Wolken &amp; Fasching (2023),</strong>
-        <a href="https://arxiv.org/abs/2306.00176" target="_blank" rel="noopener"><em>Automated Annotation with Generative AI Requires Validation.</em></a>
-        Replicated 27 annotation tasks across 11 datasets from published
-        social science papers and found that LLM performance varied
-        dramatically: from near-perfect to barely above chance : 
-        depending on the dataset and task. The takeaway: task-by-task
-        validation is non-negotiable. The authors propose a five-step
-        validation workflow and provide open-source software to implement it.
-      </p>
-    </div>
-
-    <div class="course-note">
-      <svg class="course-note__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
-      </svg>
-      <p>
-        <strong>Gilardi, Alizadeh &amp; Haunss (2023),</strong>
-        <a href="https://doi.org/10.1073/pnas.2305016120" target="_blank" rel="noopener"><em>ChatGPT Outperforms Crowd-Workers for Text-Annotation Tasks.</em></a>
-        PNAS. A widely cited study showing that ChatGPT&rsquo;s zero-shot
-        annotation quality exceeds that of crowd-sourced workers on several
-        political text classification tasks. Important nuance: the
-        comparison is against crowd workers (often low-training, high-noise),
-        not against expert coders. When compared against trained research
-        assistants, the gap narrows or disappears. The paper remains
-        valuable for establishing that LLMs are a viable annotation tool
-       : but the comparison baseline matters.
-      </p>
-    </div>
-
-    <h3>Reproducibility &amp; Open Science</h3>
 
     <div class="course-note">
       <svg class="course-note__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1378,21 +2069,19 @@ const math = {
         <a href="https://doi.org/10.1038/s43588-023-00534-8" target="_blank" rel="noopener"><em>Why open-source generative AI models are an ethical imperative for social science.</em></a>
         Nature Computational Science. Argues that reliance on closed-source
         models undermines reproducibility, transparency, and equitable
-        access: core scientific values. For the deployment decisions
-        in this module, Spirling&rsquo;s argument is directly relevant: when
-        possible, use open-weight models that can be version-pinned,
-        inspected, and shared. When closed models are necessary (because of
-        capability requirements), document the version, date, and provider
-        meticulously.
+        access &mdash; core scientific values. For the deployment decisions
+        covered today, the implication is concrete: when possible, use
+        open-weight models that can be version-pinned, inspected, and
+        shared. When closed models are necessary, document every detail.
       </p>
     </div>
 
     <div class="key-takeaway">
       <p class="key-takeaway__label">Key Takeaway</p>
       <p>
-        The research covered in this module demonstrates a clear consensus:
-        <strong>LLMs are viable annotation tools</strong>, but only when
-        deployed with the same methodological rigour applied to any
+        Current evidence strongly supports that
+        <strong>LLMs are viable annotation tools</strong> &mdash; but only
+        when deployed with the same methodological rigour applied to any
         measurement instrument. Fine-tune when prompting is insufficient.
         Validate before trusting. Document everything. Use open models when
         possible.
@@ -1407,88 +2096,4 @@ const math = {
 
 </CourseLayout>
 
-<script is:inline>
-(function() {
-  var explorer = document.getElementById("cost-explorer");
-  var svg = document.getElementById("cost-explorer-svg");
-  var insight = document.getElementById("cost-explorer-insight");
-  if (!explorer || !svg) return;
 
-  var tiers = [
-    {
-      models: [
-        { name: "GPT-4o mini", cost: 0.08, provider: "OpenAI" },
-        { name: "Claude 3.5 Haiku", cost: 0.05, provider: "Anthropic" },
-        { name: "Gemini 2.0 Flash", cost: 0.04, provider: "Google" },
-        { name: "DeepSeek-V3 (API)", cost: 0.03, provider: "DeepSeek" },
-        { name: "Llama 3.1 8B (hosted)", cost: 0.02, provider: "Together/Groq" }
-      ],
-      insight: "Budget models: best for straightforward classification where frontier capability is not needed. At these prices, 100,000 texts cost $2\u201310. Often sufficient for binary sentiment or topic classification."
-    },
-    {
-      models: [
-        { name: "Claude 3.5 Sonnet", cost: 1.50, provider: "Anthropic" },
-        { name: "GPT-4o", cost: 1.25, provider: "OpenAI" },
-        { name: "Gemini 1.5 Pro", cost: 0.65, provider: "Google" },
-        { name: "Llama 3.1 70B (hosted)", cost: 0.40, provider: "Together" },
-        { name: "Qwen 2.5 72B (hosted)", cost: 0.35, provider: "Together" }
-      ],
-      insight: "Mid-range models: better for nuanced tasks (stance detection, framing analysis, sarcasm). 100,000 texts cost $35\u2013150. The quality improvement over budget models is significant for complex annotation schemes."
-    },
-    {
-      models: [
-        { name: "o1 (reasoning)", cost: 8.00, provider: "OpenAI" },
-        { name: "Claude 3 Opus", cost: 5.00, provider: "Anthropic" },
-        { name: "o3-mini (reasoning)", cost: 3.50, provider: "OpenAI" },
-        { name: "Claude Sonnet (thinking)", cost: 4.00, provider: "Anthropic" },
-        { name: "Llama 3.1 405B (hosted)", cost: 2.00, provider: "Together" }
-      ],
-      insight: "Frontier/reasoning models: reserve for tasks requiring deep analysis \u2014 implicit stance, complex framing, multi-step inference. 100,000 texts cost $200\u2013800. Often overkill for standard classification; use selectively on hard subsets."
-    }
-  ];
-
-  var currentTier = 0;
-
-  function draw() {
-    var t = tiers[currentTier];
-    var models = t.models;
-    var pad = { left: 145, right: 30, top: 15, bottom: 30 };
-    var w = 520, barH = 28, gap = 12;
-    var h = pad.top + models.length * (barH + gap) + pad.bottom;
-    svg.setAttribute("viewBox", "0 0 " + w + " " + h);
-    var plotW = w - pad.left - pad.right;
-    var maxCost = 0;
-    for (var i = 0; i < models.length; i++) {
-      if (models[i].cost > maxCost) maxCost = models[i].cost;
-    }
-    maxCost = maxCost * 1.15;
-    var s = "";
-    s += '<rect x="' + pad.left + '" y="' + pad.top + '" width="' + plotW + '" height="' + (models.length * (barH + gap) - gap) + '" rx="4" style="fill:var(--surface,#F2F4F8);stroke:none;"/>';
-    for (var j = 0; j < models.length; j++) {
-      var m = models[j];
-      var y = pad.top + j * (barH + gap);
-      var barW = (m.cost / maxCost) * plotW;
-      s += '<text x="' + (pad.left - 8) + '" y="' + (y + barH / 2 + 4) + '" text-anchor="end" style="fill:var(--text-sec,#3D4455);font-family:var(--font-body);" font-size="10">' + m.name + '</text>';
-      s += '<rect x="' + pad.left + '" y="' + y + '" width="' + barW + '" height="' + barH + '" rx="4" style="fill:var(--accent,#2D8ABF);" opacity="' + (0.55 + 0.45 * (m.cost / maxCost)) + '"/>';
-      var labelX = pad.left + barW + 6;
-      s += '<text x="' + labelX + '" y="' + (y + barH / 2 + 4) + '" style="fill:var(--text-sec,#3D4455);font-family:var(--font-mono);" font-size="9.5" font-weight="600">$' + m.cost.toFixed(2) + '</text>';
-    }
-    s += '<text x="' + (pad.left + plotW / 2) + '" y="' + (pad.top + models.length * (barH + gap) + 12) + '" text-anchor="middle" style="fill:var(--text-muted,#6B7280);font-family:var(--font-body);" font-size="9">Estimated cost per 10,000 classifications (USD)</text>';
-    svg.innerHTML = s;
-    insight.textContent = t.insight;
-  }
-
-  var btns = explorer.querySelectorAll(".attention-explorer__sentence-btn");
-  btns.forEach(function(btn, i) {
-    btn.addEventListener("click", function() {
-      btns.forEach(function(b, j) {
-        b.classList.toggle("attention-explorer__sentence-btn--active", j === i);
-      });
-      currentTier = i;
-      draw();
-    });
-  });
-
-  draw();
-})();
-</script>
