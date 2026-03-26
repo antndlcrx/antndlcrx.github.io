@@ -2,27 +2,302 @@
 import CourseLayout from '../../layouts/CourseLayout.astro';
 
 const sections = [
-  { id: 'rag', label: 'Information Extraction & RAG' },
-  { id: 'simulated-agents', label: 'LLMs as Simulated Agents' },
+  { id: 'extraction', label: 'Information Extraction' },
+  { id: 'rag', label: 'Retrieval-Augmented Generation' },
 ];
 ---
 
 <CourseLayout
   day={4}
-  title="Social Science Applications"
-  description="RAG pipelines for large corpora and using LLMs as simulated agents to study human behavior: applications at the frontier of computational social science."
+  title="Extraction, Summarization, and RAG"
+  description="Information extraction, summarization, and retrieval-augmented generation: building systems that can read, extract, and answer questions over large corpora."
   sections={sections}
 >
 
-  <!-- ===== RAG ===== -->
-  <section id="rag">
-    <h2>Information Extraction, Summarization &amp; RAG</h2>
+  <!-- ===================================================================
+       SECTION 1: INFORMATION EXTRACTION
+       =================================================================== -->
+  <section id="extraction">
+    <h2>Information Extraction &amp; Summarization</h2>
     <p>
-      Many social science datasets are too large for a single LLM context
-      window, or require grounding in specific documents. Retrieval-Augmented
-      Generation (RAG) addresses this by combining a retrieval system with an
-      LLM, allowing it to find and reason over relevant passages from large
-      corpora.
+      On Days 2 and 3, you classified text: assigning labels to documents.
+      That answers questions like <em>&ldquo;is this tweet supportive or
+      opposed?&rdquo;</em> Now you will do something harder:
+      <strong>extract structured information</strong> from unstructured text.
+      This is the difference between asking <em>&ldquo;is this article about
+      democracy?&rdquo;</em> and asking <em>&ldquo;what specific claims does
+      this article make about democracy, what evidence does it cite, and what
+      methods does it use?&rdquo;</em>
+    </p>
+    <p>
+      This matters because review articles, legislative texts, interview
+      transcripts, and policy documents are dense with extractable
+      structure: claims, cited findings, causal arguments, policy positions.
+      Manually cataloguing all of this across a large corpus would take
+      weeks. An LLM can attempt it in seconds. The question is:
+      <strong>can you trust what it extracts?</strong>
+    </p>
+
+    <h3>From Classification to Extraction</h3>
+    <p>
+      Classification maps a text to a label from a fixed set. Extraction
+      is open-ended: the model must identify relevant pieces of information,
+      structure them according to a schema you define, and ideally trace
+      each piece back to its source in the text. The output is not a
+      single word but a structured object: a list of claims, a table of
+      entities, a set of cited findings with their provenance.
+    </p>
+    <p>
+      This makes extraction substantially harder to evaluate. With
+      classification, you compare the model's label to a ground truth label.
+      With extraction, you need to check: Did the model find all the
+      relevant items? Did it invent any that are not in the text? Did it
+      faithfully represent what the text actually says? These are three
+      different failure modes, and each one can corrupt your data in
+      different ways.
+    </p>
+
+    <div class="definition-box">
+      <p class="definition-box__label">Definition</p>
+      <p class="definition-box__term">Information Extraction</p>
+      <p>
+        The task of identifying and structuring specific pieces of
+        information from unstructured text. Unlike classification (which
+        assigns a label), extraction produces structured output: entities,
+        relationships, claims, events, or arguments, each ideally traceable
+        to a specific passage in the source.
+      </p>
+    </div>
+
+    <h3>The Three Failure Modes</h3>
+    <p>
+      When an LLM extracts information from text, three things can go
+      wrong. Understanding these failure modes is essential for
+      building trustworthy extraction pipelines.
+    </p>
+
+    <!-- Faithfulness failure modes interactive -->
+    <div id="faithfulness-failures-root"></div>
+
+    <p>
+      <strong>Hallucination:</strong> the model invents information that
+      is not in the source text. It might attribute a finding to a citation
+      that does not exist, or claim the article makes an argument it never
+      makes. Hallucinated extractions are particularly dangerous because
+      they look exactly like real ones: confident, well-structured, and
+      plausible. The only way to catch them is to check against the source.
+    </p>
+    <p>
+      <strong>Omission:</strong> the model misses important information
+      that is clearly present in the text. It might extract three of five
+      key claims, silently dropping the two that are most nuanced or
+      that require more careful reading. Omissions are less dangerous than
+      hallucinations (they don't add false data) but they bias your dataset
+      toward whatever the model finds easiest to extract.
+    </p>
+    <p>
+      <strong>Distortion:</strong> the model extracts something that is
+      partially correct but changes the meaning. It might report that
+      &ldquo;Smith (2020) found that immigration increases wages&rdquo;
+      when the article actually says &ldquo;Smith (2020) found that
+      <em>high-skilled</em> immigration increases wages <em>in some
+      sectors</em>.&rdquo; The claim is not invented, but the qualifications
+      that make it accurate have been stripped away.
+    </p>
+
+    <div class="stop-and-think">
+      <div class="stop-and-think__header">
+        <svg class="stop-and-think__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+        <span class="stop-and-think__label">Stop and Think</span>
+      </div>
+      <p>
+        Which failure mode is most dangerous for a literature review that
+        uses LLM-extracted claims as its primary data source? Would your
+        answer change if the extracted data were used for a meta-analysis
+        versus a qualitative synthesis?
+      </p>
+      <details>
+        <summary>Reveal</summary>
+        <div>
+          <p>
+            For a meta-analysis, <strong>distortion</strong> is arguably most
+            dangerous: a subtly altered effect size or a dropped qualifier
+            changes the quantitative input without being obviously wrong.
+            For a qualitative synthesis, <strong>hallucination</strong> is
+            worse: an invented claim could lead to entirely false conclusions
+            about the state of a field. Omission matters in both cases but
+            is easier to detect (you can check coverage against a table of
+            contents or known papers). The key point: different downstream
+            uses require different verification strategies.
+          </p>
+        </div>
+      </details>
+    </div>
+
+    <h3>Faithfulness as the Core Requirement</h3>
+    <p>
+      The thread running through all of today's material is
+      <strong>faithfulness</strong>: every piece of extracted or generated
+      information should be traceable to a specific passage in the source
+      text. This is the standard that separates a research tool from a
+      hallucination machine.
+    </p>
+
+    <div class="definition-box">
+      <p class="definition-box__label">Definition</p>
+      <p class="definition-box__term">Faithfulness (in extraction and generation)</p>
+      <p>
+        The property that every claim in the model's output is supported by
+        the source material provided to it. A faithful extraction contains
+        only information present in the source text. A faithful summary
+        does not add, invent, or distort. Faithfulness is distinct from
+        correctness: a faithful extraction accurately represents what the
+        source says, even if the source itself is wrong.
+      </p>
+    </div>
+
+    <p>
+      Verifying faithfulness requires comparing the model's output against
+      the source text, item by item. Two practical approaches exist.
+      <strong>String matching</strong> checks whether key phrases from each
+      extracted claim appear in the source, which is fast but brittle (it
+      misses paraphrases). <strong>LLM-as-judge</strong> uses a separate
+      model call to evaluate whether each claim is supported by the passage,
+      which is more flexible but introduces its own error rate. In practice,
+      using both provides a reasonable check.
+    </p>
+
+    <h3>Schema Design: Deciding What to Extract</h3>
+    <p>
+      Before writing a prompt, you need to decide what
+      <em>categories</em> of information to extract. This is codebook
+      design, the same skill from Day 3's classification work, applied to a
+      harder problem.
+    </p>
+    <p>
+      For academic text, common extraction categories include:
+      substantive claims (assertions the authors make), cited findings
+      (results attributed to other researchers), methodological approaches,
+      and causal arguments. But the categories are not always clean.
+      Is a &ldquo;cited finding&rdquo; also a &ldquo;claim&rdquo; when the
+      authors endorse it? Is a research design a &ldquo;method&rdquo; or
+      a &ldquo;framework&rdquo;? These ambiguities are real and affect what
+      the model extracts. Defining them precisely in the prompt is as
+      important as defining classification labels.
+    </p>
+
+    <div class="course-note">
+      <svg class="course-note__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+      </svg>
+      <p>
+        <strong>In the notebook:</strong> Exercise 1 puts you in the role
+        of the extractor. You manually identify claims, cited findings,
+        and methods from a passage of an Annual Review of Political Science
+        article on AI governance. This builds your gold standard: when the
+        model does the same extraction in Exercise 2, you compare its
+        output against yours. Exercise 3 has you write a faithfulness
+        verification function to check the model's work systematically.
+      </p>
+    </div>
+
+    <h3>Summarization: A Special Case of Extraction</h3>
+    <p>
+      Summarization is extraction where the target is the
+      <em>overall argument</em> rather than individual items.
+      The same failure modes apply: the model can hallucinate claims the
+      article never makes, omit key arguments, or distort nuanced
+      positions into simplified versions.
+    </p>
+    <p>
+      For research use, the critical question is whether a summary is
+      <strong>displacive</strong>: does reading the summary make it
+      unnecessary to read the original? If the summary is intended as a
+      research tool (helping you decide which articles to read in full),
+      some information loss is acceptable. If the summary is intended as
+      a data source (coding the article's position for quantitative
+      analysis), faithfulness is paramount and should be verified
+      item by item.
+    </p>
+
+    <div class="stop-and-think">
+      <div class="stop-and-think__header">
+        <svg class="stop-and-think__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+        <span class="stop-and-think__label">Stop and Think</span>
+      </div>
+      <p>
+        You use an LLM to summarize 200 policy documents and then code
+        each summary for policy positions. A colleague points out that
+        you are coding the model's interpretation, not the documents
+        themselves. Is this a valid concern? How would you address it?
+      </p>
+      <details>
+        <summary>Reveal</summary>
+        <div>
+          <p>
+            It is a valid concern. The model's summary is a lossy
+            transformation of the original: it reflects the model's choices
+            about what to include, emphasize, or simplify. Coding the
+            summary introduces an intermediate layer of interpretation that
+            may systematically distort certain positions. Two mitigation
+            strategies: (1) validate on a sample by coding both the original
+            documents and the summaries and measuring agreement, and (2) use
+            extraction rather than summarization, pulling specific claims
+            with provenance rather than relying on the model's editorial
+            judgment about what matters.
+          </p>
+        </div>
+      </details>
+    </div>
+
+    <div class="key-takeaway">
+      <p class="key-takeaway__label">Key Takeaway</p>
+      <p>
+        Information extraction turns unstructured text into structured
+        data, but <strong>faithfulness is the bottleneck</strong>. The model
+        can hallucinate, omit, and distort, and these errors are harder to
+        detect than classification errors because the output space is
+        open-ended. Every extraction pipeline needs a verification step.
+        The methodological standard is simple: every extracted claim should
+        be traceable to a specific passage in the source.
+      </p>
+    </div>
+
+    <h3>Resources</h3>
+    <ul class="resource-list">
+      <li><a href="https://arxiv.org/abs/2310.07521" target="_blank" rel="noopener">Min et al. (2023), <em>FActScore: Fine-grained Atomic Evaluation of Factual Precision</em></a>: a framework for evaluating faithfulness by decomposing claims into atomic facts and checking each one.</li>
+      <li><a href="https://arxiv.org/abs/2305.14251" target="_blank" rel="noopener">Tang et al. (2023), <em>Understanding Factual Errors in Summarization</em></a>: a taxonomy of faithfulness errors in LLM-generated summaries.</li>
+      <li><a href="https://arxiv.org/abs/2305.03514" target="_blank" rel="noopener">Ziems et al. (2024), <em>Can Large Language Models Transform Computational Social Science?</em></a>: comprehensive review covering extraction methodology and validity concerns for social science applications.</li>
+    </ul>
+  </section>
+
+  <!-- ===================================================================
+       SECTION 2: RAG
+       =================================================================== -->
+  <section id="rag">
+    <h2>Retrieval-Augmented Generation (RAG)</h2>
+    <p>
+      In Section 1, you extracted information from a passage you already had.
+      But what if you have a question and do not know which passages to look
+      at? A colleague asks: <em>&ldquo;What does the recent political science
+      literature say about how states approach AI governance?&rdquo;</em> The
+      answer is somewhere in 24 review articles, totalling roughly 480 pages.
+      No model's context window can hold all of that, and even if it could,
+      performance degrades with very long contexts.
+    </p>
+    <p>
+      <strong>RAG solves this</strong>: instead of feeding the model
+      everything, you first <em>retrieve</em> the most relevant passages,
+      then feed only those to the model for <em>generation</em>. The
+      retrieval step uses <strong>embeddings</strong>: the same vector
+      representations from <a href="/course/day-1">Day 1</a>. You embed
+      your question, embed all your passages, and find the passages whose
+      vectors are closest to your question's vector. Then you pass those
+      passages to the model as context.
     </p>
 
     <div class="definition-box">
@@ -30,79 +305,843 @@ const sections = [
       <p class="definition-box__term">Retrieval-Augmented Generation (RAG)</p>
       <p>
         A framework that augments an LLM's generation with retrieved context
-        from an external knowledge base. The pipeline typically involves:
-        document chunking → embedding and indexing → query-time retrieval →
-        context-augmented generation.
+        from an external knowledge base. Instead of relying on the model's
+        training data (which may be outdated, incomplete, or fabricated), RAG
+        grounds the model's output in specific documents you control. The
+        pipeline has four stages: chunk the documents, embed and index the
+        chunks, retrieve relevant chunks at query time, and generate an
+        answer conditioned on the retrieved context.
       </p>
     </div>
 
+    <h3>The RAG Pipeline</h3>
     <p>
-      We cover the full RAG pipeline: chunking strategies, embedding models for
-      retrieval, vector stores, and evaluating RAG output quality. The emphasis
-      is on building pipelines that are reliable enough for research use, where
-      faithfulness to source documents is paramount.
+      Building a RAG system involves four design decisions, each of which
+      affects the quality of the final output. Getting retrieval wrong
+      means the model never sees the relevant information; getting
+      generation wrong means the model does not use the information it does
+      see. Both failure points need separate evaluation.
     </p>
 
-    <div class="key-takeaway">
-      <p class="key-takeaway__label">Key Takeaway</p>
-      <p>
-        RAG lets you scale LLM-based analysis to corpora of any size while
-        maintaining source grounding. But retrieval quality is the bottleneck:
-        if the retriever misses relevant passages or returns irrelevant ones,
-        the generator will produce plausible-sounding but unfaithful output.
-      </p>
-    </div>
-  </section>
+    <!-- RAG pipeline step-by-step interactive -->
+    <div id="rag-pipeline-root"></div>
 
-  <!-- ===== SIMULATED AGENTS ===== -->
-  <section id="simulated-agents">
-    <h2>LLMs as Simulated Agents</h2>
+    <h3>Step 1: Chunking</h3>
     <p>
-      A provocative line of research uses LLMs as stand-ins for human
-      respondents: what Argyle et al. (2023) call "silicon sampling." Can
-      we prompt an LLM to simulate how a 65-year-old conservative voter in
-      rural Ohio would respond to a survey? And if so, when should we trust
-      the results?
+      Documents must be split into pieces small enough for the embedding
+      model to handle and specific enough for retrieval to be meaningful.
+      This is <strong>chunking</strong>, and it is the most
+      underappreciated design choice in RAG.
     </p>
 
+    <!-- Chunking strategy visualiser -->
+    <div id="chunking-visualiser-root"></div>
+
     <p>
-      This module examines the <em>Homo silicus</em> paradigm: its theoretical
-      motivation, empirical validation studies, failure modes, and ethical
-      considerations. We explore both the promise (cheap, fast, controllable
-      simulated populations) and the risks (systematic biases, lack of
-      genuine lived experience).
+      <strong>Chunk size</strong> is the primary trade-off. Small chunks
+      (100-200 words) are precise: retrieval returns exactly the relevant
+      sentence or paragraph. But they lose context: a claim extracted from
+      a 100-word chunk may be missing the qualifications stated in the
+      surrounding paragraphs. Large chunks (500-1000 words) preserve
+      context but dilute relevance: a chunk about immigration policy that
+      also discusses taxation may be retrieved for tax questions when the
+      immigration content is irrelevant.
+    </p>
+    <p>
+      <strong>Overlap</strong> addresses boundary problems. Without
+      overlap, a claim that spans two chunks is split between them, and
+      neither chunk alone captures the full meaning. Overlapping chunks
+      (sharing 50-100 words with their neighbours) ensure that boundary
+      information appears in at least one chunk. The cost is redundancy:
+      more chunks means more embeddings and a larger index.
+    </p>
+    <p>
+      <strong>Metadata</strong> attached to each chunk (article title,
+      author, topic, year) enables filtered retrieval: search only within
+      articles about a specific topic, or restrict to a particular time
+      period. Without metadata, a query about Labour's immigration policy
+      might retrieve chunks from Conservative manifestos that happen to
+      use similar language.
+    </p>
+
+    <h3>Step 2: Embedding and Indexing</h3>
+    <p>
+      Each chunk is converted into a dense vector using an embedding model.
+      In the notebook, you use <strong>all-MiniLM-L6-v2</strong>, a small
+      (80MB) sentence-transformer that produces 384-dimensional vectors. It
+      was trained so that semantically similar texts end up with similar
+      vectors, which is exactly what retrieval requires.
+    </p>
+    <p>
+      These vectors are stored in a <strong>vector index</strong> (the
+      notebook uses FAISS, Facebook's similarity search library) that
+      enables fast nearest-neighbour search. When a question comes in,
+      you embed it with the same model and find the <em>k</em> chunks whose
+      vectors are closest to the question's vector.
     </p>
 
     <div class="stop-and-think">
       <div class="stop-and-think__header">
         <svg class="stop-and-think__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10"/>
-          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
-          <line x1="12" y1="17" x2="12.01" y2="17"/>
+          <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
         </svg>
         <span class="stop-and-think__label">Stop and Think</span>
       </div>
       <p>
-        Under what conditions might simulating survey responses with an LLM be
-        a valid complement to traditional surveys? Under what conditions
-        would it be misleading or even harmful?
+        The embedding model converts text into vectors based on semantic
+        similarity. But &ldquo;semantically similar&rdquo; is not the same
+        as &ldquo;relevant to the question.&rdquo; Can you think of a case
+        where a passage is highly relevant to a research question but
+        would have low cosine similarity to the question's embedding?
       </p>
       <details>
         <summary>Reveal</summary>
         <div>
           <p>
-            Simulation may be valid for exploring hypotheses, pilot-testing
-            survey instruments, or studying well-documented populations where
-            the model's training data includes representative perspectives. It
-            becomes misleading when used as a substitute for data from
-            underrepresented populations (the model has less to draw on),
-            when the simulated responses are presented as genuine data, or
-            when the research question depends on authentic lived experience
-            rather than stereotypical patterns.
+            A passage that <em>answers</em> a question often uses different
+            vocabulary from the question itself. The question
+            &ldquo;What causes democratic backsliding?&rdquo; uses the term
+            &ldquo;backsliding,&rdquo; but a relevant passage might discuss
+            &ldquo;erosion of institutional constraints&rdquo; or
+            &ldquo;executive aggrandisement&rdquo; without ever using the
+            word &ldquo;backsliding.&rdquo; Good embedding models handle
+            common synonyms, but domain-specific terminology and indirect
+            answers remain a challenge. This is why evaluating retrieval
+            quality is as important as evaluating generation quality.
           </p>
         </div>
       </details>
     </div>
+
+    <h3>Step 3: Retrieval</h3>
+    <p>
+      At query time, the question is embedded and the index returns the
+      <em>k</em> most similar chunks. The choice of <em>k</em> is another
+      design decision. Too few results may miss relevant information. Too
+      many dilute the context with irrelevant passages, which can cause the
+      model to generate text that blends relevant and irrelevant content.
+      In practice, <em>k</em> = 3 to 10 is common, and the right value
+      depends on how concentrated the relevant information is across the
+      corpus.
+    </p>
+
+    <p>
+      <strong>Retrieval quality is the bottleneck.</strong> If the retriever
+      returns the wrong passages, no amount of generation quality will
+      save the output. The model will produce a confident, well-structured
+      answer based on irrelevant context. Evaluating retrieval separately
+      from generation is essential: check whether the retrieved chunks
+      actually contain the information needed to answer the question
+      before evaluating the generated answer.
+    </p>
+
+    <div class="course-note">
+      <svg class="course-note__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+      </svg>
+      <p>
+        <strong>In the notebook:</strong> Exercise 4 has you rank passages
+        by relevance manually, then compare your ranking to the embedding
+        model's ranking. You will discover where semantic similarity
+        captures relevance and where it fails.
+      </p>
+    </div>
+
+    <h3>Step 4: Generation</h3>
+    <p>
+      The retrieved chunks are formatted into a prompt alongside the
+      question, and the model generates an answer. The generation prompt
+      must enforce two constraints: the model should <strong>only use
+      information from the provided passages</strong>, and it should
+      <strong>cite which passage each claim comes from</strong>. Without
+      these constraints, the model will freely mix retrieved information
+      with its own training data, and you will not be able to tell which
+      claims are grounded and which are fabricated.
+    </p>
+    <p>
+      Model scale matters for generation quality. In the notebook, you
+      compare a 3B-parameter local model with a 72B-parameter API model
+      on the same retrieval results. The larger model is substantially
+      better at synthesizing information across multiple passages without
+      losing faithfulness. The smaller model tends to either copy passages
+      verbatim (safe but not a synthesis) or attempt synthesis and
+      introduce errors.
+    </p>
+
+    <h3>Evaluating RAG Output</h3>
+    <p>
+      RAG evaluation has two layers, and conflating them is a common
+      mistake.
+    </p>
+    <p>
+      <strong>Retrieval evaluation:</strong> Did the system find the right
+      passages? Check the retrieved chunks against the question and verify
+      that the answer is actually contained in them. If retrieval fails,
+      the generation cannot succeed, regardless of model quality.
+    </p>
+    <p>
+      <strong>Generation evaluation:</strong> Given the correct passages,
+      did the model produce a faithful, well-grounded answer? This is
+      the same faithfulness verification from Section 1, now applied to
+      generated text rather than extracted items. Each claim in the answer
+      should be traceable to a specific retrieved passage.
+    </p>
+    <p>
+      The notebook introduces a <strong>provenance check</strong> that
+      uses embedding similarity to match each sentence in the generated
+      answer to its closest retrieved passage. Sentences with low
+      similarity to any passage are flagged as potentially ungrounded:
+      the model may have drawn on its training data rather than the
+      provided context.
+    </p>
+
+    <div class="course-note">
+      <svg class="course-note__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+      </svg>
+      <p>
+        <strong>In the notebook:</strong> Exercise 5 has you write the
+        generation prompt for the RAG pipeline, enforcing source-only
+        generation and citation. Exercise 6 compares the RAG answer to a
+        no-context answer on the same question: you will see hallucination
+        in the no-context version and grounding in the RAG version. The
+        provenance check function then verifies whether the RAG answer
+        actually uses the retrieved passages.
+      </p>
+    </div>
+
+    <div class="stop-and-think">
+      <div class="stop-and-think__header">
+        <svg class="stop-and-think__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+        <span class="stop-and-think__label">Stop and Think</span>
+      </div>
+      <p>
+        Your RAG system retrieves 5 passages and generates an answer with
+        8 claims. The provenance check shows that 6 claims match retrieved
+        passages with high similarity, but 2 do not match any passage.
+        What could explain the ungrounded claims? How would you handle this
+        in a research pipeline?
+      </p>
+      <details>
+        <summary>Reveal</summary>
+        <div>
+          <p>
+            Several explanations are possible. The model may have drawn on
+            its training data to fill gaps in the retrieved context. The
+            claims may be valid inferences from the passages that the
+            provenance check fails to match (paraphrased too heavily for
+            embedding similarity to catch). Or the model may have
+            hallucinated. You cannot tell from the check alone. In a
+            research pipeline, ungrounded claims should be flagged for manual
+            review, not silently included. One practical approach: set a
+            grounding threshold and automatically discard claims below it,
+            then manually verify a sample of the claims above it.
+          </p>
+        </div>
+      </details>
+    </div>
+
+    <h3>RAG for Social Science Research</h3>
+    <p>
+      RAG enables research workflows that were previously impractical.
+      Querying decades of parliamentary records, analyzing large legislative
+      databases, building interactive research tools over document
+      collections, or conducting systematic reviews across hundreds of
+      papers: these all become feasible when retrieval and generation
+      are combined into a pipeline.
+    </p>
+    <p>
+      But RAG does not eliminate the researcher's judgment. It changes
+      <em>where</em> judgment is applied: from reading every document to
+      designing the pipeline (chunk size, embedding model, retrieval
+      parameters, generation prompt) and evaluating its output
+      (retrieval quality, faithfulness, provenance). The pipeline is an
+      instrument, and like any instrument, it needs validation before you
+      trust its measurements.
+    </p>
+
+    <div class="course-note">
+      <svg class="course-note__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+      </svg>
+      <p>
+        Anthropic (2024),
+        <a href="https://www.anthropic.com/news/contextual-retrieval" target="_blank" rel="noopener"><em>Contextual Retrieval.</em></a>
+        Demonstrates that prepending context (a brief summary of the
+        document) to each chunk before embedding substantially improves
+        retrieval accuracy. A practical technique for production RAG
+        pipelines where retrieval quality is the bottleneck.
+      </p>
+    </div>
+
+    <div class="course-note">
+      <svg class="course-note__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+      </svg>
+      <p>
+        <strong>Coming in Day 5:</strong> The functions you build today
+        (<code>retrieve()</code>, <code>rag_answer()</code>,
+        <code>verify_faithfulness()</code>) become <strong>tools</strong>
+        that an agent can call. Instead of you writing the pipeline steps
+        manually, an agent decides which tool to use and when. The pipeline
+        becomes a planning loop.
+      </p>
+    </div>
+
+    <div class="key-takeaway">
+      <p class="key-takeaway__label">Key Takeaway</p>
+      <p>
+        RAG grounds the model's answers in your actual data, scaling
+        LLM-based analysis to corpora of any size. But it is not magic:
+        retrieval quality determines generation quality, and both need
+        separate evaluation. Every design choice (chunk size, overlap,
+        embedding model, <em>k</em>, generation prompt) affects the output.
+        The provenance thread from extraction carries through to RAG:
+        <strong>every claim should be traceable to a source</strong>.
+      </p>
+    </div>
+
+    <h3>Resources</h3>
+    <ul class="resource-list">
+      <li><a href="https://arxiv.org/abs/2005.11401" target="_blank" rel="noopener">Lewis et al. (2020), <em>Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks</em></a>: the foundational RAG paper.</li>
+      <li><a href="https://arxiv.org/abs/2312.10997" target="_blank" rel="noopener">Gao et al. (2024), <em>Retrieval-Augmented Generation for Large Language Models: A Survey</em></a>: comprehensive overview of RAG techniques, architectures, and evaluation.</li>
+      <li><a href="https://www.anthropic.com/news/contextual-retrieval" target="_blank" rel="noopener">Anthropic (2024), <em>Contextual Retrieval</em></a>: improved chunking strategy that prepends document context to each chunk.</li>
+      <li><a href="https://python.langchain.com" target="_blank" rel="noopener">LangChain</a> and <a href="https://www.llamaindex.ai" target="_blank" rel="noopener">LlamaIndex</a>: production RAG pipeline frameworks.</li>
+      <li><a href="https://www.sbert.net" target="_blank" rel="noopener">Sentence Transformers</a>: the embedding models used for semantic retrieval. <a href="https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2" target="_blank" rel="noopener">all-MiniLM-L6-v2</a> is used in the notebook.</li>
+      <li>ChromaDB, <a href="https://github.com/facebookresearch/faiss" target="_blank" rel="noopener">FAISS</a>, Pinecone: vector database options for embedding storage and retrieval at different scales.</li>
+    </ul>
   </section>
 
 </CourseLayout>
+
+<!-- =================================================================== -->
+<!-- COMPONENT STYLES                                                    -->
+<!-- =================================================================== -->
+<style is:inline>
+/* ── Shared widget tokens ── */
+.widget-wrap {
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background: var(--surface, #FFFFFF);
+  border: 1px solid var(--border, #E2E6EE);
+  border-radius: 12px;
+  /* Muted sage for “success / faithful” — less saturated than #2D7D46 */
+  --w-success: #4C6D60;
+  --w-success-border: #C9D9CE;
+  --w-success-bg: #F1F6F3;
+  --w-success-hi: #E0E9E5;
+  --w-success-bar: #7A9A8C;
+  --w-chunk-teal: #4A6058;
+  --w-chunk-teal-bg: #F4F8F6;
+}
+/* Canopy: keep Lagoon blues for widget chrome so it doesn’t merge with sage tokens */
+:root[data-theme="green"] .widget-wrap {
+  --accent: #2D8ABF;
+  --accent-light: #E8EEF6;
+  --accent-hover: #3BA3D4;
+}
+.widget-eyebrow {
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent, #2D8ABF);
+  margin-bottom: 0.5rem;
+}
+.widget-title {
+  font-family: var(--font-display, 'Source Serif 4', Georgia, serif);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text, #1A1D27);
+  line-height: 1.25;
+  margin-bottom: 0.75rem;
+}
+.widget-intro {
+  font-size: 0.92rem;
+  color: var(--text-sec, #3D4455);
+  line-height: 1.65;
+  max-width: 620px;
+  margin-bottom: 1.5rem;
+}
+@keyframes widgetFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.wfade { animation: widgetFadeIn 0.3s ease-out; }
+
+/* ── Faithfulness failures ── */
+.ff__tabs { display: flex; gap: 0.35rem; margin-bottom: 0; flex-wrap: wrap; }
+.ff__tab {
+  font-family: var(--font-body, sans-serif); font-size: 0.78rem; font-weight: 600;
+  padding: 0.5rem 1rem; border: 1.5px solid var(--border, #E2E6EE); border-bottom: none;
+  border-radius: 8px 8px 0 0; background: var(--surface-alt, #F5F5F0);
+  color: var(--text-muted, #6B7280); cursor: pointer; transition: all 0.25s ease;
+  position: relative; top: 1.5px;
+}
+.ff__tab:hover { color: var(--text-sec, #3D4455); background: var(--surface, #FFF); }
+.ff__tab--active { background: var(--surface, #FFF); color: var(--text, #1A1D27); z-index: 1; }
+.ff__tab--faithful.ff__tab--active { color: var(--w-success); border-color: var(--w-success-border); border-bottom-color: var(--surface, #FFF); }
+.ff__tab--hallucination.ff__tab--active { color: #B83230; border-color: #E8AAAA; border-bottom-color: var(--surface, #FFF); }
+.ff__tab--omission.ff__tab--active { color: #8B6914; border-color: #E8D49A; border-bottom-color: var(--surface, #FFF); }
+.ff__tab--distortion.ff__tab--active { color: #6D28D9; border-color: #C9B5F5; border-bottom-color: var(--surface, #FFF); }
+
+.ff__panel { border: 1.5px solid var(--border, #E2E6EE); border-radius: 0 12px 12px 12px; background: var(--surface, #FFF); overflow: hidden; }
+.ff__panel--faithful { border-color: var(--w-success-border); }
+.ff__panel--hallucination { border-color: #E8AAAA; }
+.ff__panel--omission { border-color: #E8D49A; }
+.ff__panel--distortion { border-color: #C9B5F5; }
+
+.ff__status { display: flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1.25rem; font-size: 0.78rem; font-weight: 600; }
+.ff__status--faithful { background: var(--w-success-bg); color: var(--w-success); }
+.ff__status--hallucination { background: #FDF0F0; color: #B83230; }
+.ff__status--omission { background: #FDF8EC; color: #8B6914; }
+.ff__status--distortion { background: #F3EEFF; color: #6D28D9; }
+.ff__status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+.ff__columns { display: grid; grid-template-columns: 1fr 1fr; min-height: 18rem; }
+@media (max-width: 640px) { .ff__columns { grid-template-columns: 1fr; } }
+.ff__col { padding: 1.25rem; }
+.ff__col--source { border-right: 1px solid var(--border, #E2E6EE); background: var(--surface-alt, #F5F5F0); }
+@media (max-width: 640px) { .ff__col--source { border-right: none; border-bottom: 1px solid var(--border, #E2E6EE); } }
+.ff__col-label { font-family: var(--font-mono, monospace); font-size: 0.62rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted, #6B7280); margin-bottom: 0.75rem; }
+.ff__source-text { font-size: 0.84rem; color: var(--text-sec, #3D4455); line-height: 1.7; }
+.ff__source-text .hl-source { background: var(--w-success-hi); border-radius: 2px; padding: 0 2px; }
+.ff__source-text .hl-missing { background: #FFF3CD; border-radius: 2px; padding: 0 2px; }
+.ff__source-text .hl-distorted { background: #E8DAFF; border-radius: 2px; padding: 0 2px; }
+
+.ff__item { margin-bottom: 1rem; padding: 0.75rem 0.85rem; border-radius: 8px; border: 1px solid var(--border, #E2E6EE); background: var(--surface-alt, #F5F5F0); font-size: 0.84rem; line-height: 1.6; color: var(--text-sec, #3D4455); }
+.ff__item--ok { border-color: var(--w-success-border); background: var(--w-success-bg); }
+.ff__item--hallucinated { border-color: #E8AAAA; background: #FDF0F0; }
+.ff__item--distorted { border-color: #C9B5F5; background: #F3EEFF; }
+.ff__item-label { font-family: var(--font-mono, monospace); font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.3rem; }
+.ff__item-label--ok { color: var(--w-success); }
+.ff__item-label--error { color: #B83230; }
+.ff__item-label--warning { color: #8B6914; }
+.ff__item-label--distorted { color: #6D28D9; }
+.ff__item .hl-error { background: #FECDD3; border-radius: 2px; padding: 0 2px; font-weight: 600; }
+.ff__item .hl-distort { background: #DDD6FE; border-radius: 2px; padding: 0 2px; font-weight: 600; }
+.ff__explanation { padding: 1rem 1.25rem; border-top: 1px solid var(--border, #E2E6EE); font-size: 0.85rem; color: var(--text-sec, #3D4455); line-height: 1.6; }
+.ff__explanation strong { color: var(--text, #1A1D27); }
+
+/* ── RAG pipeline ── */
+.pipeline { position: relative; }
+.pipeline::before { content: ''; position: absolute; left: 1.35rem; top: 2.2rem; bottom: 2.2rem; width: 2px; background: var(--border, #E2E6EE); z-index: 0; }
+.step { position: relative; margin-bottom: 0.75rem; z-index: 1; }
+.step:last-child { margin-bottom: 0; }
+.step__header {
+  display: flex; align-items: center; gap: 0.85rem; padding: 0.85rem 1rem;
+  background: var(--surface, #FFF); border: 1.5px solid var(--border, #E2E6EE);
+  border-radius: 12px; cursor: pointer; transition: all 0.25s ease; user-select: none;
+}
+.step__header:hover { border-color: var(--accent, #2D8ABF); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.step--active .step__header { border-color: var(--accent, #2D8ABF); border-bottom-left-radius: 0; border-bottom-right-radius: 0; background: var(--accent-light, #E8EEF6); }
+.step__number {
+  width: 2.2rem; height: 2.2rem; border-radius: 50%;
+  background: var(--surface-alt, #F5F5F0); border: 2px solid var(--border, #E2E6EE);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-mono, monospace); font-size: 0.78rem; font-weight: 700;
+  color: var(--text-muted, #6B7280); flex-shrink: 0; transition: all 0.25s ease;
+}
+.step--active .step__number { background: var(--accent, #2D8ABF); border-color: var(--accent, #2D8ABF); color: white; }
+.step__label { flex: 1; }
+.step__name { font-size: 0.92rem; font-weight: 700; color: var(--text, #1A1D27); line-height: 1.3; }
+.step__brief { font-size: 0.78rem; color: var(--text-muted, #6B7280); line-height: 1.4; margin-top: 0.1rem; }
+.step__chevron { font-size: 0.7rem; color: var(--text-muted, #6B7280); transition: transform 0.25s ease; flex-shrink: 0; }
+.step--active .step__chevron { transform: rotate(90deg); color: var(--accent, #2D8ABF); }
+.step__detail { display: none; border: 1.5px solid var(--accent, #2D8ABF); border-top: none; border-radius: 0 0 12px 12px; background: var(--surface, #FFF); overflow: hidden; }
+.step--active .step__detail { display: block; }
+.step__transform { display: grid; grid-template-columns: 1fr auto 1fr; gap: 0; align-items: stretch; border-bottom: 1px solid var(--border, #E2E6EE); }
+@media (max-width: 600px) { .step__transform { grid-template-columns: 1fr; } .step__arrow-col { display: none; } }
+.step__io { padding: 1rem 1.15rem; }
+.step__io-label { font-family: var(--font-mono, monospace); font-size: 0.6rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted, #6B7280); margin-bottom: 0.5rem; }
+.step__io-content { font-size: 0.78rem; color: var(--text-sec, #3D4455); line-height: 1.6; font-family: var(--font-mono, monospace); }
+.step__io-content--prose { font-family: var(--font-body, sans-serif); font-size: 0.82rem; }
+.step__arrow-col { display: flex; align-items: center; justify-content: center; padding: 0 0.25rem; color: var(--accent, #2D8ABF); font-size: 1.2rem; }
+.step__info { padding: 1rem 1.15rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+@media (max-width: 600px) { .step__info { grid-template-columns: 1fr; } }
+.step__info-box { padding: 0.7rem 0.85rem; border-radius: 8px; font-size: 0.8rem; line-height: 1.55; color: var(--text-sec, #3D4455); }
+.step__info-box--choices { background: var(--accent-light, #E8EEF6); border: 1px solid #C8D6E8; }
+.step__info-box--failure { background: #FDF0F0; border: 1px solid #E8AAAA; }
+.step__info-label { font-family: var(--font-mono, monospace); font-size: 0.62rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.3rem; }
+.step__info-label--choices { color: var(--accent, #2D8ABF); }
+.step__info-label--failure { color: #9E3A38; }
+.trunc { overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
+.vec-preview { font-family: var(--font-mono, monospace); font-size: 0.72rem; color: var(--accent, #2D8ABF); background: var(--accent-light, #E8EEF6); padding: 0.3rem 0.5rem; border-radius: 4px; display: inline-block; margin-top: 0.25rem; word-break: break-all; line-height: 1.5; }
+.score-bar { display: inline-block; height: 5px; border-radius: 3px; vertical-align: middle; margin-left: 0.35rem; }
+
+/* ── Chunking visualiser ── */
+.cv__query { background: var(--surface-alt, #F5F5F0); border: 1px solid var(--border, #E2E6EE); border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.6rem; }
+.cv__query-label { font-family: var(--font-mono, monospace); font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted, #6B7280); flex-shrink: 0; }
+.cv__query-text { font-size: 0.88rem; color: var(--text, #1A1D27); font-weight: 500; font-style: italic; }
+.cv__tabs { display: flex; gap: 0.35rem; margin-bottom: 0; }
+.cv__tab {
+  font-family: var(--font-body, sans-serif); font-size: 0.78rem; font-weight: 600;
+  padding: 0.5rem 1rem; border: 1.5px solid var(--border, #E2E6EE); border-bottom: none;
+  border-radius: 8px 8px 0 0; background: var(--surface-alt, #F5F5F0);
+  color: var(--text-muted, #6B7280); cursor: pointer; transition: all 0.25s ease;
+  position: relative; top: 1.5px;
+}
+.cv__tab:hover { color: var(--text-sec, #3D4455); background: var(--surface, #FFF); }
+.cv__tab--active { background: var(--surface, #FFF); color: var(--text, #1A1D27); border-color: var(--accent, #2D8ABF); border-bottom-color: var(--surface, #FFF); z-index: 1; }
+.cv__panel { border: 1.5px solid var(--accent, #2D8ABF); border-radius: 0 12px 12px 12px; background: var(--surface, #FFF); overflow: hidden; }
+.cv__strategy-bar { padding: 0.75rem 1.15rem; background: var(--accent-light, #E8EEF6); border-bottom: 1px solid var(--border, #E2E6EE); display: flex; flex-wrap: wrap; gap: 1.25rem; align-items: center; }
+.cv__strategy-stat { font-size: 0.78rem; color: var(--text-sec, #3D4455); }
+.cv__strategy-stat strong { font-family: var(--font-mono, monospace); color: var(--accent, #2D8ABF); font-size: 0.82rem; }
+.cv__text-area { padding: 1.25rem; font-size: 0.84rem; line-height: 1.8; color: var(--text-sec, #3D4455); }
+.chunk { border-radius: 3px; padding: 1px 0; position: relative; }
+.chunk--1 { background: #E8EEF6; }
+.chunk--2 { background: #FDF5EE; }
+.chunk--3 { background: #F3EEFF; }
+.chunk--4 { background: var(--w-chunk-teal-bg); }
+.chunk--overlap { background: #FEF0C7; border-bottom: 2.5px solid #D97706; padding-bottom: 1px; }
+.chunk-boundary { display: inline-block; width: 0; height: 1em; border-left: 2px dashed var(--text-muted, #6B7280); margin: 0 3px; vertical-align: text-bottom; opacity: 0.4; }
+.chunk-label { display: inline-block; font-family: var(--font-mono, monospace); font-size: 0.58rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; padding: 0.1rem 0.35rem; border-radius: 3px; vertical-align: text-top; margin-right: 2px; position: relative; top: -1px; color: white; }
+.chunk-label--1 { background: #2E5090; }
+.chunk-label--2 { background: #7B4F2B; }
+.chunk-label--3 { background: #6D28D9; }
+.chunk-label--4 { background: var(--w-chunk-teal); }
+.overlap-marker { display: inline-block; font-family: var(--font-mono, monospace); font-size: 0.52rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; padding: 0.08rem 0.3rem; border-radius: 2px; background: #D97706; color: white; vertical-align: text-top; margin-right: 2px; position: relative; top: -1px; }
+.retrieval-badge { display: inline-block; font-family: var(--font-mono, monospace); font-size: 0.6rem; font-weight: 600; padding: 0.1rem 0.4rem; border-radius: 3px; margin-left: 0.35rem; vertical-align: text-top; position: relative; top: -1px; }
+.retrieval-badge--yes { background: var(--w-success-bg); color: var(--w-success); border: 1px solid var(--w-success-border); }
+.retrieval-badge--partial { background: #FDF8EC; color: #8B6914; border: 1px solid #E8D49A; }
+.retrieval-badge--no { background: var(--surface-alt, #F5F5F0); color: var(--text-muted, #6B7280); border: 1px solid var(--border, #E2E6EE); }
+.cv__analysis { padding: 1rem 1.15rem; border-top: 1px solid var(--border, #E2E6EE); font-size: 0.85rem; color: var(--text-sec, #3D4455); line-height: 1.6; }
+.cv__analysis strong { color: var(--text, #1A1D27); }
+.cv__analysis-label { font-family: var(--font-mono, monospace); font-size: 0.62rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.35rem; }
+.cv__analysis-label--good { color: var(--w-success); }
+.cv__analysis-label--problem { color: #9E3A38; }
+.cv__analysis-label--tradeoff { color: #8B6914; }
+</style>
+
+<!-- =================================================================== -->
+<!-- 1. FAITHFULNESS FAILURE MODES                                       -->
+<!-- =================================================================== -->
+<script is:inline>
+(function () {
+  var root = document.getElementById("faithfulness-failures-root");
+  if (!root) return;
+
+  var sourceText = 'The governance of artificial intelligence presents challenges that differ from prior technology regulation in several respects. Cihon et al. (2020) argue that AI systems are \u201Cgeneral-purpose\u201D in ways that make sector-specific regulation difficult, as the same underlying model can be deployed across healthcare, finance, and criminal justice. Existing regulatory frameworks, designed around specific applications, struggle to address a technology whose risks depend heavily on context of deployment (Marchetti 2022). Furthermore, the rapid pace of AI development means that regulatory processes often lag behind the technology they aim to govern. Several scholars have noted that democratic states face a particular tension: the desire to regulate AI to protect citizens\u2019 rights must be balanced against the competitive pressure to foster innovation (Roberts et al. 2021, Ding 2018).';
+
+  var modes = [
+    {
+      id: "faithful", label: "Faithful",
+      statusText: "All extracted claims are supported by the source text.",
+      sourceHighlights: sourceText,
+      items: [
+        { label: "Claim", labelCls: "ff__item-label--ok", cls: "ff__item--ok",
+          text: '<strong>Claim:</strong> AI governance differs from prior technology regulation because AI systems are general-purpose and can be deployed across multiple sectors.<br><span style="font-size:0.78rem;color:var(--text-muted,#6B7280);">Source: Cihon et al. (2020)</span>' },
+        { label: "Cited finding", labelCls: "ff__item-label--ok", cls: "ff__item--ok",
+          text: '<strong>Cited finding:</strong> Existing regulatory frameworks, designed around specific applications, struggle with AI because its risks depend on deployment context.<br><span style="font-size:0.78rem;color:var(--text-muted,#6B7280);">Source: Marchetti (2022)</span>' },
+        { label: "Claim", labelCls: "ff__item-label--ok", cls: "ff__item--ok",
+          text: '<strong>Claim:</strong> Democratic states face a tension between regulating AI to protect rights and fostering innovation to remain competitive.<br><span style="font-size:0.78rem;color:var(--text-muted,#6B7280);">Source: Roberts et al. (2021), Ding (2018)</span>' }
+      ],
+      explanation: "This extraction is <strong>faithful</strong>: every claim is directly supported by the passage and correctly attributed. The claims are paraphrased but preserve the meaning and qualifications of the original text."
+    },
+    {
+      id: "hallucination", label: "Hallucination",
+      statusText: "One extracted claim is not present in the source text.",
+      sourceHighlights: sourceText,
+      items: [
+        { label: "Claim", labelCls: "ff__item-label--ok", cls: "ff__item--ok",
+          text: '<strong>Claim:</strong> AI governance differs from prior technology regulation because AI systems are general-purpose.<br><span style="font-size:0.78rem;color:var(--text-muted,#6B7280);">Source: Cihon et al. (2020)</span>' },
+        { label: "Cited finding", labelCls: "ff__item-label--ok", cls: "ff__item--ok",
+          text: '<strong>Cited finding:</strong> Existing regulatory frameworks struggle with AI because its risks depend on deployment context.<br><span style="font-size:0.78rem;color:var(--text-muted,#6B7280);">Source: Marchetti (2022)</span>' },
+        { label: "Cited finding", labelCls: "ff__item-label--error", cls: "ff__item--hallucinated",
+          text: '<strong>Cited finding:</strong> <span class="hl-error">A 2023 OECD survey found that 78% of member states had adopted national AI strategies, though implementation varied widely across governance systems.</span><br><span style="font-size:0.78rem;color:var(--text-muted,#6B7280);">Source: OECD (2023)</span>' }
+      ],
+      explanation: '<strong>The third item is fabricated.</strong> The passage never mentions the OECD, the 78% figure, or national AI strategies. The model generated a plausible-sounding claim with a realistic citation, but none of it appears in the source text. Without checking against the source, you would have no reason to doubt it.'
+    },
+    {
+      id: "omission", label: "Omission",
+      statusText: "A key claim from the passage is missing from the extraction.",
+      sourceHighlights: sourceText.replace(
+        'Several scholars have noted that democratic states face a particular tension: the desire to regulate AI to protect citizens\u2019 rights must be balanced against the competitive pressure to foster innovation (Roberts et al. 2021, Ding 2018).',
+        '<span class="hl-missing">Several scholars have noted that democratic states face a particular tension: the desire to regulate AI to protect citizens\u2019 rights must be balanced against the competitive pressure to foster innovation (Roberts et al. 2021, Ding 2018).</span>'
+      ),
+      items: [
+        { label: "Claim", labelCls: "ff__item-label--ok", cls: "ff__item--ok",
+          text: '<strong>Claim:</strong> AI governance differs from prior technology regulation because AI systems are general-purpose.<br><span style="font-size:0.78rem;color:var(--text-muted,#6B7280);">Source: Cihon et al. (2020)</span>' },
+        { label: "Cited finding", labelCls: "ff__item-label--ok", cls: "ff__item--ok",
+          text: '<strong>Cited finding:</strong> Existing regulatory frameworks struggle with AI because its risks depend on deployment context.<br><span style="font-size:0.78rem;color:var(--text-muted,#6B7280);">Source: Marchetti (2022)</span>' },
+        { label: "Missing", labelCls: "ff__item-label--warning", cls: "",
+          text: '<em style="color:#8B6914;">The passage\u2019s argument about democratic states balancing rights protection against innovation pressure (Roberts et al. 2021, Ding 2018) was not extracted. This is highlighted in yellow in the source text.</em>' }
+      ],
+      explanation: '<strong>The democratic tension argument is missing.</strong> The model silently dropped the most nuanced political argument while keeping the straightforward definitional claims. Omissions systematically bias your dataset toward whatever the model finds easiest to extract.'
+    },
+    {
+      id: "distortion", label: "Distortion",
+      statusText: "An extracted claim subtly changes the meaning of the source.",
+      sourceHighlights: sourceText.replace(
+        'the desire to regulate AI to protect citizens\u2019 rights must be balanced against the competitive pressure to foster innovation (Roberts et al. 2021, Ding 2018)',
+        '<span class="hl-distorted">the desire to regulate AI to protect citizens\u2019 rights must be balanced against the competitive pressure to foster innovation (Roberts et al. 2021, Ding 2018)</span>'
+      ),
+      items: [
+        { label: "Claim", labelCls: "ff__item-label--ok", cls: "ff__item--ok",
+          text: '<strong>Claim:</strong> AI governance differs from prior technology regulation because AI systems are general-purpose.<br><span style="font-size:0.78rem;color:var(--text-muted,#6B7280);">Source: Cihon et al. (2020)</span>' },
+        { label: "Cited finding", labelCls: "ff__item-label--ok", cls: "ff__item--ok",
+          text: '<strong>Cited finding:</strong> Existing regulatory frameworks struggle with AI because its risks depend on deployment context.<br><span style="font-size:0.78rem;color:var(--text-muted,#6B7280);">Source: Marchetti (2022)</span>' },
+        { label: "Claim (distorted)", labelCls: "ff__item-label--distorted", cls: "ff__item--distorted",
+          text: '<strong>Claim:</strong> Democratic states <span class="hl-distort">prioritise innovation over regulation</span> when it comes to AI governance.<br><span style="font-size:0.78rem;color:var(--text-muted,#6B7280);">Source: Roberts et al. (2021), Ding (2018)</span>' }
+      ],
+      explanation: '<strong>The third claim changes the meaning.</strong> The passage describes a <em>tension</em> that must be \u201Cbalanced\u201D; the extraction converts this into a claim that states \u201Cprioritise innovation over regulation.\u201D Same citation, same topic, shifted meaning. In a dataset, this would systematically bias toward more one-sided characterisations of the literature.'
+    }
+  ];
+
+  var activeMode = 0;
+
+  function render() {
+    var m = modes[activeMode];
+    var tabsHtml = '';
+    for (var t = 0; t < modes.length; t++) {
+      var actCls = t === activeMode ? ' ff__tab--active ff__tab--' + modes[t].id : '';
+      tabsHtml += '<button class="ff__tab' + actCls + '" data-idx="' + t + '">' + modes[t].label + '</button>';
+    }
+    var itemsHtml = '';
+    for (var i = 0; i < m.items.length; i++) {
+      var item = m.items[i];
+      itemsHtml += '<div class="ff__item ' + item.cls + '"><div class="ff__item-label ' + item.labelCls + '">' + item.label + '</div>' + item.text + '</div>';
+    }
+    var dotColors = { faithful: '#4C6D60', hallucination: '#B83230', omission: '#8B6914', distortion: '#6D28D9' };
+
+    var html = '<div class="widget-wrap">';
+    html += '<div class="widget-eyebrow">Interactive visualisation</div>';
+    html += '<div class="widget-title">The Three Failure Modes of Extraction</div>';
+    html += '<p class="widget-intro">Click each tab to see the same passage with a faithful extraction and then each failure mode. Errors are highlighted so you can compare against the source.</p>';
+    html += '<div class="ff__tabs">' + tabsHtml + '</div>';
+    html += '<div class="ff__panel ff__panel--' + m.id + '">';
+    html += '<div class="ff__status ff__status--' + m.id + '"><span class="ff__status-dot" style="background:' + dotColors[m.id] + ';"></span>' + m.statusText + '</div>';
+    html += '<div class="ff__columns wfade">';
+    html += '<div class="ff__col ff__col--source"><div class="ff__col-label">Source passage</div><div class="ff__source-text">' + m.sourceHighlights + '</div></div>';
+    html += '<div class="ff__col"><div class="ff__col-label">Model extraction</div>' + itemsHtml + '</div>';
+    html += '</div>';
+    html += '<div class="ff__explanation">' + m.explanation + '</div>';
+    html += '</div></div>';
+
+    root.innerHTML = html;
+    root.querySelectorAll('.ff__tab').forEach(function (tab) {
+      tab.addEventListener('click', function () {
+        activeMode = parseInt(tab.getAttribute('data-idx'), 10);
+        render();
+      });
+    });
+  }
+  render();
+})();
+</script>
+
+<!-- =================================================================== -->
+<!-- 2. RAG PIPELINE                                                     -->
+<!-- =================================================================== -->
+<script is:inline>
+(function () {
+  var root = document.getElementById("rag-pipeline-root");
+  if (!root) return;
+
+  var steps = [
+    {
+      name: "Chunk", brief: "Split documents into retrievable pieces",
+      inputLabel: "Full article (~8,000 words)",
+      input: '<div class="step__io-content--prose trunc">The governance of artificial intelligence presents challenges that differ from prior technology regulation in several respects. Cihon et al. (2020) argue that AI systems are "general-purpose" in ways that make sector-specific regulation difficult, as the same underlying model can be deployed across healthcare, finance, and criminal justice...</div><div style="margin-top:0.4rem;font-size:0.75rem;color:var(--text-muted,#6B7280);font-style:italic;">+ 7,500 more words across 20 pages</div>',
+      outputLabel: "16 overlapping chunks (~500 words each)",
+      output: '<div style="display:flex;flex-wrap:wrap;gap:0.25rem;margin-bottom:0.4rem;"><span style="display:inline-block;font-family:var(--font-mono,monospace);font-size:0.68rem;font-weight:500;padding:0.15rem 0.45rem;border-radius:3px;background:var(--surface-alt,#F5F5F0);border:1px solid var(--border,#E2E6EE);color:var(--text-sec,#3D4455);">Chunk 1</span><span style="display:inline-block;font-family:var(--font-mono,monospace);font-size:0.68rem;font-weight:500;padding:0.15rem 0.45rem;border-radius:3px;background:var(--accent-light,#E8EEF6);border:1px solid var(--accent,#2D8ABF);color:var(--accent,#2D8ABF);">Chunk 2</span><span style="display:inline-block;font-family:var(--font-mono,monospace);font-size:0.68rem;font-weight:500;padding:0.15rem 0.45rem;border-radius:3px;background:var(--surface-alt,#F5F5F0);border:1px solid var(--border,#E2E6EE);color:var(--text-sec,#3D4455);">Chunk 3</span><span style="display:inline-block;font-family:var(--font-mono,monospace);font-size:0.68rem;font-weight:500;padding:0.15rem 0.45rem;border-radius:3px;background:var(--surface-alt,#F5F5F0);border:1px solid var(--border,#E2E6EE);color:var(--text-sec,#3D4455);">...</span><span style="display:inline-block;font-family:var(--font-mono,monospace);font-size:0.68rem;font-weight:500;padding:0.15rem 0.45rem;border-radius:3px;background:var(--surface-alt,#F5F5F0);border:1px solid var(--border,#E2E6EE);color:var(--text-sec,#3D4455);">Chunk 16</span></div><div class="step__io-content--prose" style="font-size:0.78rem;color:var(--text-sec,#3D4455);margin-top:0.35rem;"><strong style="color:var(--accent,#2D8ABF);">Chunk 2:</strong> "...AI systems are \u201Cgeneral-purpose\u201D in ways that make sector-specific regulation difficult, as the same underlying model can be deployed across healthcare, finance, and criminal justice. Existing regulatory frameworks, designed around specific applications, struggle to address a technology whose risks depend heavily on context of deployment (Marchetti 2022). Furthermore, the rapid pace..."</div>',
+      choices: '<strong>Chunk size:</strong> 200-500 words is typical. Smaller chunks are more precise; larger chunks preserve more context.<br><br><strong>Overlap:</strong> 50-100 words shared between neighbours prevents information at chunk boundaries from being lost.',
+      failure: 'If chunks are too large, retrieval returns a mix of relevant and irrelevant text. If too small, individual chunks lack enough context. A claim split across two chunks may not be found by either one.'
+    },
+    {
+      name: "Embed", brief: "Convert each chunk into a dense vector",
+      inputLabel: "Text chunk (natural language)",
+      input: '<div class="step__io-content--prose" style="font-size:0.78rem;">AI systems are "general-purpose" in ways that make sector-specific regulation difficult, as the same underlying model can be deployed across healthcare, finance, and criminal justice...</div>',
+      outputLabel: "384-dimensional vector",
+      output: '<div class="vec-preview">[0.023, -0.118, 0.045, 0.201, -0.067, 0.154, -0.032, 0.089, ... ]</div><div style="font-size:0.75rem;color:var(--text-muted,#6B7280);margin-top:0.35rem;">384 numbers encoding the semantic meaning of this chunk. Similar chunks will have similar vectors (high cosine similarity).</div>',
+      choices: '<strong>Embedding model:</strong> all-MiniLM-L6-v2 (fast, 384d) vs. larger models like e5-large (more accurate, 1024d, slower). The embedding model determines what "similarity" means.<br><br><strong>Normalisation:</strong> vectors are typically L2-normalised so inner product equals cosine similarity.',
+      failure: 'If the embedding model does not capture domain-specific meaning well, semantically relevant chunks may not have similar vectors. A passage about "executive aggrandisement" may not be close to a query about "democratic backsliding" even though they are topically related.'
+    },
+    {
+      name: "Index", brief: "Store vectors so you can search them",
+      inputLabel: "All chunk vectors (n \u00d7 384 matrix)",
+      input: '<div style="font-family:var(--font-mono,monospace);font-size:0.75rem;color:var(--text-sec,#3D4455);line-height:1.5;">Chunk 1: [0.012, -0.087, 0.134, ...]<br>Chunk 2: [0.023, -0.118, 0.045, ...]<br>Chunk 3: [-0.056, 0.091, 0.022, ...]<br><span style="color:var(--text-muted,#6B7280);">... 13 more chunks ...</span><br>Chunk 16: [0.078, -0.043, 0.112, ...]</div>',
+      outputLabel: "Searchable vector store",
+      output: '<div style="font-family:var(--font-mono,monospace);font-size:0.75rem;color:var(--text-sec,#3D4455);line-height:1.5;"><span style="color:var(--accent,#2D8ABF);font-weight:600;">FAISS Index</span><br>Vectors: 16<br>Dimensions: 384<br>Time per query: &lt;1ms</div><div style="font-size:0.75rem;color:var(--text-muted,#6B7280);margin-top:0.35rem;">The index stores all vectors and lets you quickly find the ones most similar to a new query vector. For research-scale corpora (hundreds to thousands of documents), this is essentially instant.</div>',
+      choices: '<strong>Metadata:</strong> attach article title, author, year, and topic to each chunk. This lets you filter retrieval (e.g., "only search articles about democracy") rather than searching the entire corpus blindly.<br><br><strong>At research scale</strong> (up to a few thousand documents), the simplest index type works fine. You do not need to worry about approximate search methods until you reach millions of chunks.',
+      failure: 'Indexing itself rarely fails. The real risk is not storing enough metadata: without article-level tags, you cannot restrict retrieval to specific subsets of the corpus, and a query about one party\u2019s immigration policy might retrieve passages from a different party that uses similar language.'
+    },
+    {
+      name: "Retrieve", brief: "Find the most relevant chunks for a query",
+      inputLabel: "Research question",
+      input: '<div class="step__io-content--prose" style="font-size:0.82rem;font-weight:500;color:var(--text,#1A1D27);">"How do states approach the governance and regulation of AI?"</div><div style="font-size:0.75rem;color:var(--text-muted,#6B7280);margin-top:0.3rem;">Embedded with the same model, then compared against all vectors in the index.</div>',
+      outputLabel: "Top-k chunks ranked by similarity",
+      output: '<div style="font-size:0.78rem;line-height:1.6;">' +
+        '<div style="margin-bottom:0.4rem;"><span style="font-family:var(--font-mono,monospace);font-weight:600;color:var(--accent,#2D8ABF);">1.</span> <span style="color:var(--text-sec,#3D4455);">AI Governance, Chunk 2</span> <span style="font-family:var(--font-mono,monospace);font-size:0.7rem;color:#4C6D60;font-weight:600;">0.87</span><span class="score-bar" style="width:87%;background:#7A9A8C;"></span></div>' +
+        '<div style="margin-bottom:0.4rem;"><span style="font-family:var(--font-mono,monospace);font-weight:600;color:var(--accent,#2D8ABF);">2.</span> <span style="color:var(--text-sec,#3D4455);">AI Governance, Chunk 5</span> <span style="font-family:var(--font-mono,monospace);font-size:0.7rem;color:#4C6D60;font-weight:600;">0.81</span><span class="score-bar" style="width:81%;background:#7A9A8C;"></span></div>' +
+        '<div style="margin-bottom:0.4rem;"><span style="font-family:var(--font-mono,monospace);font-weight:600;color:var(--accent,#2D8ABF);">3.</span> <span style="color:var(--text-sec,#3D4455);">State Capacity, Chunk 8</span> <span style="font-family:var(--font-mono,monospace);font-size:0.7rem;color:#8B6914;font-weight:600;">0.63</span><span class="score-bar" style="width:63%;background:#8B6914;"></span></div>' +
+        '<div style="margin-bottom:0.4rem;"><span style="font-family:var(--font-mono,monospace);font-weight:600;color:var(--accent,#2D8ABF);">4.</span> <span style="color:var(--text-sec,#3D4455);">Sanctions, Chunk 3</span> <span style="font-family:var(--font-mono,monospace);font-size:0.7rem;color:#9E3A38;font-weight:600;">0.41</span><span class="score-bar" style="width:41%;background:#9E3A38;"></span></div>' +
+        '<div><span style="font-family:var(--font-mono,monospace);font-weight:600;color:var(--accent,#2D8ABF);">5.</span> <span style="color:var(--text-sec,#3D4455);">Corruption, Chunk 12</span> <span style="font-family:var(--font-mono,monospace);font-size:0.7rem;color:#9E3A38;font-weight:600;">0.38</span><span class="score-bar" style="width:38%;background:#9E3A38;"></span></div></div>',
+      choices: '<strong>k (number of results):</strong> too few misses relevant information; too many dilutes context with irrelevant passages. k=3 to 10 is typical.<br><br><strong>Score threshold:</strong> results below a similarity threshold (e.g., 0.5) are probably irrelevant. Consider filtering them out before generation.',
+      failure: 'If the query uses different vocabulary from the source, relevant chunks may score low. "How do governments regulate AI?" and "state approaches to algorithmic governance" are the same question but may retrieve different chunks. Try multiple query phrasings.'
+    },
+    {
+      name: "Generate", brief: "Answer the question using only retrieved passages",
+      inputLabel: "Prompt: question + top-k passages",
+      input: '<div style="font-size:0.78rem;line-height:1.55;"><span style="color:var(--accent,#2D8ABF);font-weight:600;font-family:var(--font-mono,monospace);font-size:0.7rem;">SYSTEM:</span> <span style="color:var(--text-sec,#3D4455);">Answer using ONLY the passages below. Cite each claim.</span><br><br><span style="color:var(--accent,#2D8ABF);font-weight:600;font-family:var(--font-mono,monospace);font-size:0.7rem;">PASSAGES:</span> <span style="color:var(--text-muted,#6B7280);">[1] AI Governance, Chunk 2... [2] AI Governance, Chunk 5... [3] State Capacity, Chunk 8...</span><br><br><span style="color:var(--accent,#2D8ABF);font-weight:600;font-family:var(--font-mono,monospace);font-size:0.7rem;">QUESTION:</span> <span style="color:var(--text-sec,#3D4455);">How do states approach AI governance?</span></div>',
+      outputLabel: "Grounded answer with citations",
+      output: '<div class="step__io-content--prose" style="font-size:0.82rem;color:var(--text-sec,#3D4455);line-height:1.65;">"States face distinct challenges in governing AI because the technology is general-purpose and resists sector-specific regulation [1]. Existing frameworks struggle because AI risks depend on deployment context [1]. Democratic states face a particular tension between protecting citizens\u2019 rights through regulation and maintaining competitiveness through innovation [2]."</div>',
+      choices: '<strong>Prompt design:</strong> explicitly instruct "only use the provided passages" and specify a citation format. Without this, the model freely mixes retrieved content with training data.<br><br><strong>Model scale:</strong> larger models synthesize across passages more faithfully. Smaller models tend to copy verbatim or introduce errors.',
+      failure: 'Even with explicit instructions, models sometimes draw on training data instead of the provided context. The result looks grounded but contains claims not in the retrieved text. This is why the provenance check from Section 1 matters here too.'
+    }
+  ];
+
+  var activeStep = null;
+
+  function render() {
+    var html = '<div class="widget-wrap">';
+    html += '<div class="widget-eyebrow">Interactive visualisation</div>';
+    html += '<div class="widget-title">The RAG Pipeline, Step by Step</div>';
+    html += '<p class="widget-intro">Click each step to see what happens to the data, what design choices you face, and what goes wrong when the step fails.</p>';
+    html += '<div class="pipeline">';
+    for (var i = 0; i < steps.length; i++) {
+      var s = steps[i];
+      var cls = activeStep === i ? ' step--active' : '';
+      html += '<div class="step' + cls + '">';
+      html += '<div class="step__header" data-idx="' + i + '"><div class="step__number">' + (i+1) + '</div><div class="step__label"><div class="step__name">' + s.name + '</div><div class="step__brief">' + s.brief + '</div></div><div class="step__chevron">\u25B6</div></div>';
+      html += '<div class="step__detail">';
+      html += '<div class="step__transform"><div class="step__io"><div class="step__io-label">Input: ' + s.inputLabel + '</div><div class="step__io-content">' + s.input + '</div></div><div class="step__arrow-col">\u2192</div><div class="step__io"><div class="step__io-label">Output: ' + s.outputLabel + '</div><div class="step__io-content">' + s.output + '</div></div></div>';
+      html += '<div class="step__info"><div class="step__info-box step__info-box--choices"><div class="step__info-label step__info-label--choices">Design choices</div>' + s.choices + '</div><div class="step__info-box step__info-box--failure"><div class="step__info-label step__info-label--failure">What goes wrong</div>' + s.failure + '</div></div>';
+      html += '</div></div>';
+    }
+    html += '</div></div>';
+    root.innerHTML = html;
+
+    root.querySelectorAll('.step__header').forEach(function (hdr) {
+      hdr.addEventListener('click', function () {
+        var idx = parseInt(hdr.getAttribute('data-idx'), 10);
+        activeStep = activeStep === idx ? null : idx;
+        render();
+      });
+    });
+  }
+  render();
+})();
+</script>
+
+<!-- =================================================================== -->
+<!-- 3. CHUNKING STRATEGY VISUALISER                                     -->
+<!-- =================================================================== -->
+<script is:inline>
+(function () {
+  var root = document.getElementById("chunking-visualiser-root");
+  if (!root) return;
+
+  var sentences = [
+    "The governance of artificial intelligence presents challenges that differ from prior technology regulation in several respects.",
+    "Cihon et al. (2020) argue that AI systems are \u201Cgeneral-purpose\u201D in ways that make sector-specific regulation difficult, as the same underlying model can be deployed across healthcare, finance, and criminal justice.",
+    "Existing regulatory frameworks, designed around specific applications, struggle to address a technology whose risks depend heavily on context of deployment (Marchetti 2022).",
+    "Furthermore, the rapid pace of AI development means that regulatory processes often lag behind the technology they aim to govern.",
+    "Several scholars have noted that democratic states face a particular tension: the desire to regulate AI to protect citizens\u2019 rights must be balanced against the competitive pressure to foster innovation (Roberts et al. 2021, Ding 2018).",
+    "Authoritarian regimes, by contrast, face fewer domestic constraints but must navigate international norms and the reputational costs of deploying AI for surveillance (Feldstein 2019).",
+    "The result is a fragmented global landscape in which regulatory approaches vary widely across political systems, with limited convergence on standards or enforcement mechanisms.",
+    "This fragmentation poses particular challenges for AI systems that operate across borders, as compliance with one jurisdiction\u2019s requirements may conflict with another\u2019s."
+  ];
+
+  var query = "How do democratic states balance AI regulation with innovation?";
+
+  var strategies = [
+    {
+      tabLabel: "Small (~2 sent.)", chunkSize: "~40 words", numChunks: 4, overlap: "None",
+      chunks: [
+        { sentIdx: [0,1], label: "1", colorCls: "1", retrieval: "partial", score: "0.58" },
+        { sentIdx: [2,3], label: "2", colorCls: "2", retrieval: "partial", score: "0.52" },
+        { sentIdx: [4,5], label: "3", colorCls: "3", retrieval: "yes", score: "0.84" },
+        { sentIdx: [6,7], label: "4", colorCls: "4", retrieval: "no", score: "0.31" }
+      ],
+      analysis: { labelCls: "cv__analysis-label--problem", label: "Problem: boundary splits context",
+        text: '<strong>Chunk 3 is retrieved</strong> and contains the key claim about democratic states (sentence 5). But sentence 4 ("regulatory processes lag behind the technology") is in Chunk 2, separated from the democratic tension argument it sets up. The model sees the conclusion without the buildup.' }
+    },
+    {
+      tabLabel: "Medium + overlap", chunkSize: "~80 words", numChunks: 3, overlap: "1 sentence",
+      chunks: [
+        { sentIdx: [0,1,2], label: "1", colorCls: "1", retrieval: "partial", score: "0.55" },
+        { sentIdx: [2,3,4,5], label: "2", colorCls: "2", retrieval: "yes", score: "0.86", overlapIdx: [2] },
+        { sentIdx: [5,6,7], label: "3", colorCls: "3", retrieval: "no", score: "0.34", overlapIdx: [5] }
+      ],
+      analysis: { labelCls: "cv__analysis-label--good", label: "This works well",
+        text: '<strong>Chunk 2 captures the full argument.</strong> It includes the regulatory lag (sentence 4) and the democratic tension (sentence 5), preserving the logical connection. The overlap means sentence 3 appears in both Chunks 1 and 2, so context is not lost at the boundary.' }
+    },
+    {
+      tabLabel: "Large (full para.)", chunkSize: "~160 words", numChunks: 1, overlap: "N/A",
+      chunks: [
+        { sentIdx: [0,1,2,3,4,5,6,7], label: "1", colorCls: "1", retrieval: "yes", score: "0.71" }
+      ],
+      analysis: { labelCls: "cv__analysis-label--tradeoff", label: "Trade-off: context preserved, relevance diluted",
+        text: '<strong>The whole passage is one chunk.</strong> No information is lost, but the similarity score (0.71) is lower than the medium strategy (0.86) because the chunk is diluted with irrelevant sentences. In a real corpus, this chunk competes against others, and the diluted score may push it below more focused results from other articles.' }
+    }
+  ];
+
+  var activeStrategy = 1;
+
+  function render() {
+    var s = strategies[activeStrategy];
+    var overlapSentences = {};
+    for (var ci = 0; ci < s.chunks.length; ci++) {
+      if (s.chunks[ci].overlapIdx) {
+        for (var oi = 0; oi < s.chunks[ci].overlapIdx.length; oi++) overlapSentences[s.chunks[ci].overlapIdx[oi]] = true;
+      }
+    }
+
+    var tabsHtml = '';
+    for (var t = 0; t < strategies.length; t++) {
+      var actCls = t === activeStrategy ? ' cv__tab--active' : '';
+      tabsHtml += '<button class="cv__tab' + actCls + '" data-idx="' + t + '">' + strategies[t].tabLabel + '</button>';
+    }
+
+    var textHtml = '';
+    for (var ci = 0; ci < s.chunks.length; ci++) {
+      var chunk = s.chunks[ci];
+      if (ci > 0) textHtml += '<span class="chunk-boundary"></span> ';
+      textHtml += '<span class="chunk-label chunk-label--' + chunk.colorCls + '">Chunk ' + chunk.label + '</span>';
+      var badgeCls = chunk.retrieval === "yes" ? "retrieval-badge--yes" : chunk.retrieval === "partial" ? "retrieval-badge--partial" : "retrieval-badge--no";
+      var badgeText = chunk.retrieval === "yes" ? "\u2713 Retrieved (" + chunk.score + ")" : chunk.retrieval === "partial" ? "~ Borderline (" + chunk.score + ")" : "\u2717 Not retrieved (" + chunk.score + ")";
+      textHtml += '<span class="retrieval-badge ' + badgeCls + '">' + badgeText + '</span> ';
+      textHtml += '<span class="chunk chunk--' + chunk.colorCls + '">';
+      for (var j = 0; j < chunk.sentIdx.length; j++) {
+        var sIdx = chunk.sentIdx[j];
+        var isOverlap = overlapSentences[sIdx] && ci > 0 && chunk.overlapIdx && chunk.overlapIdx.indexOf(sIdx) >= 0;
+        if (isOverlap) {
+          textHtml += '<span class="overlap-marker">overlap</span><span class="chunk chunk--overlap">' + sentences[sIdx] + '</span> ';
+        } else {
+          textHtml += sentences[sIdx] + ' ';
+        }
+      }
+      textHtml += '</span>';
+    }
+
+    var html = '<div class="widget-wrap">';
+    html += '<div class="widget-eyebrow">Interactive visualisation</div>';
+    html += '<div class="widget-title">How Chunking Affects Retrieval</div>';
+    html += '<p class="widget-intro">The same passage, split three different ways. Watch how chunk boundaries determine what the retriever can find.</p>';
+    html += '<div class="cv__query"><span class="cv__query-label">Query</span><span class="cv__query-text">"' + query + '"</span></div>';
+    html += '<div class="cv__tabs">' + tabsHtml + '</div>';
+    html += '<div class="cv__panel">';
+    html += '<div class="cv__strategy-bar"><div class="cv__strategy-stat">Chunk size: <strong>' + s.chunkSize + '</strong></div><div class="cv__strategy-stat">Chunks: <strong>' + s.numChunks + '</strong></div><div class="cv__strategy-stat">Overlap: <strong>' + s.overlap + '</strong></div></div>';
+    html += '<div class="cv__text-area wfade">' + textHtml + '</div>';
+    html += '<div class="cv__analysis wfade"><div class="cv__analysis-label ' + s.analysis.labelCls + '">' + s.analysis.label + '</div>' + s.analysis.text + '</div>';
+    html += '</div>';
+    html += '<div style="display:flex;flex-wrap:wrap;gap:0.75rem;margin-top:0.75rem;font-size:0.72rem;color:var(--text-muted,#6B7280);">';
+    html += '<span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#FEF0C7;border-bottom:2.5px solid #D97706;vertical-align:middle;margin-right:3px;"></span> Overlap (shared between adjacent chunks)</span>';
+    html += '<span><span style="display:inline-block;width:0;height:10px;border-left:2px dashed var(--text-muted,#6B7280);vertical-align:middle;margin-right:5px;opacity:0.4;"></span> Chunk boundary</span>';
+    html += '</div></div>';
+
+    root.innerHTML = html;
+    root.querySelectorAll('.cv__tab').forEach(function (tab) {
+      tab.addEventListener('click', function () {
+        activeStrategy = parseInt(tab.getAttribute('data-idx'), 10);
+        render();
+      });
+    });
+  }
+  render();
+})();
+</script>
