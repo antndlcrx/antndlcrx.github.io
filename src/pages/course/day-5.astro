@@ -2,113 +2,875 @@
 import CourseLayout from '../../layouts/CourseLayout.astro';
 
 const sections = [
-  { id: 'agents', label: 'Agents & Tool Use' },
-  { id: 'orchestration', label: 'Orchestration & Workflows' },
-  { id: 'capstone', label: 'Capstone Project' },
+  { id: 'agents', label: 'What Is an Agent?' },
+  { id: 'react', label: 'The ReAct Pattern' },
+  { id: 'failure-modes', label: 'Failure Modes' },
+  { id: 'production', label: 'From Notebooks to Production' },
 ];
 ---
 
 <CourseLayout
   day={5}
   title="Agentic Workflows"
-  description="Building autonomous research agents with tool use, ReAct patterns, and multi-step orchestration: the frontier of what LLMs can do for your research."
+  description="Building autonomous research agents with tool use, the ReAct pattern, failure modes and safeguards, and the bridge from notebooks to production tools."
   sections={sections}
 >
 
-  <!-- ===== AGENTS ===== -->
+  <!-- ===================================================================
+       SECTION 1: WHAT IS AN AGENT?
+       =================================================================== -->
   <section id="agents">
-    <h2>Agents &amp; Tool Use</h2>
+    <h2>What Is an Agent?</h2>
     <p>
-      An LLM agent is a system where the model doesn't just generate text but
-      takes <em>actions</em>: calling APIs, querying databases, running code,
-      or browsing the web. This transforms the model from a text processor
-      into an autonomous research assistant.
+      In every session so far, <strong>you</strong> have been the
+      decision-maker. You decided which prompt to write, which tool to call,
+      which results to inspect. The model did what you asked, one step at a
+      time.
+    </p>
+    <p>
+      An <strong>agent</strong> reverses this. You give the model a goal,
+      and it decides what steps to take: which tools to call, in what order,
+      and what to do with the results. The model becomes the planner; you
+      become the supervisor.
+    </p>
+    <p>
+      This is not a different kind of model. It is the same LLM you have
+      been using all week, wrapped in a loop that lets it take actions and
+      observe results. The architecture is surprisingly simple: a system
+      prompt that describes available tools, a parser that extracts tool
+      calls from the model's output, and a while loop that executes tools
+      and feeds results back. That's it.
     </p>
 
     <div class="definition-box">
       <p class="definition-box__label">Definition</p>
-      <p class="definition-box__term">ReAct Pattern</p>
+      <p class="definition-box__term">LLM Agent</p>
       <p>
-        A prompting framework where the model alternates between
-        <strong>Rea</strong>soning (thinking through what to do next) and
-        <strong>Act</strong>ing (executing a tool call), using the results of
-        each action to inform subsequent reasoning. This creates a transparent,
-        step-by-step problem-solving loop.
+        A system where a language model autonomously plans and executes
+        multi-step tasks by calling external tools (search, code execution,
+        APIs, databases) and using the results to inform subsequent actions.
+        The model decides <em>what</em> to do and <em>when</em>; the
+        surrounding code handles <em>how</em> (parsing, execution,
+        error handling).
       </p>
     </div>
 
+    <h3>Tools as Building Blocks</h3>
     <p>
-      We cover the building blocks of agentic systems: function calling
-      conventions, the Model Context Protocol (MCP) for tool integration,
-      and frameworks like LangGraph for orchestrating multi-step workflows.
+      An agent is only as useful as its tools. In the notebook, the tools
+      come directly from your Day 4 work: <code>search_literature()</code>
+      searches the political science corpus using the FAISS index you built,
+      <code>extract_findings()</code> pulls structured claims from a passage,
+      <code>summarize()</code> condenses text, and
+      <code>calculate()</code> evaluates mathematical expressions.
     </p>
-  </section>
-
-  <!-- ===== ORCHESTRATION ===== -->
-  <section id="orchestration">
-    <h2>Orchestration &amp; Workflows</h2>
     <p>
-      Real research tasks rarely fit into a single LLM call. Agentic workflows
-      compose multiple steps: retrieval, analysis, validation,
-      reporting: into pipelines that can process data with minimal human
-      intervention.
+      Each tool is a Python function with a clear interface: it takes a
+      string input and returns a string output. The agent does not know
+      how the tools work internally. It knows only their names, their
+      descriptions, and the format of their inputs. This separation is
+      important: it means you can swap out the implementation (replace
+      FAISS with a database, replace the local model with an API) without
+      changing the agent's behaviour.
     </p>
-
     <p>
-      We examine practical patterns: how to design reliable multi-step
-      pipelines, handle errors and retries, implement human-in-the-loop
-      checkpoints, and ensure reproducibility in workflows that involve
-      stochastic LLM outputs.
-    </p>
-
-    <div class="key-takeaway">
-      <p class="key-takeaway__label">Key Takeaway</p>
-      <p>
-        Agentic workflows represent the frontier of LLM applications in
-        research. They can automate complex analysis pipelines, but they also
-        amplify errors: a mistake in an early step propagates through the
-        entire chain. Careful design with validation checkpoints is essential.
-      </p>
-    </div>
-  </section>
-
-  <!-- ===== CAPSTONE ===== -->
-  <section id="capstone">
-    <h2>Capstone Project</h2>
-    <p>
-      The final module brings everything together. You will design and implement
-      an end-to-end research pipeline using LLMs, drawing on the concepts and
-      techniques from all five days of the course.
+      The pattern scales. Production agents like
+      <a href="https://docs.anthropic.com/en/docs/claude-code" target="_blank" rel="noopener">Claude Code</a>
+      use the same architecture with more powerful tools: file system
+      operations, shell commands, web search, code execution. The
+      <a href="https://modelcontextprotocol.io" target="_blank" rel="noopener">Model Context Protocol (MCP)</a>
+      standardises this further, providing a universal interface so that
+      any tool can work with any model.
     </p>
 
     <div class="stop-and-think">
       <div class="stop-and-think__header">
         <svg class="stop-and-think__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10"/>
-          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
-          <line x1="12" y1="17" x2="12.01" y2="17"/>
+          <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+        <span class="stop-and-think__label">Stop and Think</span>
+      </div>
+      <p>
+        Think about your own research workflow. What are the
+        &ldquo;tools&rdquo; you use repeatedly: searching a database,
+        reading a paper, extracting data from a table, running a
+        statistical test? If each of these were a function an agent
+        could call, which parts of your workflow could be automated,
+        and which require judgment that a model cannot provide?
+      </p>
+      <details>
+        <summary>Reveal</summary>
+        <div>
+          <p>
+            Most researchers find that the
+            <em>search → read → extract → organise</em> loop is highly
+            automatable: an agent can find relevant papers, pull out key
+            claims, and compile structured summaries. The parts that resist
+            automation are theoretical judgment (is this framework
+            appropriate?), methodological criticism (is this identification
+            strategy valid?), and creative synthesis (what does this pattern
+            mean?). The practical sweet spot is using agents for the
+            mechanical parts and reserving human judgment for the
+            interpretive parts.
+          </p>
+        </div>
+      </details>
+    </div>
+
+    <div class="course-note">
+      <svg class="course-note__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+      </svg>
+      <p>
+        <strong>In the notebook:</strong> Exercise 1a is &ldquo;Be the
+        Algorithm&rdquo; for agents. You plan the steps a model would take
+        to answer a research question, writing out the Thought / Action /
+        Observation sequence by hand. Exercise 1b has you test each tool
+        individually before putting them in the loop.
+      </p>
+    </div>
+  </section>
+
+  <!-- ===================================================================
+       SECTION 2: THE REACT PATTERN
+       =================================================================== -->
+  <section id="react">
+    <h2>The ReAct Pattern</h2>
+    <p>
+      Most LLM agents follow a framework called <strong>ReAct</strong>
+      (<a href="https://arxiv.org/abs/2210.03629" target="_blank" rel="noopener">Yao et al., 2023</a>):
+      the model alternates between <strong>Rea</strong>soning and
+      <strong>Act</strong>ing. At each step, it produces a thought
+      (reasoning about what to do next), then an action (a tool call),
+      then observes the result. This cycle repeats until the model has
+      enough information to produce a final answer.
+    </p>
+
+    <!-- ReAct loop interactive -->
+    <div id="react-loop-root"></div>
+
+    <p>
+      The power of ReAct is transparency. Because the model writes out its
+      reasoning at every step, you can audit the decision-making process.
+      If the agent gives a wrong answer, you can trace back through the
+      thoughts and observations to find where it went wrong: Did it search
+      for the wrong thing? Did it misinterpret a tool result? Did it
+      synthesize correctly but from incomplete evidence?
+    </p>
+
+    <h3>The Three Components</h3>
+    <p>
+      Building a ReAct agent requires three pieces, each with different
+      levels of difficulty:
+    </p>
+    <p>
+      <strong>The system prompt</strong> is the hardest part. It must
+      describe the agent's role, list the available tools with precise
+      descriptions, specify the exact Thought / Action / Action Input
+      format, and set behavioural rules (one tool at a time, do not invent
+      information, cite sources). If the format specification is imprecise,
+      the model's output will be unparseable.
+    </p>
+    <p>
+      <strong>The parser</strong> extracts tool calls from the model's text
+      output. It looks for patterns like <code>Action: search_literature</code>
+      and <code>Action Input: social media polarization</code>, or detects
+      when the model produces a <code>Final Answer:</code> instead. This is
+      string parsing, not conceptual work, but it must match the format
+      specified in the system prompt exactly.
+    </p>
+    <p>
+      <strong>The loop</strong> orchestrates everything. It sends the
+      conversation to the model, parses the response, executes the
+      requested tool, appends the observation to the conversation, and
+      repeats. It also enforces safeguards: a maximum number of steps
+      (preventing infinite loops), error handling for format violations,
+      and cost tracking.
+    </p>
+
+    <div class="definition-box">
+      <p class="definition-box__label">Definition</p>
+      <p class="definition-box__term">ReAct (Reasoning + Acting)</p>
+      <p>
+        A prompting framework where the model alternates between reasoning
+        (thinking through what to do next) and acting (executing a tool
+        call), using the results of each action to inform subsequent
+        reasoning. This creates a transparent, step-by-step
+        problem-solving loop that can be audited and debugged.
+      </p>
+    </div>
+
+    <div class="stop-and-think">
+      <div class="stop-and-think__header">
+        <svg class="stop-and-think__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+        <span class="stop-and-think__label">Stop and Think</span>
+      </div>
+      <p>
+        The system prompt for a ReAct agent is much longer and more
+        prescriptive than a classification prompt. Why? What happens if the
+        format specification is vague?
+      </p>
+      <details>
+        <summary>Reveal</summary>
+        <div>
+          <p>
+            A classification prompt produces a single output (a label).
+            An agent prompt produces <em>structured</em> output that must
+            be parsed by code. If the model writes
+            <code>I'll search for: social media</code> instead of
+            <code>Action: search_literature</code>, the parser fails and
+            the loop breaks. The system prompt must be prescriptive enough
+            that the model produces machine-parseable output reliably across
+            many steps. This is why larger models are better for agents:
+            they follow structured formats more consistently.
+          </p>
+        </div>
+      </details>
+    </div>
+
+    <div class="course-note">
+      <svg class="course-note__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+      </svg>
+      <p>
+        <strong>In the notebook:</strong> Exercise 2a has you write the
+        system prompt. Exercise 2b has you build the agent loop. Exercise
+        2c runs the agent on real research questions so you can watch it
+        reason, act, and synthesize in real time.
+      </p>
+    </div>
+  </section>
+
+  <!-- ===================================================================
+       SECTION 3: FAILURE MODES
+       =================================================================== -->
+  <section id="failure-modes">
+    <h2>When Agents Fail</h2>
+    <p>
+      Agents fail in ways that are qualitatively different from single-call
+      LLM failures. A classification error affects one label. An agent
+      error can cascade through multiple steps, producing a
+      confident-sounding synthesis built on flawed intermediate results.
+      Understanding these failure modes is essential for building agents
+      you can trust.
+    </p>
+
+    <!-- Agent failure modes reference -->
+    <div id="failure-modes-root"></div>
+
+    <h3>Hallucination on Missing Data</h3>
+    <p>
+      When the corpus does not contain information relevant to the query,
+      a well-behaved agent should say so. Instead, many agents fabricate
+      plausible-sounding results. The agent might &ldquo;search&rdquo; the
+      corpus, get back irrelevant passages, and then synthesize an answer
+      as if the passages contained what it needed. The final answer reads
+      as confidently grounded, but the connection between the retrieved
+      text and the claims is fabricated.
+    </p>
+    <p>
+      This is more dangerous than single-call hallucination because the
+      agent <em>did</em> use a tool. The presence of a search step creates
+      a false sense of grounding. The answer looks like it went through
+      proper retrieval when it did not.
+    </p>
+
+    <h3>Format Drift</h3>
+    <p>
+      After several steps, the model may drift out of the
+      Thought / Action / Observation format. It might start writing
+      conversational prose, skip the Action line, or merge its reasoning
+      with a premature final answer. When the parser cannot extract a tool
+      call, the loop stalls or produces an error.
+    </p>
+    <p>
+      Format drift is more common with smaller models and longer
+      conversations. The accumulated context pushes the model away from
+      the structured format established in the system prompt. Mitigation
+      strategies include keeping the conversation short (fewer steps),
+      re-injecting format reminders, or using models specifically trained
+      for tool calling.
+    </p>
+
+    <h3>Infinite Loops and Redundant Actions</h3>
+    <p>
+      An agent might search for the same query repeatedly, extracting
+      from the same passage multiple times, or cycling between tools
+      without making progress. This wastes tokens and money without
+      improving the answer. A hard step limit (typically 5-10 steps)
+      prevents runaway costs, but it does not prevent the agent from
+      wasting those steps on redundant actions.
+    </p>
+
+    <h3>Cascading Errors</h3>
+    <p>
+      An early mistake propagates through subsequent steps. If the
+      agent's first search retrieves irrelevant passages, the extraction
+      step will extract irrelevant claims, and the synthesis will build
+      on irrelevant evidence. Each step looks locally reasonable (the
+      extraction is faithful to the passage it was given), but the chain
+      is globally wrong because the first link was bad.
+    </p>
+    <p>
+      This is the agent-specific version of the &ldquo;retrieval quality
+      is the bottleneck&rdquo; lesson from Day 4. In an agent, every
+      tool call is a potential bottleneck, and errors compound.
+    </p>
+
+    <h3>Safeguards</h3>
+    <p>
+      Production agents address these failure modes with several
+      mechanisms:
+    </p>
+    <p>
+      <strong>Step budgets</strong> cap the number of tool calls. After
+      reaching a limit, the agent must synthesize from whatever it has.
+      Some implementations inject a warning at step N-2: &ldquo;You have
+      2 steps remaining. Summarize your findings.&rdquo;
+    </p>
+    <p>
+      <strong>Minimum evidence rules</strong> require the agent to search
+      at least twice before producing a final answer, preventing premature
+      synthesis from a single source.
+    </p>
+    <p>
+      <strong>Provenance verification</strong> runs after the agent
+      finishes: a separate call checks whether every claim in the final
+      answer is supported by an observation from a tool call. This is
+      the same faithfulness check from Day 4, applied to agent output.
+    </p>
+    <p>
+      <strong>Human-in-the-loop checkpoints</strong> pause the agent at
+      critical decision points and ask for human approval before
+      proceeding. For high-stakes applications (modifying data, sending
+      communications), this is essential.
+    </p>
+
+    <div class="stop-and-think">
+      <div class="stop-and-think__header">
+        <svg class="stop-and-think__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+        <span class="stop-and-think__label">Stop and Think</span>
+      </div>
+      <p>
+        An agent answers your research question with a well-structured
+        synthesis citing three sources. The provenance check shows that
+        all three citations correspond to real passages in the corpus.
+        Does this mean the answer is trustworthy?
+      </p>
+      <details>
+        <summary>Reveal</summary>
+        <div>
+          <p>
+            Not necessarily. Provenance confirms that the citations are
+            real, but it does not confirm that the agent's
+            <em>interpretation</em> of those passages is correct. The agent
+            may have distorted the meaning (the same failure mode from
+            Day 4's extraction section), selectively quoted to support a
+            conclusion the passages do not actually support, or missed
+            contradicting evidence because it did not search broadly enough.
+            Grounded citations are a necessary condition for trust, not a
+            sufficient one.
+          </p>
+        </div>
+      </details>
+    </div>
+
+    <div class="course-note">
+      <svg class="course-note__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+      </svg>
+      <p>
+        <strong>In the notebook:</strong> Exercise 2d stress-tests the agent
+        with out-of-domain questions, adversarial inputs, and questions
+        designed to trigger failure modes. Exercise 2e has you pick one
+        safeguard and implement it: minimum evidence rules, step budget
+        awareness, or post-hoc source verification.
+      </p>
+    </div>
+
+    <div class="key-takeaway">
+      <p class="key-takeaway__label">Key Takeaway</p>
+      <p>
+        An agent is a loop, not magic. The quality depends on three things:
+        the model's ability to follow the Thought/Action format reliably,
+        the quality and coverage of the tools, and safeguards against the
+        failure modes catalogued above. In production, you add retry logic,
+        context management, cost tracking, and human-in-the-loop approval
+        for high-stakes actions.
+      </p>
+    </div>
+
+    <h3>Resources</h3>
+    <ul class="resource-list">
+      <li><a href="https://arxiv.org/abs/2210.03629" target="_blank" rel="noopener">Yao et al. (2023), <em>ReAct: Synergizing Reasoning and Acting in Language Models</em></a>: the foundational framework for language model agents.</li>
+      <li><a href="https://arxiv.org/abs/2302.04761" target="_blank" rel="noopener">Schick et al. (2023), <em>Toolformer: Language Models Can Learn to Use Tools</em></a>: how models learn to call external tools during generation.</li>
+      <li><a href="https://arxiv.org/abs/2308.11432" target="_blank" rel="noopener">Wang et al. (2023), <em>A Survey on Large Language Model based Autonomous Agents</em></a>: comprehensive overview of agent architectures, planning strategies, and evaluation.</li>
+    </ul>
+  </section>
+
+  <!-- ===================================================================
+       SECTION 4: FROM NOTEBOOKS TO PRODUCTION
+       =================================================================== -->
+  <section id="production">
+    <h2>From Notebooks to Production</h2>
+    <p>
+      The agent you build in the notebook works, but it lives in a Colab
+      environment. Production agents need a real development environment
+      (a terminal, file system, version control), persistent tool
+      connections (databases, APIs, web search), better observability
+      (logging, cost tracking, auditing), and human oversight for
+      high-stakes actions.
+    </p>
+    <p>
+      Three tools bridge this gap. Your instructor will demonstrate each
+      one live during the session.
+    </p>
+
+    <h3>GitHub Codespaces</h3>
+    <p>
+      <a href="https://github.com/features/codespaces" target="_blank" rel="noopener">Codespaces</a>
+      provides a full cloud development environment in your browser:
+      VS Code with a terminal, file system, Git, Python, and anything
+      else you need. No local installation required.
+    </p>
+    <p>
+      For agent development, Codespaces solves the &ldquo;works on my
+      machine&rdquo; problem. You configure the environment once (in a
+      <code>devcontainer.json</code> file), and every collaborator gets
+      an identical setup. GitHub's free tier includes 60 hours per month,
+      which is sufficient for experimentation.
+    </p>
+
+    <h3>Claude Code</h3>
+    <p>
+      <a href="https://docs.anthropic.com/en/docs/claude-code" target="_blank" rel="noopener">Claude Code</a>
+      is a command-line agent that lives in your terminal. It can read and
+      write files, execute shell commands, search codebases, and plan
+      multi-step tasks. It uses the exact same ReAct architecture you
+      built in the notebook, with a frontier model and real filesystem
+      tools.
+    </p>
+    <p>
+      For researchers, Claude Code is useful for data analysis
+      (&ldquo;Load this CSV, compute summary statistics, and create a
+      visualization&rdquo;), pipeline building (&ldquo;Write a Python
+      script that cleans and merges these three datasets&rdquo;), and
+      iterative analysis (&ldquo;The regression shows heteroskedasticity.
+      Add robust standard errors and re-run&rdquo;).
+    </p>
+    <p>
+      Installation requires Node.js and an Anthropic API key:
+    </p>
+    <pre style="background:var(--surface-alt, #F5F5F0);border:1px solid var(--border, #E2E6EE);border-radius:8px;padding:0.75rem 1rem;font-family:var(--font-mono, monospace);font-size:0.82rem;color:var(--text-sec, #3D4455);overflow-x:auto;">npm install -g @anthropic-ai/claude-code
+cd my-research-project/
+claude</pre>
+
+    <h3>Model Context Protocol (MCP)</h3>
+    <p>
+      <a href="https://modelcontextprotocol.io" target="_blank" rel="noopener">MCP</a>
+      is an open standard that lets AI models connect to external tools
+      and data sources. Instead of defining tools as Python functions
+      (as you do in the notebook), MCP defines a protocol so that any tool
+      can work with any model.
+    </p>
+    <p>
+      Think of it as <strong>USB for AI</strong>: just as USB lets any
+      peripheral work with any computer, MCP lets any tool work with any
+      AI model. You can connect Claude to your university's database,
+      Google Drive, or Zotero. You can build custom MCP servers that
+      expose your datasets or analysis pipelines. And you can share tools
+      across your research group: one person builds the server, everyone
+      uses it.
+    </p>
+    <p>
+      MCP servers are lightweight programs (often 50-100 lines of Python
+      or TypeScript). The
+      <a href="https://modelcontextprotocol.io" target="_blank" rel="noopener">MCP documentation</a>
+      has quickstart guides and examples.
+    </p>
+
+    <div class="course-note">
+      <svg class="course-note__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+      </svg>
+      <p>
+        <strong>Anthropic (2024),</strong>
+        <a href="https://modelcontextprotocol.io" target="_blank" rel="noopener"><em>Model Context Protocol Specification.</em></a>
+        Open standard for connecting AI models to external tools and
+        data sources. The specification defines how tools advertise their
+        capabilities, how models request tool calls, and how results are
+        returned.
+      </p>
+    </div>
+
+    <h3>The Full Arc: Five Days, One Toolkit</h3>
+    <p>
+      The progression across the course has been deliberate. Day 1 built
+      the foundations: how models represent meaning and generate text.
+      Days 2 and 3 taught you to control models: prompting, validation,
+      fine-tuning, APIs at scale. Day 4 applied these skills to research
+      tasks: extraction, RAG, working with large corpora. Day 5 showed
+      how to orchestrate all of these into autonomous workflows.
+    </p>
+    <p>
+      Each day's tools became the next day's building blocks. Day 1's
+      embeddings powered Day 4's retrieval. Day 2's prompting skills
+      shaped Day 4's extraction prompts and Day 5's system prompt.
+      Day 3's validation framework carried through as the faithfulness
+      checks in Days 4 and 5. And Day 4's functions became Day 5's
+      agent tools.
+    </p>
+
+    <div class="stop-and-think">
+      <div class="stop-and-think__header">
+        <svg class="stop-and-think__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
         </svg>
         <span class="stop-and-think__label">Stop and Think</span>
       </div>
       <p>
         Think about a research question from your own work. How could you
-        decompose it into a multi-step pipeline using the techniques covered in
-        this course? Which modules would each step draw on?
+        decompose it into a multi-step pipeline using the techniques covered
+        in this course? Which days' tools would each step draw on?
       </p>
     </div>
 
+    <h3>Where to Go from Here</h3>
+    <p>
+      The course gave you foundations. Here are concrete next steps, ordered
+      by how quickly you can start:
+    </p>
+    <p>
+      <strong>This week:</strong> Apply the RAG pipeline from Day 4 to your
+      own corpus (parliamentary records, news archives, legal texts). Build
+      a classification pipeline from Day 3 for your own annotation task.
+      Try Claude Code on a real research project.
+    </p>
+    <p>
+      <strong>This month:</strong> Set up a Codespace for your research
+      group's codebase. Build a custom MCP server that connects Claude to
+      your data. Run a validation study comparing LLM annotations to
+      human annotations on your specific task.
+    </p>
+    <p>
+      <strong>This year:</strong> Integrate LLM-based methods into a
+      published paper. Contribute to the methodological conversation about
+      validity, reproducibility, and best practices for LLMs in social
+      science.
+    </p>
+
+    <div class="key-takeaway">
+      <p class="key-takeaway__label">Key Takeaway</p>
+      <p>
+        Agents can automate significant portions of the research workflow:
+        literature reviews, data collection pipelines, iterative analysis.
+        The key is understanding what to delegate and what requires human
+        judgment. Start with well-defined, bounded tasks (literature search
+        and extraction) before attempting open-ended research assistance.
+        Build safeguards in from the start, not after something goes wrong.
+      </p>
+    </div>
+
+    <h3>Resources</h3>
+    <ul class="resource-list">
+      <li><a href="https://docs.anthropic.com/en/docs/claude-code" target="_blank" rel="noopener">Claude Code documentation</a>: setup, usage, and best practices for terminal-based AI assistance.</li>
+      <li><a href="https://github.com/features/codespaces" target="_blank" rel="noopener">GitHub Codespaces</a>: browser-based development environments with free tier (60h/month).</li>
+      <li><a href="https://modelcontextprotocol.io" target="_blank" rel="noopener">Model Context Protocol</a>: open standard for connecting AI models to external tools.</li>
+      <li><a href="https://langchain-ai.github.io/langgraph/" target="_blank" rel="noopener">LangGraph</a>: framework for building stateful, multi-step agent workflows.</li>
+      <li><a href="https://elicit.com" target="_blank" rel="noopener">Elicit</a> and <a href="https://www.semanticscholar.org" target="_blank" rel="noopener">Semantic Scholar</a>: AI-powered research tools for literature review that use agent-like architectures under the hood.</li>
+    </ul>
+
     <div class="course-note">
       <svg class="course-note__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
-        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
       </svg>
       <p>
-        <strong>Capstone ideas:</strong> Automated content analysis of
-        parliamentary debates, RAG-powered policy document analysis, simulated
-        focus groups for survey pretesting, or an agentic literature review
-        pipeline.
+        <strong>Stay connected.</strong> All notebooks and materials remain
+        available at
+        <a href="https://llmsforsocialscience.net" target="_blank" rel="noopener">llmsforsocialscience.net</a>.
+        If you are interested in doing research on LLMs for social science,
+        reach out: we are building a research lab focused on these methods.
       </p>
     </div>
   </section>
 
 </CourseLayout>
+
+<!-- =================================================================== -->
+<!-- COMPONENT STYLES                                                    -->
+<!-- =================================================================== -->
+<style is:inline>
+/* ── Shared widget tokens ── */
+.widget-wrap { margin: 2rem 0; padding: 1.5rem; background: var(--surface, #FFFFFF); border: 1px solid var(--border, #E2E6EE); border-radius: 12px; }
+.widget-eyebrow { font-family: var(--font-mono, 'JetBrains Mono', monospace); font-size: 0.7rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent, #2D8ABF); margin-bottom: 0.5rem; }
+.widget-title { font-family: var(--font-display, 'Source Serif 4', Georgia, serif); font-size: 1.35rem; font-weight: 700; color: var(--text, #1A1D27); line-height: 1.25; margin-bottom: 0.75rem; }
+.widget-intro { font-size: 0.92rem; color: var(--text-sec, #3D4455); line-height: 1.65; max-width: 620px; margin-bottom: 1.5rem; }
+
+/* ── ReAct loop ── */
+.rl__question { background: var(--surface-alt, #F5F5F0); border: 1px solid var(--border, #E2E6EE); border-radius: 8px; padding: 0.85rem 1.15rem; margin-bottom: 1.5rem; }
+.rl__question-label { font-family: var(--font-mono, monospace); font-size: 0.62rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted, #6B7280); margin-bottom: 0.3rem; }
+.rl__question-text { font-size: 0.92rem; color: var(--text, #1A1D27); font-weight: 500; font-style: italic; line-height: 1.5; }
+
+.rl__trace { position: relative; padding-left: 2rem; min-height: 10rem; }
+.rl__trace::before { content: ''; position: absolute; left: 0.55rem; top: 0; bottom: 0; width: 2px; background: var(--border, #E2E6EE); }
+
+.rl__step { position: relative; margin-bottom: 0.85rem; animation: rlStepIn 0.35s ease-out; }
+@keyframes rlStepIn { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; transform: translateX(0); } }
+
+.rl__step-dot { position: absolute; left: -1.65rem; top: 0.55rem; width: 12px; height: 12px; border-radius: 50%; border: 2px solid white; z-index: 1; }
+.rl__step-dot--thought { background: #2E5090; box-shadow: 0 0 0 1px #B8CCE8; }
+.rl__step-dot--action { background: #8B6914; box-shadow: 0 0 0 1px #E8D49A; }
+.rl__step-dot--observation { background: #2D7D46; box-shadow: 0 0 0 1px #B8DBBD; }
+.rl__step-dot--answer { background: #6D28D9; box-shadow: 0 0 0 1px #C9B5F5; }
+
+.rl__step-card { border-radius: 8px; padding: 0.7rem 0.9rem; font-size: 0.82rem; line-height: 1.6; color: var(--text-sec, #3D4455); }
+.rl__step-card--thought { background: #EDF2FA; border: 1px solid #B8CCE8; }
+.rl__step-card--action { background: #FDF8EC; border: 1px solid #E8D49A; }
+.rl__step-card--observation { background: #EDF7F0; border: 1px solid #B8DBBD; }
+.rl__step-card--answer { background: #F3EEFF; border: 1px solid #C9B5F5; }
+
+.rl__step-label { font-family: var(--font-mono, monospace); font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem; }
+.rl__step-label--thought { color: #2E5090; }
+.rl__step-label--action { color: #8B6914; }
+.rl__step-label--observation { color: #2D7D46; }
+.rl__step-label--answer { color: #6D28D9; }
+
+.rl__step-card code { font-family: var(--font-mono, monospace); font-size: 0.8em; background: rgba(255,255,255,0.6); border-radius: 3px; padding: 0.1em 0.3em; }
+
+.rl__controls { display: flex; align-items: center; gap: 0.75rem; margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--border, #E2E6EE); }
+.rl__btn { font-family: var(--font-body, sans-serif); font-size: 0.82rem; font-weight: 600; padding: 0.55rem 1.25rem; border-radius: 8px; border: none; cursor: pointer; transition: all 0.25s ease; }
+.rl__btn--primary { background: var(--accent, #2D8ABF); color: white; }
+.rl__btn--primary:hover { background: #1E3A6E; }
+.rl__btn--ghost { background: transparent; color: var(--accent, #2D8ABF); border: 1.5px solid var(--border, #E2E6EE); }
+.rl__btn--ghost:hover { border-color: var(--accent, #2D8ABF); background: #E8EEF6; }
+.rl__step-counter { font-family: var(--font-mono, monospace); font-size: 0.72rem; color: var(--text-muted, #6B7280); margin-left: auto; }
+
+.rl__legend { display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 1rem; font-size: 0.72rem; color: var(--text-muted, #6B7280); }
+.rl__legend-item { display: flex; align-items: center; gap: 0.3rem; }
+.rl__legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+.rl__annotation { margin-top: 1.25rem; padding: 0.85rem 1rem; border-left: 3px solid var(--accent, #2D8ABF); background: #E8EEF6; border-radius: 0 8px 8px 0; font-size: 0.85rem; color: var(--text-sec, #3D4455); line-height: 1.6; min-height: 3rem; }
+.rl__annotation strong { color: var(--text, #1A1D27); }
+
+/* ── Failure modes ── */
+.fm__cards { display: flex; flex-direction: column; gap: 0.5rem; }
+.fm__card { background: var(--surface, #FFF); border: 1.5px solid var(--border, #E2E6EE); border-radius: 12px; overflow: hidden; transition: border-color 0.25s ease; }
+.fm__card-header { display: flex; align-items: center; gap: 0.75rem; padding: 0.85rem 1.15rem; cursor: pointer; user-select: none; transition: background 0.25s ease; }
+.fm__card-header:hover { background: var(--surface-alt, #F5F5F0); }
+.fm__card-icon { width: 2rem; height: 2rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; flex-shrink: 0; }
+.fm__card-label { flex: 1; }
+.fm__card-name { font-size: 0.9rem; font-weight: 700; color: var(--text, #1A1D27); line-height: 1.3; }
+.fm__card-brief { font-size: 0.75rem; color: var(--text-muted, #6B7280); line-height: 1.4; margin-top: 0.1rem; }
+.fm__card-chevron { font-size: 0.7rem; color: var(--text-muted, #6B7280); transition: transform 0.25s ease; flex-shrink: 0; }
+.fm__card--active .fm__card-chevron { transform: rotate(90deg); }
+.fm__card-detail { display: none; padding: 0 1.15rem 1.15rem 1.15rem; }
+.fm__card--active .fm__card-detail { display: block; animation: fmFadeIn 0.3s ease-out; }
+@keyframes fmFadeIn { from { opacity: 0; } to { opacity: 1; } }
+.fm__example { border-radius: 8px; padding: 0.85rem; margin-bottom: 0.75rem; font-size: 0.82rem; line-height: 1.6; color: var(--text-sec, #3D4455); }
+.fm__example-label { font-family: var(--font-mono, monospace); font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.35rem; }
+.fm__trace-line { display: flex; align-items: flex-start; gap: 0.5rem; margin-bottom: 0.3rem; font-size: 0.78rem; }
+.fm__trace-label { font-family: var(--font-mono, monospace); font-size: 0.62rem; font-weight: 700; text-transform: uppercase; padding: 0.1rem 0.35rem; border-radius: 3px; flex-shrink: 0; margin-top: 0.15rem; white-space: nowrap; }
+.fm__safeguard { background: #EDF7F0; border: 1px solid #B8DBBD; border-radius: 8px; padding: 0.7rem 0.85rem; font-size: 0.82rem; line-height: 1.55; color: var(--text-sec, #3D4455); }
+.fm__safeguard-label { font-family: var(--font-mono, monospace); font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #2D7D46; margin-bottom: 0.25rem; }
+</style>
+
+<!-- =================================================================== -->
+<!-- 1. REACT LOOP VISUALISER                                            -->
+<!-- =================================================================== -->
+<script is:inline>
+(function () {
+  var root = document.getElementById("react-loop-root");
+  if (!root) return;
+
+  var question = "What does recent political science research say about the relationship between social media and political polarization?";
+
+  var steps = [
+    { type: "thought", text: "I need to find what the political science literature says about social media and polarization. Let me start with a broad search.",
+      annotation: "<strong>Step 1: Planning.</strong> The agent reasons about the goal before acting. This is the 'Rea' in ReAct. A direct answer without searching would risk hallucination." },
+    { type: "action", text: '<code>search_literature("social media political polarization")</code>',
+      annotation: "<strong>Step 1: Acting.</strong> The agent calls its search tool. Your code parses this line, extracts the function name and argument, and executes the function." },
+    { type: "observation", text: '[1] "Kubin & von Sikorski (2024): Research shows mixed evidence on whether social media directly causes polarization. Some studies find echo chamber effects, while others emphasize that most users are exposed to cross-cutting content..." (score: 0.84)<br>[2] "Settle (2022): Political communication on social media differs from offline because of algorithmic curation, low barriers to expression, and the public nature of interactions..." (score: 0.79)<br>[3] "Barber\u00e1 (2023): Network analysis of Twitter suggests ideological sorting has increased over time, but the causal role of the platform versus broader societal trends remains debated..." (score: 0.72)',
+      annotation: "<strong>Step 1: Observing.</strong> The tool returns results. These are real passages from the corpus, not model-generated text. The agent now has evidence to work with." },
+    { type: "thought", text: "I found some relevant results about mixed evidence and echo chambers. But I should search for experimental evidence on algorithmic effects specifically.",
+      annotation: "<strong>Step 2: Replanning.</strong> The agent evaluates the first results and decides it needs more targeted evidence. This is where agent reasoning adds value over a single RAG call." },
+    { type: "action", text: '<code>search_literature("algorithmic curation filter bubbles echo chambers")</code>',
+      annotation: "<strong>Step 2: Refined search.</strong> The agent uses a different query informed by terms it found in the first observation." },
+    { type: "observation", text: '[1] "Guess et al. (2023): Experimental evidence from Facebook and Instagram suggests that removing algorithmic curation had minimal effects on political attitudes and polarization, challenging the echo chamber hypothesis..." (score: 0.81)<br>[2] "Levy (2021): A randomized experiment on Facebook news feed shows that exposure to counter-attitudinal content can reduce affective polarization, but effects are modest and short-lived..." (score: 0.74)',
+      annotation: "<strong>Step 2: New evidence.</strong> This search found experimental studies that complicate the narrative. The agent now has both observational and experimental findings." },
+    { type: "thought", text: "I now have evidence on both sides. Let me extract the key findings from the most important passage to make sure I represent it accurately.",
+      annotation: "<strong>Step 3: Verification.</strong> Rather than jumping to a conclusion, the agent extracts structured claims from a specific passage. This is the faithfulness discipline from Day 4." },
+    { type: "action", text: '<code>extract_findings("Guess et al. (2023): Experimental evidence from Facebook and Instagram suggests that removing algorithmic curation had minimal effects...")</code>',
+      annotation: "<strong>Step 3: Extraction.</strong> The agent uses the extraction tool to pull structured, citable claims." },
+    { type: "observation", text: "Findings:<br>\u2022 Removing algorithmic curation on Facebook/Instagram did not significantly change political attitudes<br>\u2022 Effect on affective polarization was minimal<br>\u2022 Authors conclude that algorithms are \"not the main driver\" of polarization<br>Source: Guess et al. (2023), experimental design",
+      annotation: "<strong>Step 3: Structured evidence.</strong> The extraction provides specific, verifiable claims. The agent can now synthesize from structured findings rather than loose impressions." },
+    { type: "thought", text: "I have enough evidence to answer the question. The literature shows a nuanced picture: concerns about echo chambers exist but experimental evidence suggests algorithmic curation is not the primary driver. I should present both sides with citations.",
+      annotation: "<strong>Step 4: Deciding to stop.</strong> The agent judges it has sufficient evidence. Stopping too early produces thin answers; stopping too late wastes tokens." },
+    { type: "answer", text: 'Recent political science research presents a <strong>nuanced and contested picture</strong> of social media\'s role in polarization. Observational studies document patterns consistent with echo chambers and ideological sorting on platforms like Twitter (Barber\u00e1 2023), and scholars have identified mechanisms including algorithmic curation, low barriers to expression, and the public visibility of political conflict (Settle 2022, Kubin & von Sikorski 2024).<br><br>However, experimental evidence complicates this narrative. Guess et al. (2023) found that removing algorithmic curation on Facebook and Instagram had minimal effects on political attitudes or affective polarization, suggesting algorithms are "not the main driver." Similarly, Levy (2021) found that exposure to counter-attitudinal content had only modest, short-lived effects.<br><br>The emerging consensus is that social media may <strong>reinforce and accelerate</strong> pre-existing polarization trends rather than causing them independently (Kubin & von Sikorski 2024).',
+      annotation: "<strong>Final Answer.</strong> The agent synthesizes across three search results and one extraction, citing specific sources. Every claim is traceable to an observation from a tool call." }
+  ];
+
+  var visibleSteps = 0;
+  var typeLabels = { thought: "Thought", action: "Action", observation: "Observation", answer: "Final Answer" };
+
+  function render() {
+    var html = '<div class="widget-wrap">';
+    html += '<div class="widget-eyebrow">Interactive visualisation</div>';
+    html += '<div class="widget-title">The ReAct Loop in Action</div>';
+    html += '<p class="widget-intro">Watch an agent work through a research question step by step. Click to advance. Notice how each Thought leads to an Action, each Observation informs the next Thought, and the loop continues until the agent has enough evidence.</p>';
+
+    html += '<div class="rl__question"><div class="rl__question-label">Research question</div><div class="rl__question-text">"' + question + '"</div></div>';
+    html += '<div class="rl__trace">';
+    for (var i = 0; i < visibleSteps; i++) {
+      var s = steps[i];
+      html += '<div class="rl__step"><div class="rl__step-dot rl__step-dot--' + s.type + '"></div>';
+      html += '<div class="rl__step-card rl__step-card--' + s.type + '"><div class="rl__step-label rl__step-label--' + s.type + '">' + typeLabels[s.type] + '</div>' + s.text + '</div></div>';
+    }
+    if (visibleSteps === 0) html += '<div style="text-align:center;padding:3rem 1rem;color:var(--text-muted,#6B7280);font-size:0.88rem;font-style:italic;">Click "Start agent" to begin.</div>';
+    html += '</div>';
+
+    var isDone = visibleSteps >= steps.length;
+    html += '<div class="rl__controls">';
+    if (!isDone) html += '<button class="rl__btn rl__btn--primary" id="rl-next">' + (visibleSteps === 0 ? 'Start agent' : 'Next step') + '</button>';
+    if (visibleSteps > 0) html += '<button class="rl__btn rl__btn--ghost" id="rl-reset">Reset</button>';
+    html += '<span class="rl__step-counter">' + visibleSteps + ' / ' + steps.length + '</span></div>';
+
+    html += '<div class="rl__legend">';
+    html += '<span class="rl__legend-item"><span class="rl__legend-dot" style="background:#2E5090;"></span> Thought</span>';
+    html += '<span class="rl__legend-item"><span class="rl__legend-dot" style="background:#8B6914;"></span> Action</span>';
+    html += '<span class="rl__legend-item"><span class="rl__legend-dot" style="background:#2D7D46;"></span> Observation</span>';
+    html += '<span class="rl__legend-item"><span class="rl__legend-dot" style="background:#6D28D9;"></span> Final Answer</span>';
+    html += '</div>';
+
+    if (visibleSteps > 0) {
+      html += '<div class="rl__annotation">' + steps[visibleSteps - 1].annotation + '</div>';
+    } else {
+      html += '<div class="rl__annotation">The agent receives a research question and must decide how to answer it using only the tools available: search, extract, summarize, and calculate. It cannot browse the web or access information beyond its tool set.</div>';
+    }
+    html += '</div>';
+
+    root.innerHTML = html;
+
+    var nextBtn = document.getElementById('rl-next');
+    if (nextBtn) nextBtn.addEventListener('click', function () { visibleSteps++; render(); });
+    var resetBtn = document.getElementById('rl-reset');
+    if (resetBtn) resetBtn.addEventListener('click', function () { visibleSteps = 0; render(); });
+  }
+  render();
+})();
+</script>
+
+<!-- =================================================================== -->
+<!-- 2. AGENT FAILURE MODES                                              -->
+<!-- =================================================================== -->
+<script is:inline>
+(function () {
+  var root = document.getElementById("failure-modes-root");
+  if (!root) return;
+
+  var modes = [
+    {
+      name: "Hallucination on Missing Data", brief: "The corpus lacks the answer, but the agent fabricates one anyway",
+      icon: "\uD83D\uDC7B", color: "#9E3A38", bgColor: "#FDF0F0", borderColor: "#E8AAAA",
+      example: { bg: "#FDF0F0", labelColor: "#9E3A38", label: "Example trace",
+        lines: [
+          { label: "Thought", color: "#2E5090", bg: "#EDF2FA", text: "I need to find unemployment data for France in 2019." },
+          { label: "Action", color: "#8B6914", bg: "#FDF8EC", text: 'search_literature("France unemployment 2019")' },
+          { label: "Observation", color: "#2D7D46", bg: "#EDF7F0", text: "[No relevant results. Top result: general EU economic governance, score: 0.31]" },
+          { label: "Answer", color: "#9E3A38", bg: "#FDF0F0", text: '"According to the literature, France\'s unemployment rate in 2019 was approximately 8.5%..." \u2190 <strong>Fabricated.</strong> The corpus contains no unemployment statistics. The agent drew from training data while appearing to cite the corpus.' }
+        ]
+      },
+      safeguard: "<strong>Minimum evidence threshold.</strong> If no search result scores above 0.5, the agent should acknowledge the gap instead of synthesizing. Add a check: if all retrieval scores are below threshold, return \"The corpus does not contain information on this topic.\""
+    },
+    {
+      name: "Format Drift", brief: "The model stops following the Thought/Action structure",
+      icon: "\uD83C\uDF00", color: "#8B6914", bgColor: "#FDF8EC", borderColor: "#E8D49A",
+      example: { bg: "#FDF8EC", labelColor: "#8B6914", label: "Example trace (step 4 of 6)",
+        lines: [
+          { label: "Thought", color: "#2E5090", bg: "#EDF2FA", text: "I've found some relevant material. Let me search for more." },
+          { label: "Action", color: "#8B6914", bg: "#FDF8EC", text: 'search_literature("democratic backsliding causes")' },
+          { label: "Observation", color: "#2D7D46", bg: "#EDF7F0", text: "[Results about institutional erosion, executive power, etc.]" },
+          { label: "???", color: "#8B6914", bg: "#FDF8EC", text: '"Based on what I\'ve found so far, it seems like democratic backsliding is primarily caused by..." \u2190 <strong>Format broken.</strong> The model started writing a conversational answer instead of using Thought/Action format. The parser cannot extract a tool call or final answer.' }
+        ]
+      },
+      safeguard: "<strong>Format enforcement.</strong> When the parser fails, inject a message reminding the model of the exact format. Larger models drift less frequently. Keeping conversations shorter (fewer steps) also helps."
+    },
+    {
+      name: "Redundant Loops", brief: "The agent repeats the same actions without making progress",
+      icon: "\uD83D\uDD04", color: "#6D28D9", bgColor: "#F3EEFF", borderColor: "#C9B5F5",
+      example: { bg: "#F3EEFF", labelColor: "#6D28D9", label: "Example trace (steps 3-5)",
+        lines: [
+          { label: "Action 3", color: "#8B6914", bg: "#FDF8EC", text: 'search_literature("populism causes")' },
+          { label: "Action 4", color: "#8B6914", bg: "#FDF8EC", text: 'search_literature("causes of populism")' },
+          { label: "Action 5", color: "#8B6914", bg: "#FDF8EC", text: 'search_literature("what causes populism")' },
+          { label: "Result", color: "#6D28D9", bg: "#F3EEFF", text: '\u2190 <strong>Three nearly identical queries.</strong> The agent used 3 of its 6 steps retrieving the same passages with slightly different wording, wasting tokens and budget.' }
+        ]
+      },
+      safeguard: "<strong>Step budget awareness.</strong> After step N/2, inject a message: \"You have used 3 of 6 steps. Summarize what you have found so far and plan your remaining steps carefully.\" This forces the agent to take stock and diversify."
+    },
+    {
+      name: "Cascading Errors", brief: "An early mistake propagates through the entire chain",
+      icon: "\u26A1", color: "#2E5090", bgColor: "#EDF2FA", borderColor: "#B8CCE8",
+      example: { bg: "#EDF2FA", labelColor: "#2E5090", label: "Example trace",
+        lines: [
+          { label: "Action 1", color: "#8B6914", bg: "#FDF8EC", text: 'search_literature("impact of trade agreements") \u2190 Wrong query for a question about sanctions' },
+          { label: "Observe", color: "#2D7D46", bg: "#EDF7F0", text: "[Returns passages about free trade agreements, not sanctions]" },
+          { label: "Action 2", color: "#8B6914", bg: "#FDF8EC", text: "extract_findings([passage about trade agreements])" },
+          { label: "Answer", color: "#9E3A38", bg: "#FDF0F0", text: '"The literature suggests that international trade agreements are the primary mechanism..." \u2190 <strong>Each step is locally correct</strong> (extraction is faithful to the passage), <strong>but the chain is globally wrong</strong> because the first search was off-target.' }
+        ]
+      },
+      safeguard: "<strong>Provenance verification.</strong> After the agent finishes, check whether each claim in the answer connects to an observation that actually addresses the original question. This catches cases where the chain drifted away from the research question."
+    }
+  ];
+
+  var activeIdx = null;
+
+  function render() {
+    var html = '<div class="widget-wrap">';
+    html += '<div class="widget-eyebrow">Interactive reference</div>';
+    html += '<div class="widget-title">Agent Failure Modes</div>';
+    html += '<p class="widget-intro">Agents fail in ways that are harder to detect than single-call errors. Click each card to see a concrete example and the safeguard that addresses it.</p>';
+    html += '<div class="fm__cards">';
+
+    for (var i = 0; i < modes.length; i++) {
+      var m = modes[i];
+      var isActive = activeIdx === i;
+      var cls = isActive ? ' fm__card--active' : '';
+      var bs = isActive ? 'border-color:' + m.borderColor + ';' : '';
+
+      html += '<div class="fm__card' + cls + '" style="' + bs + '">';
+      html += '<div class="fm__card-header" data-idx="' + i + '">';
+      html += '<div class="fm__card-icon" style="background:' + m.bgColor + ';color:' + m.color + ';">' + m.icon + '</div>';
+      html += '<div class="fm__card-label"><div class="fm__card-name">' + m.name + '</div><div class="fm__card-brief">' + m.brief + '</div></div>';
+      html += '<div class="fm__card-chevron">\u25B6</div></div>';
+
+      html += '<div class="fm__card-detail">';
+      var ex = m.example;
+      html += '<div class="fm__example" style="background:' + ex.bg + ';">';
+      html += '<div class="fm__example-label" style="color:' + ex.labelColor + ';">' + ex.label + '</div>';
+      for (var j = 0; j < ex.lines.length; j++) {
+        var l = ex.lines[j];
+        html += '<div class="fm__trace-line"><span class="fm__trace-label" style="color:' + l.color + ';background:' + l.bg + ';">' + l.label + '</span><span>' + l.text + '</span></div>';
+      }
+      html += '</div>';
+      html += '<div class="fm__safeguard"><div class="fm__safeguard-label">Safeguard</div>' + m.safeguard + '</div>';
+      html += '</div></div>';
+    }
+
+    html += '</div></div>';
+    root.innerHTML = html;
+
+    root.querySelectorAll('.fm__card-header').forEach(function (hdr) {
+      hdr.addEventListener('click', function () {
+        var idx = parseInt(hdr.getAttribute('data-idx'), 10);
+        activeIdx = activeIdx === idx ? null : idx;
+        render();
+      });
+    });
+  }
+  render();
+})();
+</script>
