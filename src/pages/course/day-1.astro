@@ -6,7 +6,7 @@ const sections = [
   { id: 'tokenization', label: 'Tokenization' },
   { id: 'transformers', label: 'The Transformer' },
   { id: 'language-modeling', label: 'Language Modeling' },
-  { id: 'scaling', label: 'Scaling & Capabilities' },
+  { id: 'scaling', label: 'Scaling, Data & Capabilities' },
   { id: 'cost', label: 'Context, Memory & Cost' },
 ];
 
@@ -45,7 +45,7 @@ const math = {
   ffnFormula: String.raw`$$\text{FFN}(\mathbf{x}) = \mathbf{W}_2\,\sigma(\mathbf{W}_1\mathbf{x} + \mathbf{b}_1) + \mathbf{b}_2$$`,
   ffnCaption: String.raw`Two learned linear transformations with a nonlinearity $\sigma$ between them. The inner dimension $d_\text{ff}$ is typically $4 \times d_\text{model}$, so the FFN first expands each token's representation and then compresses it back. $\sigma$ is GELU in GPT-style models, SwiGLU in Llama.`,
   unembedFormula: String.raw`$$\mathbf{z}_t = \mathbf{h}_t\,W_U^\top, \qquad W_U \in \mathbb{R}^{|\mathcal{V}| \times d}$$`,
-  unembedCaption: String.raw`The final hidden state $\mathbf{h}_t \in \mathbb{R}^d$ is projected to a vector of $|\mathcal{V}|$ raw scores (logits) by the unembedding matrix $W_U$. Softmax then turns these into the next-token probability distribution. In most modern LLMs, $W_U = W_E^\top$ (weight tying): the embedding and unembedding matrices share parameters.`,
+  unembedCaption: String.raw`The final hidden state $\mathbf{h}_t \in \mathbb{R}^d$ is projected to a vector of $|\mathcal{V}|$ raw scores (logits) by the unembedding matrix $W_U$. Softmax then turns these into the next-token probability distribution. In some model families (GPT-2, BERT), $W_U = W_E^\top$ (weight tying): the embedding and unembedding matrices share parameters. Many recent LLMs (Llama, Mistral) use separate matrices instead.`,
   mlmDef: String.raw`A training objective in which a random subset of input tokens (typically 15 %) is replaced by a special <code>[MASK]</code> token, and the model is trained to predict the original tokens from the surrounding context. Unlike causal language modeling, the model can use context from <em>both directions</em> simultaneously.`,
 };
 ---
@@ -69,36 +69,24 @@ const math = {
       you can reason about, debug, and justify in a methods section.
     </p>
     <p>
-      Computers operate on numbers, but research data is text. <strong>Word
-      embeddings</strong> bridge this gap by mapping words into a geometric
-      space where proximity encodes meaning: "parliament" lands closer to
-      "government" than to "bicycle," and directions in the space capture
-      relationships like gender or formality. Before embeddings can do their
-      work, though, text must be split into units the model can process.
-      <strong>Tokenization</strong> determines what the model actually sees,
-      with direct consequences for multilingual research, API costs, and
-      model behaviour.
+      This module builds the foundations from the ground up: how text becomes
+      numbers, how the Transformer processes those numbers in context, why
+      "predict the next token" turns out to be a powerful learning signal,
+      and how scale and cost shape what is practical for research. Each
+      section introduces a concept you will rely on throughout the course.
     </p>
-    <p>
-      Static embeddings give each word one fixed vector regardless of context,
-      which means "bank" gets the same representation next to "river" as next to
-      "deposit." The <strong>Transformer architecture</strong> solves this with
-      self-attention: each token builds a representation informed by its context.
-      Queries, Keys, and Values, multi-head attention, feed-forward networks,
-      causal masking, and the encoder/decoder distinction together produce the
-      contextual representations that power modern NLP.
-    </p>
-    <p>
-      Transformers are trained with a deceptively simple objective:
-      <strong>predict the next token</strong>. Solving this well on
-      internet-scale data forces the model to build internal representations
-      of syntax, facts, and reasoning. <strong>Scaling laws</strong> describe
-      the remarkably predictable relationship between model size, training data,
-      compute, and loss, and the capabilities that follow from lower loss.
-      These architectural choices create practical constraints that shape
-      research design: context windows, KV cache memory, and the cost
-      structure of deploying models at scale.
-    </p>
+
+    <div class="key-takeaway">
+      <p class="key-takeaway__label">After This Module You Will Be Able To</p>
+      <ol>
+        <li>Explain how word embeddings encode meaning as geometry and why that matters for measuring culture and bias.</li>
+        <li>Describe how tokenization shapes what a model sees, and identify where it introduces inequality.</li>
+        <li>Trace a self-attention computation step by step and distinguish encoder-only from decoder-only architectures.</li>
+        <li>Explain why next-token prediction produces general capabilities and how cross-entropy loss drives learning.</li>
+        <li>Read scaling-law plots and reason about the relationship between model size, data, compute, and performance.</li>
+        <li>Estimate context window and memory requirements for a given model and research task.</li>
+      </ol>
+    </div>
   </section>
 
   <!-- ===================================================================
@@ -318,53 +306,40 @@ const math = {
       foundational tool for computational social science.
     </p>
 
-    <!-- Social science application: Bias in embeddings -->
+    <!-- Social science application: Embeddings as cultural measurement -->
     <div class="course-note course-note--research">
       <svg class="course-note__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
       </svg>
       <p>
-        <strong>Social Science Application.</strong>
-        <a href="https://www.science.org/doi/10.1126/science.aal4230" target="_blank" rel="noopener">Caliskan, Bryson &amp; Narayanan (2017)</a>
-        demonstrated in <em>Science</em> that word embeddings replicate the full
-        range of implicit biases measured in humans via the Implicit Association
-        Test (IAT), including associations between European-American names and
-        pleasant words. Because embeddings are trained on human-generated text,
-        they absorb the biases present in that text: embedding geometry becomes
-        a lens for studying culture.
+        <strong>Social Science Application: Embeddings as Cultural Measurement.</strong>
+        The same geometry that makes embeddings useful for NLP makes them a
+        research instrument for studying culture and bias. A foundational line
+        of work demonstrates this progression:
       </p>
-    </div>
-
-    <div class="course-note course-note--research">
-      <svg class="course-note__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
-      </svg>
-      <p>
-        <strong>Social Science Application.</strong>
-        <a href="https://www.pnas.org/doi/10.1073/pnas.1720347115" target="_blank" rel="noopener">Garg, Schiebinger, Jurafsky &amp; Zou (2018)</a>
-        trained embeddings on text from each decade of the 20th century and
-        tracked how gender and ethnic stereotypes in American English evolved
-        over time in <em>PNAS</em>: a computational history of bias that aligns with
-        known social changes. The same vector geometry that makes embeddings
-        useful for NLP makes them a measurement instrument for historical sociology.
-      </p>
-    </div>
-
-    <div class="course-note course-note--research">
-      <svg class="course-note__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
-      </svg>
-      <p>
-        <strong>Social Science Application.</strong>
-        <a href="https://journals.sagepub.com/doi/10.1177/0003122419877135" target="_blank" rel="noopener">Kozlowski, Taddy &amp; Evans (2019)</a>
-        established in <em>American Sociological Review</em> a framework for
-        using vector space geometry to map cultural dimensions. They showed
-        that concepts like social class, affluence, and education are encoded
-        as directions in embedding space, and that projecting words onto these
-        axes reveals the cultural associations that texts carry. This approach
-        transforms embeddings from a technical tool into a method for
-        computational cultural analysis.
-      </p>
+      <ul>
+        <li>
+          <a href="https://www.science.org/doi/10.1126/science.aal4230" target="_blank" rel="noopener">Caliskan, Bryson &amp; Narayanan (2017)</a>
+          showed in <em>Science</em> that word embeddings replicate the full
+          range of implicit biases measured in humans via the Implicit
+          Association Test (IAT). Embedding geometry absorbs the biases
+          present in training text.
+        </li>
+        <li>
+          <a href="https://www.pnas.org/doi/10.1073/pnas.1720347115" target="_blank" rel="noopener">Garg, Schiebinger, Jurafsky &amp; Zou (2018)</a>
+          extended this by training embeddings on text from each decade of the
+          20th century, tracking how gender and ethnic stereotypes in American
+          English evolved over time (<em>PNAS</em>): a computational history
+          of bias that aligns with known social changes.
+        </li>
+        <li>
+          <a href="https://journals.sagepub.com/doi/10.1177/0003122419877135" target="_blank" rel="noopener">Kozlowski, Taddy &amp; Evans (2019)</a>
+          generalised the approach in <em>American Sociological Review</em>,
+          establishing a framework for mapping cultural dimensions — social class,
+          affluence, education — as directions in embedding space. Projecting
+          words onto these axes reveals the cultural associations that texts carry.
+        </li>
+      </ul>
     </div>
 
     <div class="stop-and-think">
@@ -400,7 +375,7 @@ const math = {
         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
       </svg>
       <p>
-        <strong>In the notebook:</strong> Exercises 1&ndash;3 walk you through building
+        <strong>In the notebook:</strong> Sections 1&ndash;2 walk you through building
         BoW vectors, implementing cosine similarity from scratch, testing word
         analogies, and projecting occupations onto a gender axis.
       </p>
@@ -422,12 +397,16 @@ const math = {
   <section id="tokenization">
     <h2>Tokenization</h2>
     <p>
-      We now know that each word gets a vector. But what counts as a "word"?
-      Models don't actually operate on words as we think of them. Before text
-      enters a model, it must be split into discrete units the model can
-      process. This step, tokenization, bridges raw text and the embedding
-      layer. It determines what the model "sees," and its consequences for
-      research are more significant than most users realise.
+      We flagged a fundamental limitation of static embeddings: one vector
+      per word, regardless of context. Solving that is the job of the
+      Transformer (next section). But before we get there, we need to
+      address something even more basic: what counts as a "word" in the
+      first place? Models don't actually operate on words as we think of
+      them. Before text enters a model, it must be split into discrete
+      units the model can process. This step, <strong>tokenization</strong>,
+      bridges raw text and the embedding layer. It determines what the
+      model "sees," and its consequences for research are more significant
+      than most users realise.
     </p>
 
     <h3>The Problem: Words Are Not Enough</h3>
@@ -459,9 +438,10 @@ const math = {
 
     <h3>How BPE Works</h3>
     <p>
-      BPE, introduced by
-      <a href="https://arxiv.org/abs/1508.07909" target="_blank" rel="noopener">Sennrich et al. (2016)</a>,
-      is elegantly simple. Start with individual characters. Count every
+      BPE originated as a data compression algorithm (Gage, 1994) and was
+      adapted for neural machine translation by
+      <a href="https://arxiv.org/abs/1508.07909" target="_blank" rel="noopener">Sennrich et al. (2016)</a>.
+      The idea is elegantly simple. Start with individual characters. Count every
       adjacent pair in the training corpus. Merge the most frequent pair into
       a new token. Repeat until you reach the desired vocabulary size.
     </p>
@@ -988,12 +968,12 @@ const math = {
     </div>
 
     <p>
-      <a href="https://arxiv.org/abs/1512.03385" target="_blank" rel="noopener"><strong>Residual connections</strong></a>
+      <strong>Residual connections</strong>
       (<a href="https://arxiv.org/abs/1512.03385" target="_blank" rel="noopener">He et al., 2016</a>)
       add each sub-layer's input directly
       to its output. This lets gradients flow through the network without
       degrading, enabling very deep stacks (GPT-3 uses 96 layers).
-      <a href="https://arxiv.org/abs/1607.06450" target="_blank" rel="noopener"><strong>Layer normalisation</strong></a>
+      <strong>Layer normalisation</strong>
       (<a href="https://arxiv.org/abs/1607.06450" target="_blank" rel="noopener">Ba, Kiros &amp; Hinton, 2016</a>)
       stabilises the scale of activations at each layer.
     </p>
@@ -1177,9 +1157,10 @@ const math = {
       that use it are called <strong>decoder-only</strong> (or
       <em>causal</em>) Transformers: GPT, Llama, Mistral, Claude, and most
       contemporary chat and generation models fall into this category. The
-      attention widget above showed full bidirectional attention for pedagogical
-      clarity; in a deployed decoder-only model, the upper triangle of every
-      attention matrix is always zeroed out.
+      attention widget above already applied this causal mask — you can see
+      that early tokens have fewer positions to attend to. In a deployed
+      decoder-only model, the upper triangle of every attention matrix is
+      always zeroed out.
     </p>
     <p>
       The counterpart — models that keep full, unmasked, bidirectional
@@ -1596,10 +1577,10 @@ const math = {
       <p class="visual-diagram__caption">
         The output pipeline for a single position. The final hidden state is
         projected to one logit per vocabulary token by the unembedding matrix;
-        softmax normalises these into a probability distribution. In most
-        modern LLMs the unembedding matrix is the transpose of the input
-        embedding matrix (weight tying), so the same vectors that represent
-        meaning on the way in also score predictions on the way out.
+        softmax normalises these into a probability distribution. In some
+        models (GPT-2, BERT) the unembedding matrix is the transpose of the
+        input embedding matrix (weight tying); many recent LLMs use separate
+        matrices instead.
       </p>
     </div>
 
@@ -1608,15 +1589,9 @@ const math = {
       The chain rule is not only a way to <em>write</em> the joint probability
       of a sequence: it is also the blueprint for <em>learning</em>. Each
       factor <span set:html={math.inlineLmFactor} /> is one prediction problem at position
-      $t$. In a large text corpus, the data tell us which token actually
-      came next at every step; the model's job is to assign that token high
-      probability given the preceding context.
-    </p>
-    <p>
-      Concretely, a parameterized model (weights $\theta$) maps the context
-      <span set:html={math.inlineLmContext} /> to a vector of scores—<strong>logits</strong>—one for every
-      token in the vocabulary. A softmax turns those logits into a
-      probability distribution over <em>all</em> possible next tokens:
+      $t$. We just saw the pipeline that produces a prediction: the final
+      hidden state is projected to logits, and softmax turns them into a
+      distribution over the full vocabulary. The formal version:
     </p>
 
     <div class="formula-block">
@@ -1752,7 +1727,7 @@ const math = {
        SECTION 5: SCALING & CAPABILITIES
        =================================================================== -->
   <section id="scaling">
-    <h2>Scaling &amp; Capabilities</h2>
+    <h2>Scaling, Data &amp; Capabilities</h2>
     <p>
       We now have all the ingredients: embeddings, tokenization, the
       Transformer, and the next-token prediction objective—minimizing average
@@ -2168,7 +2143,9 @@ const math = {
       The KV cache grows linearly with sequence length and linearly with
       the number of layers. For a model like Llama-3-70B (80 layers,
       d_model = 8192) processing 8,192 tokens in FP16 precision, the KV
-      cache alone requires roughly 20 GB of GPU memory. This is why longer
+      cache alone requires roughly 20 GB of GPU memory before compression
+      techniques like Grouped-Query Attention (the calculator below lets
+      you toggle GQA to see the difference). This is why longer
       conversations consume more resources and why models get slower with
       longer inputs.
     </p>
@@ -2523,17 +2500,49 @@ const math = {
     <div class="key-takeaway">
       <p class="key-takeaway__label">Key Takeaway</p>
       <p>
-        The foundations covered in this module, embeddings, tokenization,
-        the Transformer, language modeling, and scaling, are not just technical
-        prerequisites. They are the building blocks of a new research
-        methodology. Understanding how models represent and process language
-        is essential for using them responsibly as instruments of social
-        science inquiry. Prompting (Day 2) works because of next-token
-        prediction. Classification and RAG (Days 3&ndash;4) rely on
-        contextual embeddings. Model selection requires understanding the
-        scaling and cost tradeoffs introduced here.
+        Context windows, token costs, and memory constraints are not
+        incidental engineering details. They are parameters of your research
+        design. Choosing a model, setting a context length, and deciding how
+        to handle long documents are methodological decisions that belong
+        in your methods section, informed by the architectural foundations
+        covered in this module.
       </p>
     </div>
+  </section>
+
+  <!-- ===================================================================
+       MODULE SUMMARY
+       =================================================================== -->
+  <section id="summary" class="opening-narrative">
+    <h2>Module Summary</h2>
+    <p>
+      This module traced the path from raw text to a functioning language
+      model. <strong>Embeddings</strong> map words to a geometric space where
+      proximity encodes meaning, turning text into numbers that models can
+      process. <strong>Tokenization</strong> determines the units the model
+      actually sees, with direct consequences for multilingual research and
+      cost. The <strong>Transformer</strong> replaces sequential processing
+      with parallel attention, producing contextual representations where
+      the same word gets different vectors in different contexts.
+    </p>
+    <p>
+      <strong>Language modeling</strong> gives the Transformer its learning
+      signal: predict the next token. This deceptively simple objective,
+      optimised via cross-entropy loss on internet-scale data, forces the
+      model to build internal representations of syntax, facts, and
+      reasoning. <strong>Scaling laws</strong> describe how predictably loss
+      decreases with more compute, data, and parameters, and how the
+      composition of pre-training data shapes what a model knows and where
+      it systematically fails. Finally, <strong>context windows and memory
+      costs</strong> translate these architectural choices into practical
+      constraints that shape research design.
+    </p>
+    <p>
+      Every concept introduced here recurs throughout the course. Prompting
+      (Day 2) works because of next-token prediction. Classification and
+      RAG (Days 3&ndash;4) rely on contextual embeddings. Model selection
+      requires understanding the scaling and cost tradeoffs introduced here.
+    </p>
 
     <div class="course-note">
       <svg class="course-note__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
