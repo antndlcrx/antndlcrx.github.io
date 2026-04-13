@@ -12,9 +12,50 @@ const sections = [
 <CourseLayout
   day={2}
   title="From Models to Tools"
-  description="Post-training alignment, prompting strategies, reasoning techniques, and how to evaluate and choose the right model for your research."
+  description="Post-training alignment reshapes behaviour. Prompting defines your measurement instrument. Reasoning trades inference compute for accuracy. Model selection is a research design decision."
   sections={sections}
 >
+
+  <!-- ===================================================================
+       OPENING FRAMING
+       =================================================================== -->
+  <section id="opening" class="opening-narrative">
+    <p class="lead-paragraph">
+      <a href="/course/day-1">Day 1</a> ended with a machine that predicts
+      the next token. That machine is powerful but not useful: ask it to
+      classify a tweet and it writes another tweet. This module covers the
+      three layers that turn a language model into a research instrument.
+    </p>
+    <p>
+      <strong>Post-training</strong> reshapes model behaviour without
+      changing its knowledge. Supervised fine-tuning teaches format
+      (how to respond to instructions), preference optimization teaches
+      quality (which responses are better), and safety training teaches
+      boundaries (when not to respond). Each of these stages is a design
+      choice made by the model provider, and each introduces biases that
+      matter for research: the annotators who define "helpful" shape what the
+      model considers a good answer.
+    </p>
+    <p>
+      <strong>Prompting</strong> is the primary interface for working with
+      post-trained models, and it functions as a measurement instrument.
+      The same classification task with slightly different wording can
+      produce substantially different results, just as survey questions do.
+      Prompt design, temperature settings, structured output formats, and
+      few-shot examples all affect what you measure and how reliably you
+      measure it.
+    </p>
+    <p>
+      <strong>Reasoning techniques</strong> extend what prompting can do.
+      Chain-of-thought prompting and dedicated reasoning models trade
+      inference compute for accuracy on hard cases, a form of
+      <strong>test-time compute scaling</strong> that complements the
+      training-time scaling laws from Day 1. The module closes with the
+      practical question this all leads to: given dozens of available models
+      with different capabilities, costs, and transparency properties, how
+      do you choose the right one for your research?
+    </p>
+  </section>
 
   <!-- ===================================================================
        SECTION 1: POST-TRAINING
@@ -467,6 +508,52 @@ const sections = [
       </p>
     </div>
 
+    <div class="course-note course-note--research">
+      <svg class="course-note__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+      </svg>
+      <p>
+        <strong>Social Science Application.</strong>
+        <a href="https://doi.org/10.1017/pan.2023.2" target="_blank" rel="noopener">Argyle et al. (2023)</a>
+        demonstrated in <em>Political Analysis</em> that prompt framing
+        and demographic "backstories" determine the distribution of
+        simulated survey responses. The same survey question, posed with
+        different persona prompts, produces different opinion distributions.
+        This is the prompting-as-experimental-design argument applied to
+        simulation: the prompt does not just extract information, it
+        <em>constructs</em> the instrument. Day 4 returns to this when we
+        cover LLMs as simulated survey respondents.
+      </p>
+    </div>
+
+    <h3>Structured Outputs</h3>
+    <p>
+      When building classification pipelines, the model's response needs to
+      be machine-readable. A response like "I would classify this as support
+      because..." is useful for a human reader but breaks automated parsing.
+      <strong>Structured output formats</strong> constrain the model to
+      produce responses in a predictable schema.
+    </p>
+    <p>
+      The simplest approach is to instruct the model to respond with a
+      single word or a JSON object. Most API providers also offer
+      <strong>JSON mode</strong>, which guarantees valid JSON output at the
+      decoding level, and <strong>function calling</strong> (or "tool use"),
+      which constrains the output to match a predefined schema. These
+      mechanisms eliminate the parsing failures that plague free-text
+      classification at scale.
+    </p>
+    <p>
+      For research pipelines, structured outputs serve two purposes. First,
+      <strong>reliability</strong>: when processing 10,000 documents, you
+      cannot afford to manually fix malformed responses. Second,
+      <strong>auditability</strong>: a JSON response with separate fields
+      for "label" and "reasoning" lets you log both the classification and
+      the model's rationale, enabling systematic error analysis. Day 3
+      covers the full pipeline from structured outputs through batching
+      and cost management.
+    </p>
+
     <div class="key-takeaway">
       <p class="key-takeaway__label">Key Takeaway</p>
       <p>
@@ -495,11 +582,21 @@ const sections = [
   <section id="reasoning">
     <h2>Reasoning</h2>
     <p>
-      Standard prompting works well for many tasks. But some cases require
-      more: sarcastic tweets, implicit stance, ambiguous framing, or tasks
-      that involve multiple logical steps. For these, asking the model to
-      <strong>reason before answering</strong> can substantially improve
-      accuracy.
+      In <a href="/course/day-1#scaling">Day 1</a>, we saw that model
+      performance follows power laws with training compute, data, and
+      parameters. But there is a second axis of scaling that operates at
+      inference rather than training: letting the model <strong>think
+      longer</strong> before answering. Chain-of-thought prompting and
+      dedicated reasoning models exploit this axis, trading output tokens
+      and latency for accuracy on tasks that require multi-step inference,
+      disambiguation, or nuanced judgment.
+    </p>
+    <p>
+      Standard prompting works well for clear-cut classification. But
+      sarcastic tweets, implicit stance, ambiguous framing, or tasks that
+      involve multiple logical steps often defeat direct prompts. For these,
+      asking the model to <strong>reason before answering</strong> can
+      substantially improve accuracy.
     </p>
 
     <h3>Chain-of-Thought Prompting</h3>
@@ -679,11 +776,13 @@ const sections = [
   <section id="evaluating">
     <h2>Evaluating &amp; Choosing Models</h2>
     <p>
-      You now know how to use a model: post-training made it follow
-      instructions, prompting lets you frame tasks precisely, and reasoning
-      techniques handle harder cases. But <strong>which model</strong>? The
-      landscape includes hundreds of options, and the right choice depends
-      on your specific research context.
+      Post-training determines how a model behaves, prompting determines
+      what you measure, and reasoning techniques extend accuracy on hard
+      cases. But all of this assumes you have already chosen a model, and
+      the landscape includes hundreds of options across a wide range of
+      capabilities, costs, and transparency properties. The choice is not
+      just technical: it is a research design decision with consequences for
+      reproducibility, data privacy, and budget.
     </p>
 
     <h3>Benchmarks: Useful but Insufficient</h3>
@@ -752,12 +851,11 @@ const sections = [
       </div>
       <svg id="model-landscape-svg" viewBox="0 0 520 380" style="width: 100%; max-width: 520px; display: block; margin: 0 auto;"></svg>
       <p class="attention-explorer__insight" id="model-landscape-insight">
-        Approximate positions based on public benchmarks and API pricing as of
-        early 2026. Capability reflects a composite of Chatbot Arena, MMLU,
-        and coding benchmarks: no single number captures
-        true capability (see text). The dashed line marks the
-        cost-capability frontier. The landscape changes rapidly;
-        verify current data before making decisions.
+        Illustrative chart based on approximate positions from public
+        benchmarks and API pricing (early 2026). Model names, positions,
+        and costs change frequently. This chart shows the <em>structure</em>
+        of the landscape (frontier, open/closed clustering), not precise
+        coordinates. Always verify current data before choosing a model.
       </p>
     </div>
 
