@@ -1,4 +1,4 @@
----
+﻿---
 import CourseLayout from '../../layouts/CourseLayout.astro';
 
 const sections = [
@@ -6,15 +6,79 @@ const sections = [
   { id: 'prompting', label: 'Prompting' },
   { id: 'reasoning', label: 'Reasoning' },
   { id: 'evaluating', label: 'Evaluating & Choosing Models' },
+  { id: 'summary', label: 'Module Summary' },
 ];
+
+const math = {
+  tempSoftmax: String.raw`$$P(w) = \frac{\exp(z_w / T)}{\sum_{w' \in \mathcal{V}} \exp(z_{w'} / T)}$$`,
+  tempSoftmaxCaption: String.raw`Temperature $T$ scales the logits before softmax. At $T = 1$ the distribution is unchanged. As $T \to 0$ all mass concentrates on the highest-scoring token (greedy decoding). As $T \to \infty$ the distribution approaches uniform, making rare tokens as likely as common ones.`,
+  precision: String.raw`$$\text{Precision} = \frac{\text{True Positives}}{\text{True Positives} + \text{False Positives}}$$`,
+  precisionCaption: String.raw`Of all the items the model labelled positive, how many actually are? High precision means few false alarms.`,
+  recall: String.raw`$$\text{Recall} = \frac{\text{True Positives}}{\text{True Positives} + \text{False Negatives}}$$`,
+  recallCaption: String.raw`Of all the items that actually are positive, how many did the model find? High recall means few missed cases.`,
+  f1: String.raw`$$F_1 = 2 \cdot \frac{\text{Precision} \cdot \text{Recall}}{\text{Precision} + \text{Recall}}$$`,
+  f1Caption: String.raw`The harmonic mean of precision and recall. $F_1$ penalises models that sacrifice one for the other: a model that labels everything positive gets perfect recall but terrible precision, and hence a low $F_1$.`,
+};
 ---
 
 <CourseLayout
   day={2}
   title="From Models to Tools"
-  description="Post-training alignment, prompting strategies, reasoning techniques, and how to evaluate and choose the right model for your research."
+  description="Post-training alignment reshapes behaviour. Prompting defines your measurement instrument. Reasoning trades inference compute for accuracy. Model selection is a research design decision."
   sections={sections}
 >
+
+  <!-- ===================================================================
+       OPENING FRAMING
+       =================================================================== -->
+  <section id="opening" class="opening-narrative">
+    <p class="lead-paragraph">
+      <a href="/course/day-1">Module 1</a> ended with a machine that predicts
+      the next token. That machine is powerful but not useful: ask it to
+      classify a tweet and it writes another tweet. This module covers the
+      three layers that turn a language model into a research instrument.
+    </p>
+    <p>
+      <strong>Post-training</strong> reshapes model behaviour without
+      changing its knowledge. Supervised fine-tuning teaches format
+      (how to respond to instructions), preference optimization teaches
+      quality (which responses are better), and safety training teaches
+      boundaries (when not to respond). Each of these stages is a design
+      choice made by the model provider, and each introduces biases that
+      matter for research: the annotators who define "helpful" shape what the
+      model considers a good answer.
+    </p>
+    <p>
+      <strong>Prompting</strong> is the primary interface for working with
+      post-trained models, and it functions as a measurement instrument.
+      The same classification task with slightly different wording can
+      produce substantially different results, just as survey questions do.
+      Prompt design, temperature settings, structured output formats, and
+      few-shot examples all affect what you measure and how reliably you
+      measure it.
+    </p>
+    <p>
+      <strong>Reasoning techniques</strong> extend what prompting can do.
+      Chain-of-thought prompting and dedicated reasoning models trade
+      inference compute for accuracy on hard cases, a form of
+      <strong>test-time compute scaling</strong> that complements the
+      training-time scaling laws from Module 1. The module closes with the
+      practical question this all leads to: given dozens of available models
+      with different capabilities, costs, and transparency properties, how
+      do you choose the right one for your research?
+    </p>
+
+    <div class="key-takeaway">
+      <p class="key-takeaway__label">After This Module You Will Be Able To</p>
+      <ol>
+        <li>Explain how SFT, preference optimization, and safety training reshape model behaviour without changing model knowledge.</li>
+        <li>Design a classification prompt with appropriate structural components and justify each choice as an experimental design decision.</li>
+        <li>Predict when chain-of-thought reasoning will improve results and when it will waste budget.</li>
+        <li>Evaluate models against task-specific criteria rather than relying on generic benchmarks.</li>
+        <li>Identify the reproducibility, transparency, and validity trade-offs between open and closed models.</li>
+      </ol>
+    </div>
+  </section>
 
   <!-- ===================================================================
        SECTION 1: POST-TRAINING
@@ -22,7 +86,7 @@ const sections = [
   <section id="post-training">
     <h2>Post-Training</h2>
     <p>
-      In <a href="/course/day-1">Day 1</a>, we built the core loop of a
+      In <a href="/course/day-1">Module 1</a>, we built the core loop of a
       language model: tokenize, embed, attend, predict. We saw that a base
       model generates fluent text, but it just completes whatever you
       give it. Ask it to classify a tweet, and it writes another tweet. It is
@@ -115,11 +179,44 @@ const sections = [
     </div>
 
     <h3>Supervised Fine-Tuning (SFT)</h3>
+
+    <div class="definition-box">
+      <p class="definition-box__label">Definition</p>
+      <p class="definition-box__term">Supervised Fine-Tuning (SFT)</p>
+      <p>
+        Continued training of a pre-trained language model on curated
+        (instruction, response) pairs. SFT teaches the model <em>format</em>
+        and <em>style</em>&mdash;how to respond to instructions&mdash;without
+        fundamentally changing the knowledge acquired during pre-training.
+        Uses standard cross-entropy loss on far fewer examples (thousands to
+        tens of thousands) than the billions of tokens in pre-training.
+      </p>
+    </div>
+
     <p>
       The first stage: show the model curated
       <strong>(instruction, response)</strong> pairs and train it to imitate
       the responses. This is analogous to giving someone a style guide with
       worked examples: <em>&ldquo;when asked X, respond like Y.&rdquo;</em>
+    </p>
+    <p>
+      A concrete training example might look like this. <strong>Instruction:</strong>
+      <em>&ldquo;Classify the following tweet as positive, negative, or
+      neutral. Tweet: &lsquo;Finally some sunshine after weeks of
+      rain!&rsquo;&rdquo;</em> <strong>Response:</strong>
+      <em>&ldquo;Positive. The tweet expresses relief and happiness about
+      an improvement in weather.&rdquo;</em> Thousands of such pairs, across
+      diverse tasks and formats, teach the model what an
+      &ldquo;answer&rdquo; looks like.
+    </p>
+    <p>
+      The scale involved is modest by pre-training standards. InstructGPT
+      used roughly 13,000 demonstration examples for SFT&mdash;compare that
+      to the hundreds of billions of tokens consumed during pre-training.
+      SFT does not rewrite the model&rsquo;s knowledge; it adjusts the
+      surface layer of behaviour. The same cross-entropy loss used in
+      pre-training drives learning, but now on curated examples instead of
+      raw internet text.
     </p>
     <p>
       After SFT, the model can follow instructions and produce formatted
@@ -129,8 +226,30 @@ const sections = [
       on-topic responses that differ in subtle quality dimensions like
       depth, accuracy, or nuance.
     </p>
+    <p>
+      For researchers, SFT also opens a door: if an off-the-shelf model
+      performs poorly on your domain, you can fine-tune it on your own
+      (instruction, response) pairs to improve task-specific performance.
+      Module 3 covers when and how to pursue this.
+    </p>
 
     <h3>Preference Optimization: Teaching Quality</h3>
+
+    <div class="definition-box">
+      <p class="definition-box__label">Definition</p>
+      <p class="definition-box__term">Preference Optimization (RLHF &amp; DPO)</p>
+      <p>
+        Training a model to prefer higher-quality responses using human
+        comparison data. <strong>RLHF</strong> (Reinforcement Learning from
+        Human Feedback) trains a separate reward model on preference pairs,
+        then uses reinforcement learning to optimise the language model.
+        <strong>DPO</strong> (Direct Preference Optimization) skips the
+        reward model and optimises the language model directly on the
+        preference data with a simpler training loop. Both methods keep the
+        model close to its SFT baseline to prevent degenerate outputs.
+      </p>
+    </div>
+
     <p>
       The key idea: let humans define &ldquo;quality&rdquo; by
       <strong>comparing pairs of model outputs</strong>. For a given prompt,
@@ -221,18 +340,23 @@ const sections = [
       considers a &ldquo;good&rdquo; answer.
     </p>
 
-    <div class="course-note">
+    <div class="course-note course-note--research">
       <svg class="course-note__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
       </svg>
       <p>
-        <strong>Santurkar et al. (2023),</strong>
-        <a href="https://arxiv.org/abs/2303.17548" target="_blank" rel="noopener"><em>Whose Opinions Do Language Models Reflect?</em></a>
-        ICML. Demonstrates that RLHF shifts model outputs toward the opinion
-        distributions of specific demographic groups, particularly
-        those overrepresented among annotators. The model&rsquo;s
-        &ldquo;opinions&rdquo; are partly an artifact of whose preferences
-        shaped its training.
+        <strong>Social Science Application.</strong>
+        <a href="https://arxiv.org/abs/2303.17548" target="_blank" rel="noopener">Santurkar et al. (2023)</a>,
+        <em>Whose Opinions Do Language Models Reflect?</em> ICML.
+        RLHF introduces a form of <strong>construct validity
+        threat</strong>: the model&rsquo;s outputs reflect not just the
+        pre-training data but the preferences of the specific annotator
+        pool that defined &ldquo;helpful.&rdquo; If that pool skews toward
+        particular demographic, political, or cultural positions, the
+        model&rsquo;s &ldquo;opinions&rdquo; will too. For social
+        scientists using LLMs to measure attitudes or classify political
+        text, this is analogous to running a survey through translators
+        who share a systematic bias: the instrument is no longer neutral.
       </p>
     </div>
 
@@ -307,9 +431,11 @@ const sections = [
   <section id="prompting">
     <h2>Prompting</h2>
     <p>
-      Post-training gave us a model that follows instructions. The quality
-      of those instructions, the <strong>prompt</strong>, now
-      determines the quality of the output. For social scientists, this is
+      Post-training gave us a model that follows instructions. But which
+      instructions? The quality of the <strong>prompt</strong> now
+      determines the quality of the output, and here a new problem
+      emerges: the same task, stated slightly differently, can produce
+      substantially different results. For social scientists, this is
       not just a practical concern. A prompt is a <strong>measurement
       instrument</strong>: it defines what construct you measure, how reliably
       you measure it, and whether your results replicate.
@@ -365,16 +491,62 @@ const sections = [
     </p>
 
     <h3>Temperature &amp; Sampling</h3>
+
+    <div class="definition-box">
+      <p class="definition-box__label">Definition</p>
+      <p class="definition-box__term">Temperature</p>
+      <p>
+        A scalar parameter <em>T</em> that controls the sharpness of the
+        probability distribution over next tokens. Logits are divided by
+        <em>T</em> before softmax: at <em>T</em>&nbsp;=&nbsp;0 the model
+        always picks the highest-probability token (greedy, deterministic);
+        at <em>T</em>&nbsp;=&nbsp;1 the distribution is unchanged; at
+        <em>T</em>&nbsp;&gt;&nbsp;1 the distribution flattens, making rare
+        tokens more likely. For classification tasks, <em>T</em>&nbsp;=&nbsp;0
+        maximises reproducibility.
+      </p>
+    </div>
+
     <p>
       Beyond the prompt itself, <strong>sampling parameters</strong> control
       how the model selects tokens from its predicted probability
       distribution. The most important parameter is
-      <strong>temperature</strong>. Drag the slider below and watch what
-      happens to the distribution over candidate output tokens.
+      <strong>temperature</strong>. Recall from Module 1 that the model produces
+      logits which softmax converts into probabilities. Temperature
+      modifies this step:
+    </p>
+
+    <div class="formula-block">
+      <p set:html={math.tempSoftmax} />
+      <p class="formula-block__caption" set:html={math.tempSoftmaxCaption} />
+    </div>
+
+    <p>
+      Drag the slider below and watch what happens to the distribution
+      over candidate output tokens.
     </p>
 
     <!-- TEMPERATURE VISUALIZER -->
     <div id="temperature-viz-root"></div>
+
+    <p>
+      Two additional sampling parameters are common. <strong>Top-k
+      sampling</strong> restricts the model to the <em>k</em>
+      highest-probability tokens, zeroing out everything else before
+      resampling. <strong>Top-p (nucleus) sampling</strong> dynamically
+      selects the smallest set of tokens whose cumulative probability
+      exceeds a threshold <em>p</em> (e.g., 0.9). Both methods prevent
+      the model from selecting extremely unlikely tokens while preserving
+      more diversity than greedy decoding.
+    </p>
+    <p>
+      <strong>For research classification tasks, set temperature to 0.</strong>
+      Greedy decoding makes the output deterministic: the same prompt
+      produces the same label every time, which is essential for
+      reproducibility. Reserve higher temperatures for tasks where
+      diversity matters, such as generating synthetic survey responses or
+      brainstorming coding prompts.
+    </p>
 
     <h3>Prompt Sensitivity</h3>
     <p>
@@ -395,6 +567,27 @@ const sections = [
 
     <!-- PROMPT SENSITIVITY HEATMAP -->
     <div id="prompt-sensitivity-root"></div>
+
+    <div class="course-note course-note--research">
+      <svg class="course-note__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+      </svg>
+      <p>
+        <strong>Social Science Application.</strong>
+        Prompt sensitivity is the LLM equivalent of <strong>question-wording
+        effects</strong> in survey methodology. In political science,
+        decades of research show that small changes in question phrasing
+        produce large shifts in measured opinion (e.g., &ldquo;welfare&rdquo;
+        vs. &ldquo;assistance to the poor&rdquo;). The same dynamic applies
+        here: semantically equivalent prompts can produce classification
+        swings of 10+ percentage points
+        (<a href="https://arxiv.org/abs/2310.11324" target="_blank" rel="noopener">Sclar et al., 2024</a>).
+        The methodological implication is clear: a single prompt is a single
+        question wording. Robust research requires testing multiple prompt
+        variants and reporting the range, just as survey research requires
+        pre-testing and reporting exact question wording.
+      </p>
+    </div>
 
     <div class="stop-and-think">
       <div class="stop-and-think__header">
@@ -467,6 +660,69 @@ const sections = [
       </p>
     </div>
 
+    <div class="course-note course-note--research">
+      <svg class="course-note__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+      </svg>
+      <p>
+        <strong>Social Science Application.</strong>
+        <a href="https://doi.org/10.1017/pan.2023.2" target="_blank" rel="noopener">Argyle et al. (2023)</a>
+        demonstrated in <em>Political Analysis</em> that prompt framing
+        and demographic "backstories" determine the distribution of
+        simulated survey responses. The same survey question, posed with
+        different persona prompts, produces different opinion distributions.
+        This is the prompting-as-experimental-design argument applied to
+        simulation: the prompt does not just extract information, it
+        <em>constructs</em> the instrument. The same principle applies
+        to the extraction and RAG pipelines in
+        <a href="/course/day-4">Module 4</a>, where prompt design determines
+        what the model extracts and how it synthesises evidence.
+      </p>
+    </div>
+
+    <h3>Structured Outputs</h3>
+    <p>
+      When building classification pipelines, the model&rsquo;s response needs to
+      be machine-readable. A response like <em>&ldquo;I would classify this
+      as support because...&rdquo;</em> is useful for a human reader but
+      breaks automated parsing. <strong>Structured output formats</strong>
+      constrain the model to produce responses in a predictable schema.
+    </p>
+    <p>
+      Consider the difference. A free-text response might say:
+      <em>&ldquo;This tweet expresses opposition to the policy, primarily
+      through sarcastic framing. I would classify it as
+      oppose.&rdquo;</em> A structured JSON response to the same prompt
+      might return:
+    </p>
+    <pre style="background: var(--surface, #F2F4F8); border: 1px solid var(--border, #E2E6EE); border-radius: 6px; padding: 1rem; font-size: 0.85rem; overflow-x: auto; margin: 1rem 0;"><code set:html={`{\n  "label": "oppose",\n  "confidence": "high",\n  "reasoning": "Sarcastic framing ('really changed the world') signals opposition."\n}`} /></pre>
+    <p>
+      The first version requires custom parsing that will inevitably break
+      on edge cases. The second can be processed with a single line of
+      code across 10,000 documents.
+    </p>
+    <p>
+      The simplest approach is to instruct the model to respond with a
+      single word or a JSON object. Most API providers also offer
+      <strong>JSON mode</strong>, which guarantees valid JSON output at the
+      decoding level, and <strong>function calling</strong> (or &ldquo;tool
+      use&rdquo;), which constrains the output to match a predefined schema.
+      These work by modifying the token sampling process: at each generation
+      step, tokens that would produce invalid JSON are masked out, ensuring
+      the output always conforms to the requested structure. This eliminates
+      the parsing failures that plague free-text classification at scale.
+    </p>
+    <p>
+      For research pipelines, structured outputs serve two purposes. First,
+      <strong>reliability</strong>: when processing 10,000 documents, you
+      cannot afford to manually fix malformed responses. Second,
+      <strong>auditability</strong>: a JSON response with separate fields
+      for &ldquo;label&rdquo; and &ldquo;reasoning&rdquo; lets you log both
+      the classification and the model&rsquo;s rationale, enabling
+      systematic error analysis. Module 3 covers the full pipeline from
+      structured outputs through batching and cost management.
+    </p>
+
     <div class="key-takeaway">
       <p class="key-takeaway__label">Key Takeaway</p>
       <p>
@@ -495,14 +751,39 @@ const sections = [
   <section id="reasoning">
     <h2>Reasoning</h2>
     <p>
-      Standard prompting works well for many tasks. But some cases require
-      more: sarcastic tweets, implicit stance, ambiguous framing, or tasks
-      that involve multiple logical steps. For these, asking the model to
-      <strong>reason before answering</strong> can substantially improve
-      accuracy.
+      Even a well-designed prompt has limits. Standard prompting works well
+      for clear-cut classification, but sarcastic tweets, implicit stance,
+      ambiguous framing, or tasks that involve multiple logical
+      steps often defeat direct prompts. The model produces a label in a
+      single forward pass without any intermediate reasoning&mdash;and for
+      hard cases, that is not enough.
+    </p>
+    <p>
+      In <a href="/course/day-1#scaling">Module 1</a>, we saw that model
+      performance follows power laws with training compute, data, and
+      parameters. But there is a second axis of scaling that operates at
+      inference rather than training: letting the model <strong>think
+      longer</strong> before answering. Chain-of-thought prompting and
+      dedicated reasoning models exploit this axis, trading output tokens
+      and latency for accuracy on tasks that require multi-step inference,
+      disambiguation, or nuanced judgment.
     </p>
 
     <h3>Chain-of-Thought Prompting</h3>
+
+    <div class="definition-box">
+      <p class="definition-box__label">Definition</p>
+      <p class="definition-box__term">Chain-of-Thought (CoT) Prompting</p>
+      <p>
+        A prompting strategy that elicits intermediate reasoning steps before
+        a final answer. The generated tokens serve as external working
+        memory, allowing the model to decompose multi-step problems. CoT can
+        be elicited by providing worked examples (<em>few-shot CoT</em>) or
+        by simply appending &ldquo;Let&rsquo;s think step by
+        step&rdquo; (<em>zero-shot CoT</em>).
+      </p>
+    </div>
+
     <p>
       <a href="https://arxiv.org/abs/2201.11903" target="_blank" rel="noopener">Wei et al. (2022)</a>
       showed that adding the phrase &ldquo;think step by step&rdquo; or
@@ -576,7 +857,7 @@ const sections = [
     </p>
     <p>
       This represents a shift in how we think about model capability.
-      In <a href="/course/day-1#scaling">Day 1</a>, we saw that performance
+      In <a href="/course/day-1#scaling">Module 1</a>, we saw that performance
       follows power laws with training compute, data, and parameters.
       Reasoning models introduce <strong>test-time compute scaling</strong>:
       instead of making the model bigger, let it <em>think longer</em>.
@@ -679,14 +960,51 @@ const sections = [
   <section id="evaluating">
     <h2>Evaluating &amp; Choosing Models</h2>
     <p>
-      You now know how to use a model: post-training made it follow
-      instructions, prompting lets you frame tasks precisely, and reasoning
-      techniques handle harder cases. But <strong>which model</strong>? The
-      landscape includes hundreds of options, and the right choice depends
-      on your specific research context.
+      Post-training determines how a model behaves, prompting determines
+      what you measure, and reasoning techniques extend accuracy on hard
+      cases. But all of this assumes you have already chosen a model. Which
+      one? The landscape includes hundreds of options across a wide range of
+      capabilities, costs, and transparency properties. The choice is not
+      just technical: it is a research design decision with consequences for
+      reproducibility, data privacy, and budget&mdash;and unlike a survey
+      instrument, the model you chose might silently change between your
+      pilot and your final data collection.
     </p>
 
+    <div class="course-note course-note--research">
+      <svg class="course-note__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+      </svg>
+      <p>
+        <strong>Social Science Application.</strong>
+        Choosing a model is analogous to choosing a measurement
+        instrument. Just as the decision between a structured survey and
+        open-ended interviews shapes what you can measure and how you
+        should interpret results, the decision between GPT-4, Claude, and
+        Llama shapes your study&rsquo;s validity, reproducibility, and
+        scope. Each model embodies different training data, alignment
+        choices, and capability profiles. This choice belongs in your
+        methods section, with explicit justification, just as you would
+        justify your choice of survey instrument or sampling strategy.
+      </p>
+    </div>
+
     <h3>Benchmarks: Useful but Insufficient</h3>
+
+    <div class="definition-box">
+      <p class="definition-box__label">Definition</p>
+      <p class="definition-box__term">Benchmark</p>
+      <p>
+        A standardised test set with known correct answers, used to compare
+        model performance on a fixed task. Benchmarks function like
+        standardised tests (GRE, LSAT): they measure <em>something</em>
+        real and enable cross-model comparison, but they do not measure the
+        specific construct you care about. A model&rsquo;s benchmark score
+        is a necessary but insufficient predictor of its performance on your
+        research task.
+      </p>
+    </div>
+
     <p>
       The field evaluates models using standardised benchmarks.
       <strong>MMLU</strong>
@@ -717,20 +1035,74 @@ const sections = [
     <h3>Open vs. Closed Models</h3>
     <p>
       The choice between open-weight and closed (proprietary API) models
-      involves trade-offs across five dimensions.
-      <strong>Capability:</strong> frontier closed models currently lead on
-      the hardest tasks, though the gap has narrowed substantially.
-      <strong>Cost:</strong> open models are free to use (you pay only for
-      compute); at scale, self-hosting can be dramatically cheaper per token.
-      <strong>Transparency:</strong> open models give you full access to
-      weights and architecture; closed models are opaque.
-      <strong>Data privacy:</strong> with open models, your data never leaves
-      your infrastructure, which may matter under IRB protocols or data
-      protection regulations.
-      <strong>Reproducibility:</strong> open model weights are fixed; closed
-      models can change without notice between when you run your study and
-      when reviewers try to replicate it.
+      involves trade-offs across five dimensions that map directly onto
+      research design concerns.
     </p>
+    <p>
+      <strong>Capability:</strong> frontier closed models currently lead on
+      the hardest tasks, though the gap has narrowed substantially. For many
+      social science classification tasks, the difference is small enough
+      that other dimensions dominate the decision.
+    </p>
+    <p>
+      <strong>Cost:</strong> open models are free to use (you pay only for
+      compute). At scale, self-hosting can be dramatically cheaper per
+      token&mdash;a difference that matters when processing millions of
+      documents.
+    </p>
+    <p>
+      <strong>Transparency:</strong> open models give you full access to
+      weights and architecture. Closed models are opaque: you cannot inspect
+      what training data was used, what safety filters are applied, or how
+      the model was post-trained.
+    </p>
+    <p>
+      <strong>Data privacy:</strong> with open models, your data never leaves
+      your infrastructure. This may be essential under IRB protocols, GDPR
+      requirements, or when working with sensitive political, health, or
+      legal data.
+    </p>
+    <p>
+      <strong>Reproducibility:</strong> this is the dimension researchers
+      most often underestimate. Open model weights are fixed: a snapshot you
+      download today produces the same outputs in two years. Closed models
+      can change without notice. If you submit a paper in June using GPT-4
+      and reviewers try to replicate your results in December, the model
+      behind the API may have been updated, retrained, or replaced entirely.
+      <a href="https://arxiv.org/abs/2307.09009" target="_blank" rel="noopener">Chen et al. (2023)</a>
+      documented substantial behaviour drift in GPT-4 and GPT-3.5 over
+      just a few months, with accuracy on specific tasks changing by 10+
+      percentage points between API snapshots.
+    </p>
+    <p>
+      The term &ldquo;open&rdquo; itself exists on a spectrum.
+      <strong>Fully open</strong> models release weights, training code,
+      and training data (e.g., OLMo). <strong>Open-weight</strong> models
+      release weights but not training data or code (e.g., Llama, Mistral).
+      <strong>API-only</strong> models provide no access to internals (e.g.,
+      GPT-4, Claude). For reproducibility, any model whose weights you can
+      download is a significant improvement over API-only access, even if
+      the training data remains proprietary.
+    </p>
+
+    <div class="course-note course-note--research">
+      <svg class="course-note__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+      </svg>
+      <p>
+        <strong>Social Science Application.</strong>
+        <a href="https://arxiv.org/abs/2307.09009" target="_blank" rel="noopener">Chen et al. (2023)</a>,
+        <em>How is ChatGPT&rsquo;s behavior changing over time?</em>,
+        documented that GPT-4&rsquo;s accuracy on specific tasks changed
+        by over 10 percentage points between API snapshots taken just months
+        apart. For empirical research, this is a <strong>temporal validity
+        threat</strong>: the instrument you validated in your pilot study
+        may not be the same instrument producing your final results. When
+        using closed API models, always record the exact model version
+        string (e.g., <code>gpt-4-0613</code>), pin it if the API allows,
+        and acknowledge the version drift risk in your methods section.
+      </p>
+    </div>
 
     <h3>Cost-Capability Frontiers</h3>
     <p>
@@ -752,12 +1124,11 @@ const sections = [
       </div>
       <svg id="model-landscape-svg" viewBox="0 0 520 380" style="width: 100%; max-width: 520px; display: block; margin: 0 auto;"></svg>
       <p class="attention-explorer__insight" id="model-landscape-insight">
-        Approximate positions based on public benchmarks and API pricing as of
-        early 2026. Capability reflects a composite of Chatbot Arena, MMLU,
-        and coding benchmarks: no single number captures
-        true capability (see text). The dashed line marks the
-        cost-capability frontier. The landscape changes rapidly;
-        verify current data before making decisions.
+        Illustrative chart based on approximate positions from public
+        benchmarks and API pricing (early 2026). Model names, positions,
+        and costs change frequently. This chart shows the <em>structure</em>
+        of the landscape (frontier, open/closed clustering), not precise
+        coordinates. Always verify current data before choosing a model.
       </p>
     </div>
 
@@ -816,6 +1187,40 @@ const sections = [
       instrument specifications: they belong in the methods section of
       your paper.
     </p>
+    <p>
+      Step 2 mentions F1. For classification tasks, <strong>accuracy</strong>
+      alone is misleading when classes are imbalanced. If 95% of your tweets
+      are neutral, a model that labels everything &ldquo;neutral&rdquo;
+      achieves 95% accuracy while being completely useless. Precision,
+      recall, and F1 give a more honest picture:
+    </p>
+
+    <div class="formula-block">
+      <p set:html={math.precision} />
+      <p class="formula-block__caption" set:html={math.precisionCaption} />
+    </div>
+
+    <div class="formula-block">
+      <p set:html={math.recall} />
+      <p class="formula-block__caption" set:html={math.recallCaption} />
+    </div>
+
+    <div class="formula-block">
+      <p set:html={math.f1} />
+      <p class="formula-block__caption" set:html={math.f1Caption} />
+    </div>
+
+    <p>
+      For multi-class tasks, report macro-averaged F1 (average F1 across
+      all classes, giving equal weight to rare categories) or per-class F1.
+      When comparing model labels to human labels, treat the comparison
+      as an <strong>inter-annotator agreement</strong> problem:
+      <strong>Cohen&rsquo;s kappa</strong> or
+      <strong>Krippendorff&rsquo;s alpha</strong> account for agreement
+      that would occur by chance, giving a more rigorous measure than raw
+      accuracy. Module 3 walks through computing these metrics on your own
+      classification results.
+    </p>
 
     <div class="course-note">
       <svg class="course-note__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -866,9 +1271,9 @@ const sections = [
       </svg>
       <p>
         <strong>In the notebook:</strong> Exercise 7 has you save your best
-        classification results and manually label 10 tweets. Day 3 opens by
-        computing inter-annotator agreement between you and the model:
-        the start of a proper validation pipeline.
+        classification results and manually label 10 tweets. Module 3 walks
+        you through computing inter-annotator agreement between you and
+        the model: the start of a proper validation pipeline.
       </p>
     </div>
 
@@ -877,7 +1282,7 @@ const sections = [
         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
       </svg>
       <p>
-        <strong>Coming in Day 3:</strong> We move from single-model evaluation
+        <strong>Coming in Module 3:</strong> We move from single-model evaluation
         to building complete classification pipelines at scale: API
         access, batching, cost management, and systematic validation using
         inter-annotator agreement metrics. We also cover when prompting is not
@@ -903,7 +1308,62 @@ const sections = [
       <li><a href="https://arxiv.org/abs/2311.12022" target="_blank" rel="noopener">Rein et al. (2023), <em>GPQA</em></a>: expert-level questions resistant to memorisation.</li>
       <li><a href="https://huggingface.co/spaces/lmarena-ai/chatbot-arena" target="_blank" rel="noopener">Chatbot Arena Leaderboard</a>: live updated model rankings.</li>
       <li><a href="https://artificialanalysis.ai" target="_blank" rel="noopener">Artificial Analysis</a>: cost, speed, and quality comparisons across providers.</li>
+      <li><a href="https://arxiv.org/abs/2307.09009" target="_blank" rel="noopener">Chen et al. (2023), <em>How is ChatGPT&rsquo;s behavior changing over time?</em></a>: documents significant performance drift in closed API models over months.</li>
     </ul>
+  </section>
+
+  <!-- ===================================================================
+       MODULE SUMMARY
+       =================================================================== -->
+  <section id="summary" class="opening-narrative">
+    <h2>Module Summary</h2>
+    <p>
+      This module traced the path from a raw language model to a usable
+      research instrument. <strong>Post-training</strong> reshapes
+      behaviour: SFT teaches format, preference optimization teaches
+      quality, and safety training teaches boundaries. None of these stages
+      add knowledge; they determine <em>how</em> the model expresses what it
+      already learned during pre-training, and each introduces biases that
+      researchers must account for.
+    </p>
+    <p>
+      <strong>Prompting</strong> is the primary interface to post-trained
+      models, and it functions as experimental design. Prompt wording,
+      temperature, structured output schemas, and few-shot examples all
+      shape what you measure and how reliably you measure it. <strong>Prompt
+      sensitivity</strong> is the LLM equivalent of question-wording effects
+      in survey research: small changes can produce large swings in results.
+      <strong>Reasoning techniques</strong>&mdash;chain-of-thought prompting
+      and dedicated reasoning models&mdash;extend accuracy on hard cases by
+      trading inference compute for depth, a form of test-time compute
+      scaling that complements the training-time scaling laws from Module 1.
+    </p>
+    <p>
+      Finally, <strong>model selection</strong> is itself a research design
+      decision. Standard benchmarks provide rough orientation but suffer from
+      contamination, gaming, and construct validity gaps. The benchmark that
+      matters most is the one you build yourself: a gold-standard evaluation
+      set drawn from your own data, validated against human coders, and
+      documented in your methods section. The choice between open and closed
+      models involves trade-offs across capability, cost, transparency, data
+      privacy, and reproducibility&mdash;dimensions that map directly onto the
+      concerns of any rigorous research design.
+    </p>
+
+    <div class="course-note">
+      <svg class="course-note__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+      </svg>
+      <p>
+        <strong>Coming in Module 3:</strong> We move from single-model
+        evaluation to building complete classification pipelines at scale.
+        You will learn how to access models programmatically, batch
+        thousands of requests efficiently, manage costs, and validate
+        results systematically using inter-annotator agreement metrics. We
+        also cover when prompting reaches its limits and fine-tuning
+        becomes the right tool.
+      </p>
+    </div>
   </section>
 
 </CourseLayout>
@@ -912,7 +1372,7 @@ const sections = [
 <!-- COMPONENT STYLES                                                    -->
 <!-- =================================================================== -->
 <style is:inline>
-/* ── Shared component tokens ── */
+/* â”€â”€ Shared component tokens â”€â”€ */
 .widget-eyebrow {
   font-family: var(--font-mono, 'JetBrains Mono', monospace);
   font-size: 0.7rem;
@@ -1812,3 +2272,4 @@ const sections = [
   draw();
 })();
 </script>
+

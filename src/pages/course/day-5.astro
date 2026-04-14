@@ -1,4 +1,4 @@
----
+﻿---
 import CourseLayout from '../../layouts/CourseLayout.astro';
 
 const sections = [
@@ -6,6 +6,7 @@ const sections = [
   { id: 'react', label: 'The ReAct Pattern' },
   { id: 'failure-modes', label: 'Failure Modes' },
   { id: 'production', label: 'From Notebooks to Production' },
+  { id: 'summary', label: 'Module Summary' },
 ];
 ---
 
@@ -15,6 +16,45 @@ const sections = [
   description="Building autonomous research agents with tool use, the ReAct pattern, failure modes and safeguards, and the bridge from notebooks to production tools."
   sections={sections}
 >
+
+  <!-- ===================================================================
+       OPENING FRAMING
+       =================================================================== -->
+  <section id="opening" class="opening-narrative">
+    <p class="lead-paragraph">
+      Over the past four days, you have built every piece of a research
+      pipeline by hand: prompting, classifying, validating, extracting,
+      retrieving, evaluating. Each step required you to decide what to do
+      next. Today, you hand that decision-making to the model itself.
+    </p>
+    <p>
+      An <strong>agent</strong> is an LLM wrapped in a loop. You give it
+      a goal and a set of tools — the same functions you wrote in
+      <a href="/course/day-4">Module 4</a> (search, extract, verify) — and
+      it decides which tool to call, in what order, and what to do with
+      the results. This is not a different kind of model. It is the same
+      model, doing the same things, but orchestrating them autonomously.
+    </p>
+    <p>
+      The power is obvious: a multi-step literature review that would take
+      you hours can run in minutes. The risk is equally obvious: every
+      failure mode from the course — hallucination, omission, distortion,
+      retrieval errors, unfaithful generation — can now compound across
+      steps without a human checking each one. Building agents that are
+      useful <em>and</em> trustworthy is the challenge of this session.
+    </p>
+
+    <div class="key-takeaway">
+      <p class="key-takeaway__label">After This Module You Will Be Able To</p>
+      <ol>
+        <li>Explain how an LLM agent works: tools, system prompt, parser, and execution loop.</li>
+        <li>Build a ReAct agent that alternates between reasoning and tool use, and trace its decision-making step by step.</li>
+        <li>Identify the four failure modes specific to agents (hallucination on missing data, format drift, redundant loops, cascading errors) and implement safeguards for each.</li>
+        <li>Evaluate agent output using provenance verification, connecting back to the faithfulness checks from <a href="/course/day-4">Module 4</a>.</li>
+        <li>Use production tools (Codespaces, Claude Code, MCP) to move from notebook prototypes to real research workflows.</li>
+      </ol>
+    </div>
+  </section>
 
   <!-- ===================================================================
        SECTION 1: WHAT IS AN AGENT?
@@ -58,7 +98,7 @@ const sections = [
     <h3>Tools as Building Blocks</h3>
     <p>
       An agent is only as useful as its tools. In the notebook, the tools
-      come directly from your Day 4 work: <code>search_literature()</code>
+      come directly from your Module 4 work: <code>search_literature()</code>
       searches the political science corpus using the FAISS index you built,
       <code>extract_findings()</code> pulls structured claims from a passage,
       <code>summarize()</code> condenses text, and
@@ -103,7 +143,7 @@ const sections = [
         <div>
           <p>
             Most researchers find that the
-            <em>search → read → extract → organise</em> loop is highly
+            <em>search â†’ read â†’ extract â†’ organise</em> loop is highly
             automatable: an agent can find relevant papers, pull out key
             claims, and compile structured summaries. The parts that resist
             automation are theoretical judgment (is this framework
@@ -197,6 +237,49 @@ const sections = [
         call), using the results of each action to inform subsequent
         reasoning. This creates a transparent, step-by-step
         problem-solving loop that can be audited and debugged.
+      </p>
+    </div>
+
+    <h3>Text Parsing vs. Native Tool Calling</h3>
+    <p>
+      The notebook builds the ReAct loop from scratch: the model outputs
+      text, and your code parses <code>Action: tool_name</code> from the
+      response. This is pedagogically valuable because it exposes every
+      moving part. But production systems rarely work this way.
+    </p>
+    <p>
+      Modern APIs (OpenAI, Anthropic, Google) support
+      <strong>native tool calling</strong>: you define tools as a JSON
+      schema, the model returns a structured tool-call object rather than
+      free text, and the API handles the format for you. This eliminates
+      format drift entirely — the model cannot produce an unparseable
+      response because the tool call is a structured object, not a
+      substring in prose.
+    </p>
+    <p>
+      Frameworks like
+      <a href="https://langchain-ai.github.io/langgraph/" target="_blank" rel="noopener">LangGraph</a>
+      and the
+      <a href="https://docs.anthropic.com/en/docs/build-with-claude/tool-use" target="_blank" rel="noopener">Anthropic tool-use API</a>
+      abstract this further, letting you define tools as Python functions
+      and handling the serialisation, execution, and result injection
+      automatically. The ReAct loop is still running underneath, but you
+      no longer write the parser yourself.
+    </p>
+
+    <div class="course-note course-note--research">
+      <svg class="course-note__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+      </svg>
+      <p>
+        <strong>Research Note.</strong>
+        The notebook uses text-parsed ReAct intentionally: you need to see
+        how the loop works to understand what can go wrong. Once you have
+        built it by hand, switch to native tool calling for any real
+        project. The failure modes (hallucination, cascading errors,
+        redundant loops) remain the same regardless of whether the tool
+        call is parsed from text or returned as a structured object.
+        Format drift is the one failure mode that native APIs eliminate.
       </p>
     </div>
 
@@ -315,7 +398,7 @@ const sections = [
     </p>
     <p>
       This is the agent-specific version of the &ldquo;retrieval quality
-      is the bottleneck&rdquo; lesson from Day 4. In an agent, every
+      is the bottleneck&rdquo; lesson from Module 4. In an agent, every
       tool call is a potential bottleneck, and errors compound.
     </p>
 
@@ -339,7 +422,13 @@ const sections = [
       <strong>Provenance verification</strong> runs after the agent
       finishes: a separate call checks whether every claim in the final
       answer is supported by an observation from a tool call. This is
-      the same faithfulness check from Day 4, applied to agent output.
+      the same faithfulness check from
+      <a href="/course/day-4">Module 4</a>, applied to agent output. The
+      <a href="/course/day-4#evaluation">three-layer evaluation
+      workflow</a> (automated metrics, stratified manual review, domain
+      expert audit) extends naturally to agents: run RAGAS-style metrics
+      over the agent&rsquo;s final answers, manually audit a sample of
+      the reasoning traces, and verify any claim that will be published.
     </p>
     <p>
       <strong>Human-in-the-loop checkpoints</strong> pause the agent at
@@ -369,7 +458,7 @@ const sections = [
             real, but it does not confirm that the agent's
             <em>interpretation</em> of those passages is correct. The agent
             may have distorted the meaning (the same failure mode from
-            Day 4's extraction section), selectively quoted to support a
+            Module 4's extraction section), selectively quoted to support a
             conclusion the passages do not actually support, or missed
             contradicting evidence because it did not search broadly enough.
             Grounded citations are a necessary condition for trust, not a
@@ -507,22 +596,82 @@ claude</pre>
       </p>
     </div>
 
-    <h3>The Full Arc: Five Days, One Toolkit</h3>
+    <div class="key-takeaway">
+      <p class="key-takeaway__label">Key Takeaway</p>
+      <p>
+        The gap between a notebook prototype and a production workflow is
+        tooling, not theory. Codespaces give you a reproducible
+        environment, Claude Code puts a frontier agent in your terminal,
+        and MCP lets you connect any model to any data source. The agent
+        architecture is the same in all three: tools, a loop, and
+        safeguards. Start with the notebook, graduate to production tools
+        when the task outgrows a single session.
+      </p>
+    </div>
+
+    <h3>Resources</h3>
+    <ul class="resource-list">
+      <li><a href="https://docs.anthropic.com/en/docs/claude-code" target="_blank" rel="noopener">Claude Code documentation</a>: setup, usage, and best practices for terminal-based AI assistance.</li>
+      <li><a href="https://github.com/features/codespaces" target="_blank" rel="noopener">GitHub Codespaces</a>: browser-based development environments with free tier (60h/month).</li>
+      <li><a href="https://modelcontextprotocol.io" target="_blank" rel="noopener">Model Context Protocol</a>: open standard for connecting AI models to external tools.</li>
+      <li><a href="https://langchain-ai.github.io/langgraph/" target="_blank" rel="noopener">LangGraph</a>: framework for building stateful, multi-step agent workflows.</li>
+      <li><a href="https://elicit.com" target="_blank" rel="noopener">Elicit</a> and <a href="https://www.semanticscholar.org" target="_blank" rel="noopener">Semantic Scholar</a>: AI-powered research tools for literature review that use agent-like architectures under the hood.</li>
+    </ul>
+  </section>
+
+  <!-- ===================================================================
+       MODULE SUMMARY
+       =================================================================== -->
+  <section id="summary" class="opening-narrative">
+    <h2>Module Summary</h2>
     <p>
-      The progression across the course has been deliberate. Day 1 built
-      the foundations: how models represent meaning and generate text.
-      Days 2 and 3 taught you to control models: prompting, validation,
-      fine-tuning, APIs at scale. Day 4 applied these skills to research
-      tasks: extraction, RAG, working with large corpora. Day 5 showed
-      how to orchestrate all of these into autonomous workflows.
+      This module introduced the agent: an LLM wrapped in a loop that
+      decides what to do, executes tools, and uses the results to plan
+      its next step. The <strong>ReAct pattern</strong> (Thought / Action /
+      Observation) makes this decision-making transparent and auditable.
+      Modern APIs replace the text-parsed version with native tool calling,
+      but the underlying loop is the same.
     </p>
     <p>
-      Each day's tools became the next day's building blocks. Day 1's
-      embeddings powered Day 4's retrieval. Day 2's prompting skills
-      shaped Day 4's extraction prompts and Day 5's system prompt.
-      Day 3's validation framework carried through as the faithfulness
-      checks in Days 4 and 5. And Day 4's functions became Day 5's
-      agent tools.
+      <strong>Failure modes</strong> in agents are qualitatively different
+      from single-call errors: hallucination on missing data looks
+      grounded because a search step occurred, format drift breaks the
+      loop silently, redundant actions waste budget, and cascading errors
+      propagate early mistakes through every subsequent step. Safeguards
+      (step budgets, minimum evidence rules, provenance verification,
+      human-in-the-loop checkpoints) exist for each failure mode. None
+      are optional for production use.
+    </p>
+    <p>
+      <strong>Production tools</strong> bridge the gap from notebooks to
+      real workflows: Codespaces for reproducible environments, Claude Code
+      for terminal-based agents, and MCP for connecting models to your
+      data. These tools use the same architecture you built by hand, with
+      more capable models and better safeguards.
+    </p>
+
+    <h3>The Full Arc: Five Modules, One Toolkit</h3>
+    <p>
+      The progression across the course has been deliberate.
+      <a href="/course/day-1">Module 1</a> built the foundations: how models
+      represent meaning and generate text.
+      <a href="/course/day-2">Modules 2</a> and
+      <a href="/course/day-3">3</a> taught you to control models:
+      prompting, validation, fine-tuning, APIs at scale.
+      <a href="/course/day-4">Module 4</a> applied those skills to harder
+      research tasks: extraction, RAG, and rigorous evaluation.
+      Module 5 showed how to orchestrate all of these into autonomous
+      workflows.
+    </p>
+    <p>
+      Each module&rsquo;s tools became the next module&rsquo;s building blocks.
+      Module 1&rsquo;s embeddings powered Module 4&rsquo;s retrieval.
+      Module 2&rsquo;s prompting skills shaped Module 4&rsquo;s extraction
+      prompts and Module 5&rsquo;s system prompt. Module 3&rsquo;s validation
+      framework carried through as the faithfulness checks in Modules 4
+      and 5. Module 4&rsquo;s evaluation metrics (RAGAS, provenance,
+      manual review) became Module 5&rsquo;s agent safeguards. And
+      Module 4&rsquo;s functions became Module 5&rsquo;s agent tools.
     </p>
 
     <div class="stop-and-think">
@@ -535,7 +684,7 @@ claude</pre>
       <p>
         Think about a research question from your own work. How could you
         decompose it into a multi-step pipeline using the techniques covered
-        in this course? Which days' tools would each step draw on?
+        in this course? Which modules&rsquo; tools would each step draw on?
       </p>
     </div>
 
@@ -545,16 +694,17 @@ claude</pre>
       by how quickly you can start:
     </p>
     <p>
-      <strong>This week:</strong> Apply the RAG pipeline from Day 4 to your
-      own corpus (parliamentary records, news archives, legal texts). Build
-      a classification pipeline from Day 3 for your own annotation task.
-      Try Claude Code on a real research project.
+      <strong>This week:</strong> Apply the RAG pipeline from
+      <a href="/course/day-4">Module 4</a> to your own corpus (parliamentary
+      records, news archives, legal texts). Build a classification
+      pipeline from <a href="/course/day-3">Module 3</a> for your own
+      annotation task. Try Claude Code on a real research project.
     </p>
     <p>
       <strong>This month:</strong> Set up a Codespace for your research
-      group's codebase. Build a custom MCP server that connects Claude to
-      your data. Run a validation study comparing LLM annotations to
-      human annotations on your specific task.
+      group&rsquo;s codebase. Build a custom MCP server that connects
+      Claude to your data. Run a validation study comparing LLM
+      annotations to human annotations on your specific task.
     </p>
     <p>
       <strong>This year:</strong> Integrate LLM-based methods into a
@@ -572,17 +722,11 @@ claude</pre>
         judgment. Start with well-defined, bounded tasks (literature search
         and extraction) before attempting open-ended research assistance.
         Build safeguards in from the start, not after something goes wrong.
+        And remember the thread that ran through every day of this course:
+        <strong>the model is an instrument, and instruments require
+        calibration</strong>.
       </p>
     </div>
-
-    <h3>Resources</h3>
-    <ul class="resource-list">
-      <li><a href="https://docs.anthropic.com/en/docs/claude-code" target="_blank" rel="noopener">Claude Code documentation</a>: setup, usage, and best practices for terminal-based AI assistance.</li>
-      <li><a href="https://github.com/features/codespaces" target="_blank" rel="noopener">GitHub Codespaces</a>: browser-based development environments with free tier (60h/month).</li>
-      <li><a href="https://modelcontextprotocol.io" target="_blank" rel="noopener">Model Context Protocol</a>: open standard for connecting AI models to external tools.</li>
-      <li><a href="https://langchain-ai.github.io/langgraph/" target="_blank" rel="noopener">LangGraph</a>: framework for building stateful, multi-step agent workflows.</li>
-      <li><a href="https://elicit.com" target="_blank" rel="noopener">Elicit</a> and <a href="https://www.semanticscholar.org" target="_blank" rel="noopener">Semantic Scholar</a>: AI-powered research tools for literature review that use agent-like architectures under the hood.</li>
-    </ul>
 
     <div class="course-note">
       <svg class="course-note__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -604,13 +748,13 @@ claude</pre>
 <!-- COMPONENT STYLES                                                    -->
 <!-- =================================================================== -->
 <style is:inline>
-/* ── Shared widget tokens ── */
+/* â”€â”€ Shared widget tokens â”€â”€ */
 .widget-wrap { margin: 2rem 0; padding: 1.5rem; background: var(--surface, #FFFFFF); border: 1px solid var(--border, #E2E6EE); border-radius: 12px; }
 .widget-eyebrow { font-family: var(--font-mono, 'JetBrains Mono', monospace); font-size: 0.7rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent, #2D8ABF); margin-bottom: 0.5rem; }
 .widget-title { font-family: var(--font-display, 'Source Serif 4', Georgia, serif); font-size: 1.35rem; font-weight: 700; color: var(--text, #1A1D27); line-height: 1.25; margin-bottom: 0.75rem; }
 .widget-intro { font-size: 0.92rem; color: var(--text-sec, #3D4455); line-height: 1.65; max-width: 620px; margin-bottom: 1.5rem; }
 
-/* ── ReAct loop ── */
+/* â”€â”€ ReAct loop â”€â”€ */
 .rl__question { background: var(--surface-alt, #F5F5F0); border: 1px solid var(--border, #E2E6EE); border-radius: 8px; padding: 0.85rem 1.15rem; margin-bottom: 1.5rem; }
 .rl__question-label { font-family: var(--font-mono, monospace); font-size: 0.62rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted, #6B7280); margin-bottom: 0.3rem; }
 .rl__question-text { font-size: 0.92rem; color: var(--text, #1A1D27); font-weight: 500; font-style: italic; line-height: 1.5; }
@@ -656,7 +800,7 @@ claude</pre>
 .rl__annotation { margin-top: 1.25rem; padding: 0.85rem 1rem; border-left: 3px solid var(--accent, #2D8ABF); background: #E8EEF6; border-radius: 0 8px 8px 0; font-size: 0.85rem; color: var(--text-sec, #3D4455); line-height: 1.6; min-height: 3rem; }
 .rl__annotation strong { color: var(--text, #1A1D27); }
 
-/* ── Failure modes ── */
+/* â”€â”€ Failure modes â”€â”€ */
 .fm__cards { display: flex; flex-direction: column; gap: 0.5rem; }
 .fm__card { background: var(--surface, #FFF); border: 1.5px solid var(--border, #E2E6EE); border-radius: 12px; overflow: hidden; transition: border-color 0.25s ease; }
 .fm__card-header { display: flex; align-items: center; gap: 0.75rem; padding: 0.85rem 1.15rem; cursor: pointer; user-select: none; transition: background 0.25s ease; }
@@ -702,7 +846,7 @@ claude</pre>
     { type: "observation", text: '[1] "Guess et al. (2023): Experimental evidence from Facebook and Instagram suggests that removing algorithmic curation had minimal effects on political attitudes and polarization, challenging the echo chamber hypothesis..." (score: 0.81)<br>[2] "Levy (2021): A randomized experiment on Facebook news feed shows that exposure to counter-attitudinal content can reduce affective polarization, but effects are modest and short-lived..." (score: 0.74)',
       annotation: "<strong>Step 2: New evidence.</strong> This search found experimental studies that complicate the narrative. The agent now has both observational and experimental findings." },
     { type: "thought", text: "I now have evidence on both sides. Let me extract the key findings from the most important passage to make sure I represent it accurately.",
-      annotation: "<strong>Step 3: Verification.</strong> Rather than jumping to a conclusion, the agent extracts structured claims from a specific passage. This is the faithfulness discipline from Day 4." },
+      annotation: "<strong>Step 3: Verification.</strong> Rather than jumping to a conclusion, the agent extracts structured claims from a specific passage. This is the faithfulness discipline from Module 4." },
     { type: "action", text: '<code>extract_findings("Guess et al. (2023): Experimental evidence from Facebook and Instagram suggests that removing algorithmic curation had minimal effects...")</code>',
       annotation: "<strong>Step 3: Extraction.</strong> The agent uses the extraction tool to pull structured, citable claims." },
     { type: "observation", text: "Findings:<br>\u2022 Removing algorithmic curation on Facebook/Instagram did not significantly change political attitudes<br>\u2022 Effect on affective polarization was minimal<br>\u2022 Authors conclude that algorithms are \"not the main driver\" of polarization<br>Source: Guess et al. (2023), experimental design",
@@ -874,3 +1018,4 @@ claude</pre>
   render();
 })();
 </script>
+
