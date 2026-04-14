@@ -1,4 +1,4 @@
----
+﻿---
 import CourseLayout from '../../layouts/CourseLayout.astro';
 
 const sections = [
@@ -33,7 +33,7 @@ const math = {
        =================================================================== -->
   <section id="opening" class="opening-narrative">
     <p class="lead-paragraph">
-      <a href="/course/day-1">Day 1</a> ended with a machine that predicts
+      <a href="/course/day-1">Module 1</a> ended with a machine that predicts
       the next token. That machine is powerful but not useful: ask it to
       classify a tweet and it writes another tweet. This module covers the
       three layers that turn a language model into a research instrument.
@@ -62,7 +62,7 @@ const math = {
       Chain-of-thought prompting and dedicated reasoning models trade
       inference compute for accuracy on hard cases, a form of
       <strong>test-time compute scaling</strong> that complements the
-      training-time scaling laws from Day 1. The module closes with the
+      training-time scaling laws from Module 1. The module closes with the
       practical question this all leads to: given dozens of available models
       with different capabilities, costs, and transparency properties, how
       do you choose the right one for your research?
@@ -86,7 +86,7 @@ const math = {
   <section id="post-training">
     <h2>Post-Training</h2>
     <p>
-      In <a href="/course/day-1">Day 1</a>, we built the core loop of a
+      In <a href="/course/day-1">Module 1</a>, we built the core loop of a
       language model: tokenize, embed, attend, predict. We saw that a base
       model generates fluent text, but it just completes whatever you
       give it. Ask it to classify a tweet, and it writes another tweet. It is
@@ -230,7 +230,7 @@ const math = {
       For researchers, SFT also opens a door: if an off-the-shelf model
       performs poorly on your domain, you can fine-tune it on your own
       (instruction, response) pairs to improve task-specific performance.
-      Day 3 covers when and how to pursue this.
+      Module 3 covers when and how to pursue this.
     </p>
 
     <h3>Preference Optimization: Teaching Quality</h3>
@@ -511,7 +511,7 @@ const math = {
       Beyond the prompt itself, <strong>sampling parameters</strong> control
       how the model selects tokens from its predicted probability
       distribution. The most important parameter is
-      <strong>temperature</strong>. Recall from Day 1 that the model produces
+      <strong>temperature</strong>. Recall from Module 1 that the model produces
       logits which softmax converts into probabilities. Temperature
       modifies this step:
     </p>
@@ -673,8 +673,10 @@ const math = {
         different persona prompts, produces different opinion distributions.
         This is the prompting-as-experimental-design argument applied to
         simulation: the prompt does not just extract information, it
-        <em>constructs</em> the instrument. Day 4 returns to this when we
-        cover LLMs as simulated survey respondents.
+        <em>constructs</em> the instrument. The same principle applies
+        to the extraction and RAG pipelines in
+        <a href="/course/day-4">Module 4</a>, where prompt design determines
+        what the model extracts and how it synthesises evidence.
       </p>
     </div>
 
@@ -717,7 +719,7 @@ const math = {
       <strong>auditability</strong>: a JSON response with separate fields
       for &ldquo;label&rdquo; and &ldquo;reasoning&rdquo; lets you log both
       the classification and the model&rsquo;s rationale, enabling
-      systematic error analysis. Day 3 covers the full pipeline from
+      systematic error analysis. Module 3 covers the full pipeline from
       structured outputs through batching and cost management.
     </p>
 
@@ -757,7 +759,7 @@ const math = {
       hard cases, that is not enough.
     </p>
     <p>
-      In <a href="/course/day-1#scaling">Day 1</a>, we saw that model
+      In <a href="/course/day-1#scaling">Module 1</a>, we saw that model
       performance follows power laws with training compute, data, and
       parameters. But there is a second axis of scaling that operates at
       inference rather than training: letting the model <strong>think
@@ -855,7 +857,7 @@ const math = {
     </p>
     <p>
       This represents a shift in how we think about model capability.
-      In <a href="/course/day-1#scaling">Day 1</a>, we saw that performance
+      In <a href="/course/day-1#scaling">Module 1</a>, we saw that performance
       follows power laws with training compute, data, and parameters.
       Reasoning models introduce <strong>test-time compute scaling</strong>:
       instead of making the model bigger, let it <em>think longer</em>.
@@ -1216,7 +1218,7 @@ const math = {
       <strong>Cohen&rsquo;s kappa</strong> or
       <strong>Krippendorff&rsquo;s alpha</strong> account for agreement
       that would occur by chance, giving a more rigorous measure than raw
-      accuracy. Day 3 walks through computing these metrics on your own
+      accuracy. Module 3 walks through computing these metrics on your own
       classification results.
     </p>
 
@@ -1269,9 +1271,9 @@ const math = {
       </svg>
       <p>
         <strong>In the notebook:</strong> Exercise 7 has you save your best
-        classification results and manually label 10 tweets. Day 3 opens by
-        computing inter-annotator agreement between you and the model:
-        the start of a proper validation pipeline.
+        classification results and manually label 10 tweets. Module 3 walks
+        you through computing inter-annotator agreement between you and
+        the model: the start of a proper validation pipeline.
       </p>
     </div>
 
@@ -1280,7 +1282,7 @@ const math = {
         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
       </svg>
       <p>
-        <strong>Coming in Day 3:</strong> We move from single-model evaluation
+        <strong>Coming in Module 3:</strong> We move from single-model evaluation
         to building complete classification pipelines at scale: API
         access, batching, cost management, and systematic validation using
         inter-annotator agreement metrics. We also cover when prompting is not
@@ -1334,7 +1336,7 @@ const math = {
       <strong>Reasoning techniques</strong>&mdash;chain-of-thought prompting
       and dedicated reasoning models&mdash;extend accuracy on hard cases by
       trading inference compute for depth, a form of test-time compute
-      scaling that complements the training-time scaling laws from Day 1.
+      scaling that complements the training-time scaling laws from Module 1.
     </p>
     <p>
       Finally, <strong>model selection</strong> is itself a research design
@@ -1353,7 +1355,7 @@ const math = {
         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
       </svg>
       <p>
-        <strong>Coming in Day 3:</strong> We move from single-model
+        <strong>Coming in Module 3:</strong> We move from single-model
         evaluation to building complete classification pipelines at scale.
         You will learn how to access models programmatically, batch
         thousands of requests efficiently, manage costs, and validate
@@ -1370,7 +1372,7 @@ const math = {
 <!-- COMPONENT STYLES                                                    -->
 <!-- =================================================================== -->
 <style is:inline>
-/* ── Shared component tokens ── */
+/* â”€â”€ Shared component tokens â”€â”€ */
 .widget-eyebrow {
   font-family: var(--font-mono, 'JetBrains Mono', monospace);
   font-size: 0.7rem;
@@ -2270,3 +2272,4 @@ const math = {
   draw();
 })();
 </script>
+

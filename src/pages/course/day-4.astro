@@ -1,18 +1,57 @@
----
+﻿---
 import CourseLayout from '../../layouts/CourseLayout.astro';
 
 const sections = [
   { id: 'extraction', label: 'Information Extraction' },
   { id: 'rag', label: 'Retrieval-Augmented Generation' },
+  { id: 'evaluation', label: 'Evaluating Pipelines' },
+  { id: 'social-science', label: 'Putting It Together' },
+  { id: 'summary', label: 'Module Summary' },
 ];
 ---
 
 <CourseLayout
   day={4}
-  title="Extraction, Summarization, and RAG"
-  description="Information extraction, summarization, and retrieval-augmented generation: building systems that can read, extract, and answer questions over large corpora."
+  title="Beyond Classification"
+  description="Information extraction, retrieval-augmented generation, and evaluation: building and validating systems that read, extract, and synthesise evidence across large corpora."
   sections={sections}
 >
+
+  <!-- ===================================================================
+       OPENING FRAMING
+       =================================================================== -->
+  <section id="opening" class="opening-narrative">
+    <p class="lead-paragraph">
+      <a href="/course/day-2">Modules 2</a> and <a href="/course/day-3">3</a>
+      treated the LLM as a classifier: assign a label from a fixed set,
+      verify against human coders, deploy at scale. Today you ask it to do
+      two harder things: <strong>extract structured information</strong> from
+      unstructured text, and <strong>retrieve and synthesise evidence</strong>
+      across corpora too large to read. Both move from closed-ended labels
+      to open-ended outputs, and that shift changes everything about how
+      you evaluate the results.
+    </p>
+    <p>
+      The thread connecting both tasks is <strong>faithfulness</strong>.
+      When the model classifies a text, the worst it can do is pick the
+      wrong label. When it extracts claims or generates an answer from
+      retrieved passages, it can invent information that looks exactly like
+      real data. Every technique in this module exists to make model outputs
+      traceable to their sources, and every evaluation metric you will
+      learn measures a different dimension of that traceability.
+    </p>
+
+    <div class="key-takeaway">
+      <p class="key-takeaway__label">After This Module You Will Be Able To</p>
+      <ol>
+        <li>Design an extraction schema, prompt a model to populate it, and verify faithfulness against source text.</li>
+        <li>Build a RAG pipeline (chunk, embed, index, retrieve, generate) and explain the design trade-offs at each stage.</li>
+        <li>Evaluate extraction and RAG outputs using both automated metrics (RAGAS, provenance checks) and manual validation, and explain why neither alone is sufficient.</li>
+        <li>Distinguish hallucination, omission, and distortion as failure modes, and design verification strategies for each.</li>
+        <li>Connect extraction and RAG into a research workflow where every claim is traceable to a specific passage in the source.</li>
+      </ol>
+    </div>
+  </section>
 
   <!-- ===================================================================
        SECTION 1: INFORMATION EXTRACTION
@@ -20,7 +59,7 @@ const sections = [
   <section id="extraction">
     <h2>Information Extraction &amp; Summarization</h2>
     <p>
-      On Days 2 and 3, you classified text: assigning labels to documents.
+      In Modules 2 and 3, you classified text: assigning labels to documents.
       That answers questions like <em>&ldquo;is this tweet supportive or
       opposed?&rdquo;</em> Now you will do something harder:
       <strong>extract structured information</strong> from unstructured text.
@@ -173,7 +212,7 @@ const sections = [
     <p>
       Before writing a prompt, you need to decide what
       <em>categories</em> of information to extract. This is codebook
-      design, the same skill from Day 3's classification work, applied to a
+      design, the same skill from Module 3's classification work, applied to a
       harder problem.
     </p>
     <p>
@@ -294,7 +333,7 @@ const sections = [
       everything, you first <em>retrieve</em> the most relevant passages,
       then feed only those to the model for <em>generation</em>. The
       retrieval step uses <strong>embeddings</strong>: the same vector
-      representations from <a href="/course/day-1">Day 1</a>. You embed
+      representations from <a href="/course/day-1">Module 1</a>. You embed
       your question, embed all your passages, and find the passages whose
       vectors are closest to your question's vector. Then you pass those
       passages to the model as context.
@@ -494,6 +533,30 @@ const sections = [
       the model may have drawn on its training data rather than the
       provided context.
     </p>
+    <p>
+      In production systems, teams usually combine several evaluation layers
+      rather than relying on one score. A practical stack is:
+      <strong>retrieval metrics</strong> (recall@k, precision@k, MRR) to test
+      whether the right evidence is found,
+      <strong>response metrics</strong> (faithfulness/groundedness, answer
+      relevance, context relevance) to test whether the answer uses that
+      evidence correctly, and <strong>human review</strong> on sampled outputs
+      to detect subtle reasoning failures that automatic metrics miss.
+    </p>
+    <p>
+      This is where frameworks like <strong>RAGAS</strong> are useful:
+      they standardize automatic scoring for common RAG failure modes and
+      make model-to-model or prompt-to-prompt comparisons reproducible.
+      But these metrics have trade-offs. They are fast and scalable, yet
+      sensitive to judge model choice, prompt wording, and domain mismatch.
+      Treat them as triage signals, not ground truth.
+    </p>
+    <p>
+      For research and policy work, the rule should be explicit:
+      <strong>automated evaluation filters candidates; manual validation
+      decides what is publishable.</strong> If a claim matters for an argument,
+      include a citation and verify it against the source passage directly.
+    </p>
 
     <div class="course-note">
       <svg class="course-note__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -506,7 +569,10 @@ const sections = [
         no-context answer on the same question: you will see hallucination
         in the no-context version and grounding in the RAG version. The
         provenance check function then verifies whether the RAG answer
-        actually uses the retrieved passages.
+        actually uses the retrieved passages. As an extension, evaluate a
+        small batch with a RAGAS-style metric set, then manually audit the
+        highest-scoring and lowest-scoring answers to see where metric scores
+        align with researcher judgment and where they fail.
       </p>
     </div>
 
@@ -581,7 +647,7 @@ const sections = [
         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
       </svg>
       <p>
-        <strong>Coming in Day 5:</strong> The functions you build today
+        <strong>Coming in Module 5:</strong> The functions you build today
         (<code>retrieve()</code>, <code>rag_answer()</code>,
         <code>verify_faithfulness()</code>) become <strong>tools</strong>
         that an agent can call. Instead of you writing the pipeline steps
@@ -599,7 +665,9 @@ const sections = [
         separate evaluation. Every design choice (chunk size, overlap,
         embedding model, <em>k</em>, generation prompt) affects the output.
         The provenance thread from extraction carries through to RAG:
-        <strong>every claim should be traceable to a source</strong>.
+        <strong>every claim should be traceable to a source</strong>. Automated
+        metrics help you scale evaluation, but manual validation remains the
+        final quality gate.
       </p>
     </div>
 
@@ -607,11 +675,540 @@ const sections = [
     <ul class="resource-list">
       <li><a href="https://arxiv.org/abs/2005.11401" target="_blank" rel="noopener">Lewis et al. (2020), <em>Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks</em></a>: the foundational RAG paper.</li>
       <li><a href="https://arxiv.org/abs/2312.10997" target="_blank" rel="noopener">Gao et al. (2024), <em>Retrieval-Augmented Generation for Large Language Models: A Survey</em></a>: comprehensive overview of RAG techniques, architectures, and evaluation.</li>
+      <li><a href="https://docs.ragas.io" target="_blank" rel="noopener">RAGAS documentation</a> and <a href="https://github.com/explodinggradients/ragas" target="_blank" rel="noopener">RAGAS (GitHub)</a>: widely used framework for RAG evaluation metrics (faithfulness, answer relevance, context relevance, and related scores).</li>
+      <li><a href="https://www.trulens.org" target="_blank" rel="noopener">TruLens</a> and <a href="https://www.deepeval.com" target="_blank" rel="noopener">DeepEval</a>: practical frameworks for continuous LLM/RAG evaluation, tracing, and regression checks in development workflows.</li>
       <li><a href="https://www.anthropic.com/news/contextual-retrieval" target="_blank" rel="noopener">Anthropic (2024), <em>Contextual Retrieval</em></a>: improved chunking strategy that prepends document context to each chunk.</li>
       <li><a href="https://python.langchain.com" target="_blank" rel="noopener">LangChain</a> and <a href="https://www.llamaindex.ai" target="_blank" rel="noopener">LlamaIndex</a>: production RAG pipeline frameworks.</li>
       <li><a href="https://www.sbert.net" target="_blank" rel="noopener">Sentence Transformers</a>: the embedding models used for semantic retrieval. <a href="https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2" target="_blank" rel="noopener">all-MiniLM-L6-v2</a> is used in the notebook.</li>
       <li>ChromaDB, <a href="https://github.com/facebookresearch/faiss" target="_blank" rel="noopener">FAISS</a>, Pinecone: vector database options for embedding storage and retrieval at different scales.</li>
     </ul>
+  </section>
+
+  <!-- ===================================================================
+       SECTION 3: EVALUATING PIPELINES
+       =================================================================== -->
+  <section id="evaluation">
+    <h2>Evaluating Extraction &amp; RAG Pipelines</h2>
+    <p>
+      The previous two sections introduced faithfulness checks and
+      provenance scoring as inline verification steps. This section steps
+      back and asks a bigger question: <strong>how do you know your entire
+      pipeline is working?</strong> Not just whether one answer is
+      grounded, but whether the system as a whole produces outputs you can
+      stake a research claim on.
+    </p>
+    <p>
+      Evaluation in extraction and RAG is harder than in classification
+      for a structural reason. Classification has a single output (a label)
+      and a single ground truth (the correct label). Extraction and RAG
+      have compound outputs: multiple claims, each with a provenance chain,
+      each potentially faithful or unfaithful, relevant or irrelevant. A
+      single &ldquo;accuracy&rdquo; number cannot capture this. You need
+      a <em>stack</em> of metrics, each testing a different failure mode.
+    </p>
+
+    <h3>Why You Need Separate Metrics for Retrieval and Generation</h3>
+    <p>
+      A RAG system can fail in two independent ways, and conflating them
+      is the most common evaluation mistake.
+    </p>
+    <p>
+      <strong>Retrieval failure:</strong> the system finds the wrong
+      passages. The answer will be wrong regardless of how good the
+      generation model is, because it never sees the evidence it needs.
+      Retrieval failure is invisible in end-to-end evaluation: the model
+      generates a confident answer from whatever context it was given,
+      and the answer may look plausible even though the evidence is
+      irrelevant.
+    </p>
+    <p>
+      <strong>Generation failure:</strong> the system finds the right
+      passages but the model misuses them. It may hallucinate beyond the
+      context, ignore key evidence, or distort nuances. Generation failure
+      is also invisible if you only check whether the answer
+      &ldquo;sounds right.&rdquo;
+    </p>
+    <p>
+      Measuring both layers separately tells you <em>where</em> your
+      pipeline is breaking, not just <em>that</em> it is breaking.
+      A study by
+      <a href="https://blog.premai.io/rag-evaluation-metrics-frameworks-testing-2026/" target="_blank" rel="noopener">PremAI (2026)</a>
+      found that retrieval accuracy alone explains only about 60% of RAG
+      quality variance; the remaining 40% comes from how the model uses
+      retrieved context. If you only measure end-to-end quality, you
+      cannot tell which layer to fix.
+    </p>
+
+    <h3>Retrieval Metrics</h3>
+    <p>
+      These metrics test whether the retriever found the right passages,
+      independent of what the model does with them.
+    </p>
+    <p>
+      <strong>Precision@k:</strong> of the <em>k</em> retrieved chunks,
+      how many are actually relevant to the query? If you retrieve 5
+      chunks and 3 contain the answer, precision@5 is 0.6. Low precision
+      means the model's context is diluted with irrelevant material.
+    </p>
+    <p>
+      <strong>Recall@k:</strong> of all the relevant passages in the
+      corpus, how many appear in the top <em>k</em> results? If the
+      answer is spread across 4 passages and the retriever finds 3,
+      recall@5 is 0.75. Low recall means the model is missing evidence.
+    </p>
+    <p>
+      <strong>Mean Reciprocal Rank (MRR):</strong> how early does the
+      first relevant result appear? MRR rewards retrievers that rank
+      the best evidence first, which matters because models tend to
+      weight earlier passages more heavily.
+    </p>
+    <p>
+      <strong>Context relevancy:</strong> a semantic measure of how
+      related the retrieved chunks are to the query, beyond keyword
+      overlap. This catches cases where retrieval returns passages that
+      use the same terms but discuss a different topic.
+    </p>
+
+    <div class="definition-box">
+      <p class="definition-box__label">Definition</p>
+      <p class="definition-box__term">The RAG Triad</p>
+      <p>
+        A simplified evaluation framework using three core metrics:
+        <strong>context relevancy</strong> (did the retriever find the
+        right passages?), <strong>faithfulness</strong> (did the generator
+        only use what it was given?), and <strong>answer relevancy</strong>
+        (did the output actually address the question?). Each metric maps
+        to different pipeline parameters: context relevancy depends on
+        chunk size and embedding model, faithfulness on the LLM and
+        prompt, answer relevancy on the prompt template. Fixing a low
+        score means tuning the right layer.
+      </p>
+    </div>
+
+    <h3>Generation Metrics</h3>
+    <p>
+      These metrics test whether the model used the retrieved passages
+      correctly.
+    </p>
+    <p>
+      <strong>Faithfulness:</strong> the proportion of claims in the
+      generated answer that are supported by the retrieved context.
+      This is the single most important metric for research use.
+      A faithfulness score below 0.8 means the model is routinely drawing
+      on its training data rather than the provided passages. For
+      regulated or publication-grade work, target 0.9 or above.
+    </p>
+    <p>
+      <strong>Answer relevancy:</strong> does the generated answer
+      actually address the question asked? A model can be perfectly
+      faithful to the retrieved context and still produce an irrelevant
+      answer if the context itself doesn&rsquo;t contain what was needed.
+      High faithfulness combined with low answer relevancy usually points
+      to a retrieval problem, not a generation problem.
+    </p>
+    <p>
+      <strong>Groundedness / provenance:</strong> for each claim in the
+      output, can you trace it back to a specific retrieved passage? This
+      is the sentence-level version of faithfulness. Ungrounded sentences
+      are flagged for review. The provenance check from Section 1
+      (matching output sentences to source passages via embedding
+      similarity) is one implementation of this metric.
+    </p>
+
+    <div class="stop-and-think">
+      <div class="stop-and-think__header">
+        <svg class="stop-and-think__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+        <span class="stop-and-think__label">Stop and Think</span>
+      </div>
+      <p>
+        Your RAG pipeline scores 0.92 on faithfulness but 0.54 on answer
+        relevancy. What is most likely going wrong, and which part of the
+        pipeline would you fix first?
+      </p>
+      <details>
+        <summary>Reveal</summary>
+        <div>
+          <p>
+            High faithfulness means the model is not hallucinating: it
+            sticks to the retrieved context. Low answer relevancy means
+            the retrieved context does not contain what is needed to
+            answer the question. This is a <strong>retrieval problem</strong>,
+            not a generation problem. Fix the retriever first: try
+            different chunk sizes, increase <em>k</em>, improve the
+            embedding model, or add query rephrasing. Do not touch the
+            generation prompt until retrieval is working.
+          </p>
+        </div>
+      </details>
+    </div>
+
+    <h3>RAGAS and Automated Evaluation Frameworks</h3>
+    <p>
+      <a href="https://docs.ragas.io" target="_blank" rel="noopener">RAGAS</a>
+      (Retrieval Augmented Generation Assessment) standardises the metrics
+      above into a reusable evaluation pipeline. It is
+      <strong>reference-free</strong> and <strong>LLM-driven</strong>: it
+      uses a judge model to score faithfulness, answer relevancy, context
+      precision, and context recall without requiring hand-labelled ground
+      truth for every question. This makes it practical to run over
+      hundreds of test queries, which is essential for catching failure
+      modes that appear only on certain question types.
+    </p>
+    <p>
+      Other frameworks serve similar roles.
+      <a href="https://www.deepeval.com" target="_blank" rel="noopener">DeepEval</a>
+      provides the same core metrics plus regression testing: you can
+      integrate it into a CI/CD pipeline so that a prompt change or model
+      swap automatically triggers evaluation and fails the build if scores
+      drop.
+      <a href="https://www.trulens.org" target="_blank" rel="noopener">TruLens</a>
+      adds tracing: it records every intermediate step (retrieved chunks,
+      prompt, response) so you can debug individual failures.
+    </p>
+    <p>
+      These tools are valuable for development and iteration. But they
+      have real limitations that you need to understand before relying on
+      them.
+    </p>
+
+    <h3>Why Automated Metrics Are Not Enough</h3>
+    <p>
+      Every automated RAG metric works the same way: a
+      <strong>judge model</strong> (typically GPT-4 class) reads the
+      question, the retrieved passages, and the generated answer, then
+      scores each dimension. This is LLM-as-judge evaluation, and it
+      inherits all the biases you studied in
+      <a href="/course/day-3">Module 3</a>.
+    </p>
+    <p>
+      <strong>Judge model sensitivity.</strong> The choice of judge model
+      changes the scores. A study using three different judge models on
+      the same outputs found faithfulness scores that varied by up to
+      0.15 depending on which model did the judging. If your metric
+      depends on an LLM&rsquo;s interpretation of &ldquo;supported by the
+      context,&rdquo; then changing the judge is like changing the ruler.
+    </p>
+    <p>
+      <strong>Prompt sensitivity.</strong> The wording of the evaluation
+      prompt matters. Small changes to how you ask the judge to score
+      faithfulness (&ldquo;is this claim supported?&rdquo; vs. &ldquo;can
+      this claim be inferred?&rdquo;) can shift scores. The metrics are
+      not measuring a fixed property; they are measuring how a specific
+      judge model interprets a specific evaluation prompt.
+    </p>
+    <p>
+      <strong>Domain mismatch.</strong> Judge models were trained on
+      general text. They may not reliably score faithfulness in highly
+      technical domains (legal, medical, domain-specific social science)
+      where a subtle distortion requires expert knowledge to detect. A
+      faithfulness score of 0.95 from a general-purpose judge does not
+      mean the output is accurate by domain standards.
+    </p>
+    <p>
+      <strong>Failure mode blindness.</strong> Automated metrics are good
+      at catching obvious hallucinations (the model claims something not
+      in the context) and bad at catching subtle distortions (the model
+      paraphrases a nuanced claim and loses the qualifications). For
+      research, the subtle cases are exactly the ones that matter.
+    </p>
+
+    <div class="course-note course-note--research">
+      <svg class="course-note__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+      </svg>
+      <p>
+        <strong>Research Note.</strong>
+        Traditional NLP metrics like BLEU and ROUGE measure word overlap
+        between the generated text and a reference answer. They are fast
+        to compute and do not require a judge model. But they are
+        essentially useless for RAG evaluation: a semantically correct
+        paraphrase scores low on ROUGE, while a hallucinated sentence
+        that happens to share vocabulary with the reference scores high.
+        If a collaborator suggests evaluating your RAG system with BLEU
+        or ROUGE, redirect to the metrics described here.
+      </p>
+    </div>
+
+    <h3>Manual Validation: The Final Quality Gate</h3>
+    <p>
+      The uncomfortable truth is this: <strong>automated evaluation
+      filters candidates; manual validation decides what is
+      publishable.</strong> This is not a limitation of current tools that
+      will be solved by better models. It is structural. The question
+      &ldquo;is this claim faithful to the source?&rdquo; is ultimately a
+      judgment about meaning, and meaning requires domain expertise.
+    </p>
+    <p>
+      A practical evaluation workflow has three layers:
+    </p>
+    <p>
+      <strong>Layer 1: Automated metrics at scale.</strong> Run RAGAS or
+      DeepEval over your full test set (50&ndash;200 questions). Use the
+      scores to identify which <em>parts</em> of the pipeline are weak.
+      Low context recall? Fix the retriever. Low faithfulness? Fix the
+      prompt or model. This is triage, not validation.
+    </p>
+    <p>
+      <strong>Layer 2: Stratified sampling for manual review.</strong>
+      From the full test set, manually review a stratified sample:
+      high-scoring outputs (to check whether the metrics are right),
+      low-scoring outputs (to understand the failure modes), and
+      edge cases (ambiguous questions, long documents, domain-specific
+      terminology). A sample of 30&ndash;50 outputs is usually sufficient
+      to calibrate your trust in the automated scores.
+    </p>
+    <p>
+      <strong>Layer 3: Domain expert audit.</strong> For any claim that
+      will appear in a publication, verify it against the source passage
+      directly. This means reading the original text, not the summary
+      or the retrieved chunk. If a RAG answer says &ldquo;Smith (2020)
+      found X,&rdquo; open Smith (2020) and check.
+    </p>
+
+    <div class="stop-and-think">
+      <div class="stop-and-think__header">
+        <svg class="stop-and-think__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+        <span class="stop-and-think__label">Stop and Think</span>
+      </div>
+      <p>
+        A colleague argues that manual validation is too slow and
+        expensive for a corpus of 10,000 documents, and that RAGAS scores
+        above 0.9 should be sufficient for publication. How would you
+        respond?
+      </p>
+      <details>
+        <summary>Reveal</summary>
+        <div>
+          <p>
+            Manual validation is not meant to cover 10,000 documents. It
+            covers a <em>sample</em>. Even 50 manually reviewed outputs
+            (0.5% of the corpus) can reveal systematic failure patterns
+            that automated metrics miss: subtle distortions, domain-specific
+            hallucinations, or consistent omission of minority viewpoints.
+            The RAGAS score is a useful filter, but it measures what a
+            judge model thinks about faithfulness, not what a domain expert
+            knows. A score of 0.9 means the judge model flagged 10% of
+            claims as potentially ungrounded. For a publication, you need
+            to know <em>what</em> those 10% are and whether the pattern
+            is random or systematic. That requires human eyes.
+          </p>
+        </div>
+      </details>
+    </div>
+
+    <div class="course-note">
+      <svg class="course-note__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+      </svg>
+      <p>
+        <strong>In the notebook:</strong> Exercise 7 walks you through
+        a complete evaluation workflow. You run RAGAS metrics over a batch
+        of RAG outputs, identify the highest- and lowest-scoring answers,
+        then manually audit both groups to see where automated scores
+        align with your domain judgment and where they diverge. The goal
+        is not to replace the automated metrics but to learn when to
+        trust them.
+      </p>
+    </div>
+
+    <div class="key-takeaway">
+      <p class="key-takeaway__label">Key Takeaway</p>
+      <p>
+        Evaluating extraction and RAG requires <strong>separate metrics
+        for separate failure modes</strong>: retrieval metrics test
+        whether you found the right evidence, generation metrics test
+        whether you used it correctly. Automated frameworks like RAGAS
+        make this scalable but inherit the biases of their judge models.
+        The rule for research is non-negotiable:
+        <strong>automated evaluation identifies problems; manual
+        validation by someone who understands the domain decides what
+        is trustworthy enough to publish.</strong> There is no score
+        threshold that exempts you from reading the sources.
+      </p>
+    </div>
+
+    <h3>Resources</h3>
+    <ul class="resource-list">
+      <li><a href="https://docs.ragas.io" target="_blank" rel="noopener">RAGAS documentation</a> and <a href="https://arxiv.org/abs/2309.15217" target="_blank" rel="noopener">Es et al. (2023), <em>RAGAS: Automated Evaluation of Retrieval Augmented Generation</em></a>: the foundational framework and paper for automated RAG evaluation.</li>
+      <li><a href="https://www.deepeval.com" target="_blank" rel="noopener">DeepEval</a>: evaluation framework with CI/CD integration and the RAG Triad metrics; useful for regression testing after prompt or model changes.</li>
+      <li><a href="https://www.trulens.org" target="_blank" rel="noopener">TruLens</a>: tracing and evaluation framework that records intermediate pipeline steps for debugging individual failures.</li>
+      <li><a href="https://arxiv.org/abs/2310.07521" target="_blank" rel="noopener">Min et al. (2023), <em>FActScore</em></a>: decomposes text into atomic facts and checks each against a source, a fine-grained alternative to binary faithfulness scoring.</li>
+      <li><a href="https://arxiv.org/abs/2404.16130" target="_blank" rel="noopener">Li et al. (2024), <em>Benchmarking LLM-as-Judge</em></a>: systematic study of how judge model choice, prompt wording, and domain affect evaluation reliability.</li>
+    </ul>
+  </section>
+
+  <!-- ===================================================================
+       SECTION 4: PUTTING IT TOGETHER
+       =================================================================== -->
+  <section id="social-science">
+    <h2>Putting It Together</h2>
+    <p>
+      You now have three capabilities: extracting structured claims from
+      text, retrieving and synthesising evidence across large corpora, and
+      evaluating both with a stack of metrics calibrated by manual review.
+      The remaining question is how these fit together in a research
+      workflow.
+    </p>
+
+    <h3>From Pipeline Components to Research Design</h3>
+    <p>
+      Consider a concrete project: you want to map how 200 political
+      science articles discuss the relationship between AI governance and
+      democratic accountability. No single technique from today is
+      sufficient.
+    </p>
+    <p>
+      <strong>Extraction gives you the data.</strong> For each article,
+      you extract substantive claims, cited findings, and causal
+      arguments. The extraction schema defines what you are measuring:
+      this is construct operationalisation, the same problem from
+      <a href="/course/day-3">Module 3</a>&rsquo;s codebook design, applied
+      to a richer output space. Each extracted item is verified against
+      its source passage using the faithfulness checks from Section 1.
+    </p>
+    <p>
+      <strong>RAG gives you synthesis.</strong> Once you have a database
+      of verified extractions, you can query across the entire corpus:
+      &ldquo;What evidence do these articles cite for AI regulatory
+      capture?&rdquo; or &ldquo;How do arguments about democratic
+      oversight differ between US and EU contexts?&rdquo; The RAG pipeline
+      retrieves relevant chunks, generates a grounded synthesis, and the
+      provenance chain lets you trace every claim back to a specific
+      article.
+    </p>
+    <p>
+      <strong>Evaluation binds it together.</strong> The three-layer
+      evaluation workflow from Section 3 applies at every stage: automated
+      metrics for triage, stratified manual review for calibration, domain
+      expert audit for anything you will publish. The same principle from
+      <a href="/course/day-3">Module 3</a>&rsquo;s validation pipeline
+      holds: the model is an instrument, and instruments require
+      calibration at every step.
+    </p>
+
+    <div class="course-note course-note--research">
+      <svg class="course-note__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+      </svg>
+      <p>
+        <strong>Ziems et al. (2024),</strong>
+        <a href="https://arxiv.org/abs/2305.03514" target="_blank" rel="noopener"><em>Can Large Language Models Transform Computational Social Science?</em></a>
+        provides the broadest review of where LLMs fit in CSS workflows.
+        Their taxonomy of tasks (classification, extraction, generation,
+        simulation) maps directly onto the progression from
+        <a href="/course/day-2">Module 2</a> through today. The paper&rsquo;s
+        central warning is that methodological shortcuts compound:
+        unverified extraction feeds ungrounded RAG, which feeds unreliable
+        conclusions. The evaluation infrastructure from Section 3 exists
+        to break this chain.
+      </p>
+    </div>
+
+    <h3>Choosing the Right Tool</h3>
+    <p>
+      Not every research question requires extraction or RAG.
+      The choice depends on what you are trying to measure.
+    </p>
+    <p>
+      <strong>Use classification</strong>
+      (<a href="/course/day-2">Modules 2</a>&ndash;<a href="/course/day-3">3</a>)
+      when the answer is a label from a fixed set. Sentiment, stance,
+      topic category, frame type. The output is simple, evaluation is
+      straightforward (kappa, F1), and the pipeline is well-understood.
+    </p>
+    <p>
+      <strong>Use extraction</strong> when you need structured data from
+      within the text: claims, entities, relationships, cited findings.
+      The output is richer and harder to evaluate, but it captures
+      information that classification cannot.
+    </p>
+    <p>
+      <strong>Use RAG</strong> when you need to synthesise across a corpus
+      too large to read: answering research questions, building evidence
+      maps, conducting systematic reviews. RAG adds retrieval to
+      generation, grounding the model&rsquo;s output in your actual data.
+    </p>
+    <p>
+      <strong>Combine them</strong> when the research design demands it.
+      Extract claims from individual articles, index the extractions,
+      and use RAG to query across the full set. Each layer adds
+      capability and complexity; add layers only when simpler approaches
+      are insufficient.
+    </p>
+
+    <div class="key-takeaway">
+      <p class="key-takeaway__label">Key Takeaway</p>
+      <p>
+        Extraction and RAG extend the LLM pipeline from
+        <a href="/course/day-3">Module 3</a> in two directions: richer
+        outputs (structured claims instead of labels) and larger scope
+        (corpus-wide synthesis instead of document-level annotation). Both
+        inherit the same core requirement: <strong>every claim must be
+        traceable to a source</strong>. The validation infrastructure
+        does not change, it deepens. The workflow is: extract with
+        verification, retrieve with evaluation, synthesise with
+        provenance, and validate manually before publishing.
+      </p>
+    </div>
+  </section>
+
+  <!-- ===================================================================
+       MODULE SUMMARY
+       =================================================================== -->
+  <section id="summary" class="opening-narrative">
+    <h2>Module Summary</h2>
+    <p>
+      This module moved beyond classification to tackle the two hardest
+      tasks in LLM-assisted research: extracting structured information
+      from unstructured text, and synthesising evidence across corpora too
+      large to read manually. <strong>Information extraction</strong>
+      turns documents into structured data (claims, entities, causal
+      arguments), but the model can hallucinate, omit, and distort. Every
+      extraction pipeline needs a faithfulness check that compares each
+      output item against its source passage.
+    </p>
+    <p>
+      <strong>Retrieval-Augmented Generation</strong> grounds the
+      model&rsquo;s answers in your actual data, making corpus-scale
+      analysis feasible. But RAG is a pipeline, not a single tool: chunk
+      size, embedding model, retrieval parameters, and generation prompt
+      each affect quality in different ways. Evaluating retrieval and
+      generation separately is essential; conflating them hides where the
+      pipeline is breaking.
+    </p>
+    <p>
+      <strong>Evaluation</strong> is the thread that ties everything
+      together. Automated metrics like RAGAS make large-scale evaluation
+      practical, but they inherit the biases of their judge models and
+      miss the subtle distortions that matter most for research. The
+      non-negotiable standard: automated evaluation identifies problems;
+      manual validation by a domain expert decides what is publishable.
+      Every concept from <a href="/course/day-1">Module 1</a> (embeddings
+      for retrieval), <a href="/course/day-2">Module 2</a> (prompting for
+      generation), and <a href="/course/day-3">Module 3</a> (validation
+      as calibration) feeds into the pipelines built here.
+    </p>
+
+    <div class="course-note">
+      <svg class="course-note__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+      </svg>
+      <p>
+        <strong>Coming in Module 5:</strong> The functions you built
+        today&mdash;<code>extract()</code>, <code>retrieve()</code>,
+        <code>rag_answer()</code>,
+        <code>verify_faithfulness()</code>&mdash;become
+        <strong>tools</strong> that an agent can call. Instead of you
+        writing the pipeline steps manually, an agent decides which tool
+        to use and when. The pipeline becomes a planning loop, and the
+        evaluation challenge shifts from checking individual outputs to
+        verifying entire reasoning chains.
+      </p>
+    </div>
   </section>
 
 </CourseLayout>
@@ -620,7 +1217,7 @@ const sections = [
 <!-- COMPONENT STYLES                                                    -->
 <!-- =================================================================== -->
 <style is:inline>
-/* ── Shared widget tokens ── */
+/* â”€â”€ Shared widget tokens â”€â”€ */
 .widget-wrap {
   margin: 2rem 0;
   padding: 1.5rem;
@@ -672,7 +1269,7 @@ const sections = [
 }
 .wfade { animation: widgetFadeIn 0.3s ease-out; }
 
-/* ── Faithfulness failures ── */
+/* â”€â”€ Faithfulness failures â”€â”€ */
 .ff__tabs { display: flex; gap: 0.35rem; margin-bottom: 0; flex-wrap: wrap; }
 .ff__tab {
   font-family: var(--font-body, sans-serif); font-size: 0.78rem; font-weight: 600;
@@ -726,7 +1323,7 @@ const sections = [
 .ff__explanation { padding: 1rem 1.25rem; border-top: 1px solid var(--border, #E2E6EE); font-size: 0.85rem; color: var(--text-sec, #3D4455); line-height: 1.6; }
 .ff__explanation strong { color: var(--text, #1A1D27); }
 
-/* ── RAG pipeline ── */
+/* â”€â”€ RAG pipeline â”€â”€ */
 .pipeline { position: relative; }
 .pipeline::before { content: ''; position: absolute; left: 1.35rem; top: 2.2rem; bottom: 2.2rem; width: 2px; background: var(--border, #E2E6EE); z-index: 0; }
 .step { position: relative; margin-bottom: 0.75rem; z-index: 1; }
@@ -772,7 +1369,7 @@ const sections = [
 .vec-preview { font-family: var(--font-mono, monospace); font-size: 0.72rem; color: var(--accent, #2D8ABF); background: var(--accent-light, #E8EEF6); padding: 0.3rem 0.5rem; border-radius: 4px; display: inline-block; margin-top: 0.25rem; word-break: break-all; line-height: 1.5; }
 .score-bar { display: inline-block; height: 5px; border-radius: 3px; vertical-align: middle; margin-left: 0.35rem; }
 
-/* ── Chunking visualiser ── */
+/* â”€â”€ Chunking visualiser â”€â”€ */
 .cv__query { background: var(--surface-alt, #F5F5F0); border: 1px solid var(--border, #E2E6EE); border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.6rem; }
 .cv__query-label { font-family: var(--font-mono, monospace); font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted, #6B7280); flex-shrink: 0; }
 .cv__query-text { font-size: 0.88rem; color: var(--text, #1A1D27); font-weight: 500; font-style: italic; }
@@ -1145,3 +1742,4 @@ const sections = [
   render();
 })();
 </script>
+

@@ -1,4 +1,4 @@
----
+﻿---
 import CourseLayout from '../../layouts/CourseLayout.astro';
 
 const sections = [
@@ -6,6 +6,7 @@ const sections = [
   { id: 'at-scale', label: 'Working at Scale' },
   { id: 'validation', label: 'Validation' },
   { id: 'social-science', label: 'Putting It Together' },
+  { id: 'summary', label: 'Module Summary' },
 ];
 
 const math = {
@@ -32,11 +33,11 @@ const math = {
 >
 
   <!-- ===================================================================
-       DAY INTRODUCTION
+       OPENING FRAMING
        =================================================================== -->
-  <div class="day-intro">
-    <p>
-      In <a href="/course/day-2">Day 2</a>, you built a prompt, chose a
+  <section id="opening" class="opening-narrative">
+    <p class="lead-paragraph">
+      In <a href="/course/day-2">Module 2</a>, you built a prompt, chose a
       model, and classified a sample of texts. You also manually labelled
       tweets yourself, the first step toward comparing your judgment
       to the model&rsquo;s. Today starts from that comparison and asks a
@@ -50,15 +51,38 @@ const math = {
       that the results are trustworthy enough to build an argument on.
     </p>
     <p>
-      By the end of this session you will understand <strong>when and how to
-      fine-tune</strong> (LoRA, QLoRA, encoder models), how to
-      <strong>move from notebook to production</strong> (APIs, batching,
-      self-hosted inference), and how to <strong>validate
-      rigorously</strong> (kappa, per-class F1, qualitative error analysis).
       The thread connecting all three: the model is a measurement
       instrument, and instruments require calibration.
     </p>
-  </div>
+
+    <div class="key-takeaway">
+      <p class="key-takeaway__label">After This Module You Will Be Able To</p>
+      <ol>
+        <li>Decide when prompting, RAG, or fine-tuning is the right approach for a given task.</li>
+        <li>Explain how LoRA adapts a large model efficiently and choose between encoder and decoder architectures for classification.</li>
+        <li>Build a scalable classification pipeline with structured outputs, batching, and cost estimation.</li>
+        <li>Validate LLM classifications using Cohen&rsquo;s kappa, per-class F1, and qualitative error analysis.</li>
+        <li>Identify systematic biases (positional, sycophancy, cultural, temporal, distribution shift) and design mitigations.</li>
+      </ol>
+    </div>
+
+    <div class="course-note">
+      <svg class="course-note__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+      </svg>
+      <p>
+        <strong>Page &amp; notebook ordering.</strong> This page covers
+        fine-tuning first, then scaling, then validation. The notebook
+        reverses the first and third: Exercises 1&ndash;3 start with
+        validation (building on your Module 2 labels), Exercises 4&ndash;5
+        cover fine-tuning, and Section 3 provides API and scale
+        infrastructure. Both orderings work; the concepts are circular
+        rather than strictly sequential. If you are working through both
+        side-by-side, read the validation section of this page before
+        starting the notebook exercises.
+      </p>
+    </div>
+  </section>
 
   <!-- ===================================================================
        SECTION 1: FINE-TUNING
@@ -66,7 +90,7 @@ const math = {
   <section id="fine-tuning">
     <h2>Fine-Tuning</h2>
     <p>
-      <a href="/course/day-2">Day 2</a> showed how prompting and reasoning
+      <a href="/course/day-2">Module 2</a> showed how prompting and reasoning
       techniques turn a language model into a classification instrument. For
       many tasks, this works well. But prompting has a ceiling: when your
       classification scheme is domain-specific, when the model makes
@@ -84,7 +108,7 @@ const math = {
     </p>
     <p>
       <strong>Prompting</strong> (covered in
-      <a href="/course/day-2#prompting">Day 2</a>) is the right starting
+      <a href="/course/day-2#prompting">Module 2</a>) is the right starting
       point when zero-shot or few-shot performance meets your validation
       threshold, when you need flexibility across multiple tasks, when you
       have little or no labeled data, or when the task aligns well with the
@@ -95,9 +119,9 @@ const math = {
       choice when the model needs domain knowledge that exceeds its training
       data or its context window: your corpus of parliamentary records,
       legal texts, or historical archives. RAG uses embeddings (from
-      <a href="/course/day-1#embeddings">Day 1</a>) to retrieve relevant
+      <a href="/course/day-1#embeddings">Module 1</a>) to retrieve relevant
       documents and feed them to the model alongside the query. We cover RAG
-      in <a href="/course/day-4">Day 4</a>.
+      in <a href="/course/day-4">Module 4</a>.
     </p>
     <p>
       <strong>Fine-tuning</strong> is the right choice when prompting
@@ -186,6 +210,26 @@ const math = {
       </p>
     </div>
 
+    <div class="course-note course-note--research">
+      <svg class="course-note__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+      </svg>
+      <p>
+        <strong>Social Science Application.</strong>
+        The decision to fine-tune is also a decision about <strong>construct
+        operationalization</strong>. When you fine-tune a model on your
+        labeled examples, your training data <em>is</em> the
+        operationalization: it defines what &ldquo;populism&rdquo; or
+        &ldquo;negative sentiment&rdquo; or &ldquo;economic framing&rdquo;
+        means in measurable terms. This makes the quality of your training
+        labels a construct validity concern, not just a data quality issue.
+        The same theoretical construct, operationalized through different
+        training examples, will produce a different measurement instrument.
+        Document your labeling criteria with the same rigour you would
+        apply to a survey codebook.
+      </p>
+    </div>
+
     <h3>What Fine-Tuning Does</h3>
     <p>
       Fine-tuning continues training a pre-trained model on your labeled
@@ -197,8 +241,8 @@ const math = {
     <p>
       For decoder models (GPT, Llama, Qwen), fine-tuning typically uses
       <strong>Supervised Fine-Tuning (SFT)</strong>: you provide
-      (instruction, response) pairs: the same format you used for
-      prompting in <a href="/course/day-2#prompting">Day 2</a>: and
+      (instruction, response) pairs&mdash;the same format you used for
+      prompting in <a href="/course/day-2#prompting">Module 2</a>&mdash;and
       the model learns to produce those responses. The critical insight:
       <strong>the training data is just prompt&ndash;response pairs</strong>.
       The difference from few-shot prompting is that instead of the model
@@ -556,18 +600,22 @@ const math = {
       (NormalFloat4 quantisation), reducing memory by roughly 75% compared to
       16-bit storage. The LoRA adapters themselves remain in full precision.
       This combination means a 7B model fits on a single consumer GPU with
-      16GB of VRAM, and even a 3B model can be fine-tuned on a free Google
-      Colab T4 (15GB).
+      16GB of VRAM using QLoRA, and even a 4B model can be fine-tuned on a
+      free Google Colab T4 (15GB).
     </p>
     <p>
-      The output of LoRA fine-tuning is a small adapter file: typically
-      tens of megabytes: that can be shared, versioned, and loaded on
+      The output of LoRA fine-tuning is a small adapter file&mdash;typically
+      tens of megabytes&mdash;that can be shared, versioned, and loaded on
       top of the base model. Multiple adapters can be trained for different
       tasks and swapped without reloading the base model.
     </p>
 
     <h3>Encoder Models for Classification</h3>
     <p>
+      LoRA makes fine-tuning decoder models practical on modest hardware. But
+      for <strong>pure classification</strong>&mdash;assigning a fixed label
+      to text, with no generation required&mdash;there is often a better
+      option entirely.
       Everything covered so far (GPT, Claude, Llama, Qwen)
       uses a <strong>decoder-only</strong> architecture. These models read
       text left to right, generating one token at a time. They are designed
@@ -580,7 +628,7 @@ const math = {
       <strong>Encoder models</strong> (BERT, RoBERTa, DeBERTa) read the
       entire input <strong>simultaneously</strong>. Every token attends to
       every other token in both directions: forward and backward.
-      In <a href="/course/day-1#transformers">Day 1</a>, we described how
+      In <a href="/course/day-1#transformers">Module 1</a>, we described how
       decoder models use <em>causal masking</em> so each token can only
       attend to preceding tokens. Encoder models remove this mask entirely:
       the representation of any word is informed by everything before
@@ -638,10 +686,11 @@ const math = {
       (<a href="https://arxiv.org/abs/2111.09543" target="_blank" rel="noopener">He et al., 2023</a>)
       switched to a more sample-efficient pre-training method. The result:
       <code>deberta-v3-base</code> (184M parameters) and
-      <code>deberta-v3-small</code> (44M parameters) are currently the best
-      general-purpose encoder models for classification. When you see
-      &ldquo;fine-tuned BERT&rdquo; in recent social science papers, the model
-      used is almost always a DeBERTa variant.
+      <code>deberta-v3-small</code> (44M parameters) remain, as of early
+      2026, among the strongest general-purpose encoder models for
+      classification. When you see &ldquo;fine-tuned BERT&rdquo; in recent
+      social science papers, the model used is almost always a DeBERTa
+      variant.
     </p>
 
     <h4>Encoder vs. Decoder: When to Use Each</h4>
@@ -750,12 +799,14 @@ const math = {
       <a href="https://doi.org/10.1017/psrm.2023.43" target="_blank" rel="noopener">Widmann &amp; Wich (2023)</a>
       found that fine-tuned encoder models (BERT-family) remain
       state-of-the-art for many classification tasks, sometimes outperforming
-      much larger prompted decoder models. A 2024 analysis in
-      <em>Language Resources and Evaluation</em> confirmed that encoder-only
-      architectures generally provide better efficiency-to-performance ratios
-      for discriminative classification, while noting that fully fine-tuned
-      large decoders can occasionally match or exceed encoder performance
-      when sufficient data and compute are available.
+      much larger prompted decoder models.
+      <a href="https://doi.org/10.1007/s10579-024-09796-y" target="_blank" rel="noopener">Benayas, Sicilia Urb&aacute;n &amp; Mora Cantallops (2024)</a>
+      confirmed in <em>Language Resources and Evaluation</em> that
+      encoder-only architectures generally provide better
+      efficiency-to-performance ratios for discriminative classification,
+      while noting that fully fine-tuned large decoders can occasionally
+      match or exceed encoder performance when sufficient data and compute
+      are available.
     </p>
 
     <h3>Practical Considerations</h3>
@@ -799,6 +850,16 @@ const math = {
       validation checkpoint.
     </p>
     <p>
+      <strong>Class imbalance:</strong> If your training data has far more
+      examples of one category than another, the model will learn to favour
+      the majority class. Address this at training time through
+      <strong>loss weighting</strong> (multiplying the loss for minority-class
+      examples by a factor proportional to the imbalance) or
+      <strong>oversampling</strong> (repeating minority-class examples in
+      the training set). Both are straightforward to configure in standard
+      training libraries.
+    </p>
+    <p>
       <strong>Evaluation:</strong> Always evaluate on a held-out test set
       that the model has never seen during training <em>or</em> validation.
       Report per-class precision, recall, and F1, not just overall
@@ -812,7 +873,7 @@ const math = {
       <strong>The prompt&ndash;then&ndash;fine-tune loop:</strong> In
       practice, prompting and fine-tuning are not alternatives; they
       are stages. You develop your classification scheme via prompting
-      (Day&nbsp;2), validate it, identify systematic errors, and then
+      (Module&nbsp;2), validate it, identify systematic errors, and then
       use the model&rsquo;s own correct outputs, verified against
       your gold standard, as training data for fine-tuning. This
       iterative loop is often more practical than manually labeling
@@ -867,8 +928,8 @@ const math = {
         <strong>In the notebook:</strong> Exercise 4 walks you through
         formatting training data for LoRA fine-tuning: converting
         labeled tweets into chat-format (instruction, response) pairs.
-        Exercise 5 trains a LoRA adapter on Qwen2.5-3B and probes whether
-        fine-tuning fixes the hard cases from Day 2. The extension section
+        Exercise 5 trains a LoRA adapter on Qwen 3 4B and probes whether
+        fine-tuning fixes the hard cases from Module 2. The extension section
         fine-tunes DeBERTa for a direct encoder-vs-decoder comparison.
       </p>
     </div>
@@ -901,7 +962,7 @@ const math = {
     <ul class="resource-list">
       <li><a href="https://arxiv.org/abs/1810.04805" target="_blank" rel="noopener">Devlin et al. (2019), <em>BERT: Pre-training of Deep Bidirectional Transformers</em></a>: the paper that established encoder-based NLP.</li>
       <li><a href="https://arxiv.org/abs/2006.03654" target="_blank" rel="noopener">He et al. (2021), <em>DeBERTa: Decoding-enhanced BERT with Disentangled Attention</em></a>: disentangled attention for better classification.</li>
-      <li><a href="https://arxiv.org/abs/2111.09543" target="_blank" rel="noopener">He et al. (2023), <em>DeBERTaV3: Improving DeBERTa using ELECTRA-Style Pre-Training</em></a>: the current best general-purpose encoder model.</li>
+      <li><a href="https://arxiv.org/abs/2111.09543" target="_blank" rel="noopener">He et al. (2023), <em>DeBERTaV3: Improving DeBERTa using ELECTRA-Style Pre-Training</em></a>: among the strongest general-purpose encoder models for classification.</li>
       <li><a href="https://arxiv.org/abs/1907.11692" target="_blank" rel="noopener">Liu et al. (2019), <em>RoBERTa: A Robustly Optimized BERT Pretraining Approach</em></a>: showed that BERT&rsquo;s training was substantially suboptimal.</li>
       <li><a href="https://github.com/huggingface/peft" target="_blank" rel="noopener">Hugging Face PEFT library</a>: LoRA, QLoRA, and other parameter-efficient methods.</li>
       <li><a href="https://github.com/unslothai/unsloth" target="_blank" rel="noopener">Unsloth</a>: 2&times; faster LoRA fine-tuning with lower memory usage.</li>
@@ -914,17 +975,17 @@ const math = {
   <section id="at-scale">
     <h2>Working at Scale</h2>
     <p>
-      You have chosen your approach: prompted classification, a fine-tuned
-      decoder, or a fine-tuned encoder. The next challenge is
-      <strong>infrastructure</strong>: how to process thousands or millions
-      of texts efficiently, reliably, and within budget.
+      You have a model that works: prompted, fine-tuned, or encoder-based.
+      It classifies 200 validation examples correctly. But your corpus has
+      50,000 texts. Without proper infrastructure, a working prototype
+      becomes a weekend of babysitting API calls, a corrupted results file
+      at text 8,000, and a budget surprise when the invoice arrives.
     </p>
     <p>
-      Running a model interactively in a chat interface works for
-      exploration. Moving to research-scale annotation requires programmatic
-      access, structured outputs, error handling, and cost planning. This
-      section covers the practical infrastructure that turns a working
-      prototype into a research pipeline.
+      Moving from notebook exploration to research-scale annotation requires
+      programmatic access, structured outputs, error handling, and cost
+      planning. This section covers the practical infrastructure that turns
+      a working prototype into a reliable research pipeline.
     </p>
 
     <h3>API Access</h3>
@@ -940,7 +1001,7 @@ const math = {
       (role, content) pairs representing the conversation. A system message
       sets the model&rsquo;s behaviour, a user message provides the input,
       and the model returns an assistant message with its response. This is
-      the same structure you used in Day 2 for prompting: the API
+      the same structure you used in Module 2 for prompting: the API
       formalises it.
     </p>
     <p>
@@ -1034,12 +1095,31 @@ const math = {
       meets your needs or whether self-hosting makes economic sense.
     </p>
 
+    <div class="course-note course-note--research">
+      <svg class="course-note__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+      </svg>
+      <p>
+        <strong>Social Science Application.</strong>
+        Cost is a <strong>research design constraint</strong>, not just an
+        operational detail. Just as survey researchers trade off sample size
+        against measurement depth within a fixed budget, LLM researchers
+        trade off model capability against corpus coverage. A cheaper model
+        that classifies 100,000 texts may yield better aggregate estimates
+        than an expensive frontier model applied to 10,000, especially if
+        the accuracy difference is small. Frame cost decisions as you would
+        any power analysis: how many observations do you need, at what
+        measurement quality, to answer your research question?
+      </p>
+    </div>
+
     <!-- Cost Estimator (interactive) -->
 <div class="ce-widget" id="ce-widget">
   <div class="ce-widget__title">Classification Cost Estimator</div>
   <div class="ce-widget__subtitle">
     Set your corpus parameters, then compare costs across model tiers.
     All estimates assume a classification task (short output).
+    Model names and prices reflect published pricing as of early 2026; verify against each provider&rsquo;s current pricing page before budgeting a real project, as models and prices change frequently.
   </div>
 
   <div class="ce-presets" id="ce-presets">
@@ -1126,10 +1206,13 @@ const math = {
         <tr><td>Sonnet 4.6</td><td>Anthropic</td><td>$3.00</td><td>$15.00</td><td>anthropic.com/pricing</td></tr>
         <tr><td>Opus 4.6</td><td>Anthropic</td><td>$5.00</td><td>$25.00</td><td>anthropic.com/pricing</td></tr>
         <tr><td>Self-hosted (8B)</td><td>You</td><td colspan="2">~$1.50/hr GPU rental</td><td>Lambda, RunPod</td></tr>
+        <tr><td>Fine-tuned encoder</td><td>You</td><td colspan="2">~$0.50/hr GPU (or CPU)</td><td>DeBERTa local</td></tr>
       </table>
       <p><strong>Cost formula.</strong> <code>cost = (input_tokens &times; input_price + output_tokens &times; output_price) / 1,000,000</code>, summed over all texts. Batch API toggle halves the cost (all three major providers offer ~50% batch discounts).</p>
       <p><strong>Processing time.</strong> Rough estimates assuming async requests with concurrency 20&ndash;50. Budget models are typically 2&ndash;5&times; faster than frontier models. Batch API returns within 24 hours.</p>
       <p><strong>Self-hosted estimate.</strong> Based on renting a single A100 80 GB at ~$1.50/hour (Lambda / RunPod spot pricing). Throughput for an 8B model with vLLM: &asymp;50 classifications/sec for short inputs.</p>
+      <p><strong>Fine-tuned encoder estimate.</strong> DeBERTa-v3-base runs on a single consumer GPU or even CPU. Throughput: &asymp;500 classifications/sec on GPU. Training takes 2&ndash;10 minutes; inference cost is effectively zero at any corpus size.</p>
+      <p><strong>Tokenization.</strong> Token counts vary across models: the same 100-word text might tokenize into 40&ndash;70 tokens depending on the model&rsquo;s vocabulary. Estimates here use a single count; actual costs may differ by &plusmn;30% across providers.</p>
     </div>
   </details>
 </div>
@@ -1223,7 +1306,8 @@ const math = {
     {name:'GPT-5.4',provider:'OpenAI',tier:'frontier',inP:2.50,outP:15.00,speed:40},
     {name:'Sonnet 4.6',provider:'Anthropic',tier:'frontier',inP:3.00,outP:15.00,speed:40},
     {name:'Opus 4.6',provider:'Anthropic',tier:'frontier',inP:5.00,outP:25.00,speed:20},
-    {name:'Self-hosted 8B',provider:'vLLM + A100',tier:'self',inP:0,outP:0,speed:50,gpuH:1.50}
+    {name:'Self-hosted 8B',provider:'vLLM + A100',tier:'self',inP:0,outP:0,speed:50,gpuH:1.50},
+    {name:'Fine-tuned encoder',provider:'DeBERTa (local)',tier:'self',inP:0,outP:0,speed:500,gpuH:0.50}
   ];
   var presetData=[
     {corpus:2,textlen:1,prompt:1,output:1,batch:false,insight:'For a pilot study of <strong>1,000 tweets</strong>, every model is effectively free (under $1). Cost only becomes a factor at 50K+ texts with mid-range or frontier models. Start cheap, validate, then scale.'},
@@ -1328,7 +1412,7 @@ const math = {
       (<a href="https://arxiv.org/abs/2309.06180" target="_blank" rel="noopener">Kwon et al., 2023</a>)
       is the most widely used open-source inference engine. Its core
       innovation, <em>PagedAttention</em>, manages the KV cache (from
-      <a href="/course/day-1#scaling">Day 1</a>) like virtual memory,
+      <a href="/course/day-1#scaling">Module 1</a>) like virtual memory,
       reducing memory waste from 60&ndash;80% to under 4%. This allows
       serving 2&ndash;4&times; more concurrent requests on the same
       hardware. vLLM supports over 50 model architectures and exposes an
@@ -1477,11 +1561,13 @@ const math = {
   <section id="validation">
     <h2>Validation</h2>
     <p>
-      Whether you use prompting, fine-tuning, or a dedicated encoder model,
-      you face the same fundamental question: <strong>can you trust the
-      results?</strong> A model that classifies 10,000 texts in minutes is
-      useless if 15% of those classifications are systematically wrong in
-      ways that bias your analysis.
+      You now have a pipeline that can process 50,000 texts in hours. But
+      speed without accuracy is worse than useless: it produces confident,
+      large-scale wrong answers. Whether you use prompting, fine-tuning,
+      or a dedicated encoder model, you face the same fundamental question:
+      <strong>can you trust the results?</strong> A model that classifies
+      10,000 texts in minutes is worthless if 15% of those classifications
+      are systematically wrong in ways that bias your analysis.
     </p>
     <p>
       The answer requires the same methodological rigour that social
@@ -1508,6 +1594,27 @@ const math = {
       should match or approximate human-level reliability: not
       surpass it.
     </p>
+
+    <div class="course-note course-note--research">
+      <svg class="course-note__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+      </svg>
+      <p>
+        <strong>Social Science Application.</strong>
+        The &ldquo;LLM as coder&rdquo; framing maps directly onto the
+        classical <strong>content analysis methodology</strong> established
+        by Krippendorff (2019). In content analysis, any coder&mdash;human
+        or machine&mdash;is a measurement device requiring reliability
+        assessment. The LLM classification pipeline follows the same
+        design: define a coding scheme (your prompt or training labels),
+        train the coder (fine-tuning or in-context learning), assess
+        pilot reliability (validation on a gold-standard set), run
+        production coding (at-scale classification), and compute post-hoc
+        reliability (agreement metrics on the full corpus). Treating the
+        LLM as &ldquo;another coder&rdquo; is not a metaphor: it is the
+        methodologically correct framework.
+      </p>
+    </div>
 
     <h3>Cohen&rsquo;s Kappa: Beyond Accuracy</h3>
     <p>
@@ -1871,7 +1978,7 @@ const math = {
       <strong>Sarcasm and irony:</strong> The surface text expresses one
       sentiment while the intended meaning is the opposite. Models that rely
       on keyword matching tend to miss this. Chain-of-thought prompting
-      (from <a href="/course/day-2#reasoning">Day 2</a>) can help, as can
+      (from <a href="/course/day-2#reasoning">Module 2</a>) can help, as can
       providing sarcastic examples in few-shot prompts.
     </p>
     <p>
@@ -1884,17 +1991,10 @@ const math = {
     </p>
     <p>
       <strong>Ambiguity:</strong> Texts that are genuinely too short or
-      context-dependent to classify reliably. These are not model failures
-      ; they reflect real uncertainty in the data. Consider adding an
+      context-dependent to classify reliably. These are not model failures;
+      they reflect real uncertainty in the data. Consider adding an
       &ldquo;ambiguous&rdquo; or &ldquo;uncertain&rdquo; category rather
-      than forcing a binary choice. Models can also help flag these cases:
-      encoder models produce softmax probabilities for each class, and
-      decoder models expose log-probabilities (logprobs) for each token.
-      When the model&rsquo;s top-class probability is low (e.g., below
-      0.7), the text is likely ambiguous or borderline. Setting a
-      <strong>confidence threshold</strong> below which texts are routed
-      to human review can dramatically improve the reliability of your
-      final dataset without requiring manual review of every text.
+      than forcing a binary choice.
     </p>
     <p>
       <strong>Indirect stance:</strong> The author reports or quotes
@@ -1909,6 +2009,34 @@ const math = {
       with non-English text, subculture-specific language, or highly
       specialised terminology. Fine-tuning or providing domain context in
       the prompt can address this.
+    </p>
+
+    <div class="definition-box">
+      <p class="definition-box__label">Technique</p>
+      <p class="definition-box__term">Confidence Thresholding</p>
+      <p>
+        Models provide uncertainty signals: encoder models produce softmax
+        probabilities for each class, and decoder models expose
+        log-probabilities (logprobs) for each generated token. When the
+        model&rsquo;s top-class probability is low (e.g., below 0.7), the
+        text is likely ambiguous or borderline. Setting a
+        <strong>confidence threshold</strong> below which texts are routed
+        to human review can dramatically improve the reliability of your
+        final dataset without requiring manual review of every text. In
+        practice, thresholding 10&ndash;20% of the most uncertain cases
+        for human adjudication is often the best cost-quality trade-off.
+      </p>
+    </div>
+
+    <p>
+      A complementary strategy is <strong>ensemble classification</strong>:
+      running the same text through two or three models (or the same model
+      multiple times at temperature &gt; 0) and taking the majority vote.
+      When all classifiers agree, confidence is high; when they disagree,
+      the text is flagged for review. This is cheap for API-based pipelines
+      (2&ndash;3&times; cost) and often more reliable than confidence
+      thresholding alone, because it catches systematic model-specific
+      errors that a single model&rsquo;s confidence score would not reveal.
     </p>
 
     <div class="stop-and-think">
@@ -1950,70 +2078,126 @@ const math = {
       research:
     </p>
 
-    <div class="definition-box">
-      <p class="definition-box__label">Bias</p>
-      <p class="definition-box__term">Positional bias</p>
+    <div class="course-note course-note--research">
+      <svg class="course-note__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+      </svg>
       <p>
-        When given ordered options (&ldquo;support or oppose&rdquo;), models
-        tend to favour the first-listed option. <strong>Mitigation:</strong>
-        rotate label order across classifications and measure whether
-        results change.
+        <strong>Social Science Application.</strong>
+        The five biases below constitute a taxonomy of <strong>measurement
+        validity threats</strong> specific to LLM-based research. Each maps
+        to a classical validity concern. Positional and sycophancy biases
+        threaten <strong>internal validity</strong>: they introduce
+        systematic error unrelated to the construct being measured. Cultural
+        and political biases threaten <strong>external validity</strong>:
+        results from one cultural context may not generalise. Temporal
+        instability threatens <strong>reliability</strong>: the same
+        measurement procedure may produce different results at different
+        times. Distribution shift threatens <strong>generalizability</strong>:
+        validation on one subset does not guarantee performance on another.
+        Documenting which threats apply and how they are mitigated belongs
+        in every methods section.
       </p>
     </div>
-    <div class="definition-box">
-      <p class="definition-box__label">Bias</p>
-      <p class="definition-box__term">Sycophancy bias</p>
-      <p>
-        Models tend toward the more &ldquo;positive&rdquo; or
-        &ldquo;agreeable&rdquo; option, over-predicting support in
-        stance detection or positive sentiment in sentiment analysis. This
-        is a direct consequence of RLHF training (from
-        <a href="/course/day-2#post-training">Day 2</a>), where annotators
-        prefer agreeable outputs. <strong>Mitigation:</strong> check
-        per-class recall; if the &ldquo;positive&rdquo; class has much
-        higher recall than the &ldquo;negative&rdquo; class, sycophancy is
-        likely at work.
-      </p>
+
+    <div class="bias-catalog">
+      <div class="bias-catalog__header">
+        <span class="bias-catalog__label">Bias Catalog</span>
+        <span class="bias-catalog__sub">Five systematic biases relevant to LLM-based classification</span>
+      </div>
+      <div class="bias-catalog__grid">
+        <div class="bias-card bias-card--internal">
+          <div class="bias-card__type">Internal validity</div>
+          <h4 class="bias-card__name">Positional bias</h4>
+          <p class="bias-card__desc">
+            When given ordered options (&ldquo;support or oppose&rdquo;), models
+            tend to favour the first-listed option.
+          </p>
+          <p class="bias-card__fix"><strong>Mitigation:</strong>
+            rotate label order across classifications and measure whether
+            results change.
+          </p>
+        </div>
+        <div class="bias-card bias-card--internal">
+          <div class="bias-card__type">Internal validity</div>
+          <h4 class="bias-card__name">Sycophancy bias</h4>
+          <p class="bias-card__desc">
+            Models tend toward the more &ldquo;positive&rdquo; or
+            &ldquo;agreeable&rdquo; option, over-predicting support in
+            stance detection or positive sentiment. A direct consequence of
+            RLHF training (from
+            <a href="/course/day-2#post-training">Module 2</a>).
+          </p>
+          <p class="bias-card__fix"><strong>Mitigation:</strong>
+            check per-class recall; if the &ldquo;positive&rdquo; class has
+            much higher recall than the &ldquo;negative&rdquo; class,
+            sycophancy is likely at work.
+          </p>
+        </div>
+        <div class="bias-card bias-card--external">
+          <div class="bias-card__type">External validity</div>
+          <h4 class="bias-card__name">Cultural and political bias</h4>
+          <p class="bias-card__desc">
+            Models trained predominantly on English-language Western data may
+            misinterpret rhetorical conventions from other cultural contexts and
+            may exhibit political leanings from their training data and
+            alignment process.
+          </p>
+          <p class="bias-card__fix"><strong>Mitigation:</strong>
+            document as a measurement validity concern; test with
+            politically diverse validation samples.
+          </p>
+        </div>
+        <div class="bias-card bias-card--reliability">
+          <div class="bias-card__type">Reliability</div>
+          <h4 class="bias-card__name">Temporal instability</h4>
+          <p class="bias-card__desc">
+            Closed-source model providers update their models without notice.
+            The exact same prompt may produce different results next month.
+          </p>
+          <p class="bias-card__fix"><strong>Mitigation:</strong>
+            pin model versions where possible; document exact version, date,
+            and provider. Open-weight models avoid this issue entirely.
+          </p>
+        </div>
+        <div class="bias-card bias-card--generalizability">
+          <div class="bias-card__type">Generalizability</div>
+          <h4 class="bias-card__name">Distribution shift</h4>
+          <p class="bias-card__desc">
+            A model validated on one subset may perform differently on texts
+            from a different time period, source, or domain. A classifier
+            trained on 2020 tweets may struggle with 2024 tweets using
+            different slang or referencing different events.
+          </p>
+          <p class="bias-card__fix"><strong>Mitigation:</strong>
+            validate on each stratum separately. This is arguably the most
+            common failure mode, and the one most often overlooked because
+            aggregate metrics can mask stratum-specific degradation.
+          </p>
+        </div>
+      </div>
     </div>
-    <div class="definition-box">
-      <p class="definition-box__label">Bias</p>
-      <p class="definition-box__term">Cultural and political bias</p>
-      <p>
-        Models trained predominantly on English-language Western data may
-        misinterpret rhetorical conventions from other cultural contexts and
-        may exhibit political leanings reflected in their training data and
-        alignment process. <strong>Mitigation:</strong> for politically
-        sensitive topics, document this as a measurement validity concern
-        and test with politically diverse validation samples.
-      </p>
-    </div>
-    <div class="definition-box">
-      <p class="definition-box__label">Bias</p>
-      <p class="definition-box__term">Temporal instability</p>
-      <p>
-        Closed-source model providers update their models without notice.
-        The exact same prompt may produce different results next month than
-        it does today. <strong>Mitigation:</strong> pin model versions where
-        possible, document the exact version, date, and provider in your
-        methods section. Open-weight models avoid this issue entirely.
-      </p>
-    </div>
-    <div class="definition-box">
-      <p class="definition-box__label">Bias</p>
-      <p class="definition-box__term">Distribution shift</p>
-      <p>
-        A model validated on one subset of your corpus may perform
-        differently on texts from a different time period, source, or
-        domain. A classifier trained on 2020 tweets may struggle with 2024
-        tweets that use different slang, reference different events, or
-        adopt different rhetorical conventions.
-        <strong>Mitigation:</strong> if your corpus spans multiple sources
-        or time periods, validate on each stratum separately. This is
-        arguably the most common real-world failure mode, and the one
-        most often overlooked because aggregate metrics can mask
-        stratum-specific degradation.
-      </p>
-    </div>
+
+<style is:inline>
+  .bias-catalog{margin:var(--sp-6) 0;}
+  .bias-catalog__header{margin-bottom:1rem;}
+  .bias-catalog__label{font-family:var(--font-mono,monospace);font-size:0.625rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--blue-2,#1E5A8A);display:block;margin-bottom:0.25rem;}
+  .bias-catalog__sub{font-size:0.82rem;color:var(--text-muted,#6B7280);}
+  .bias-catalog__grid{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;}
+  @media(max-width:640px){.bias-catalog__grid{grid-template-columns:1fr;}}
+  .bias-card{background:var(--card,#fff);border:1px solid var(--border,#E2E6EE);border-radius:var(--radius-md,8px);padding:1rem 1.15rem;border-top:3px solid var(--accent,#2D8ABF);display:flex;flex-direction:column;gap:0.35rem;}
+  .bias-card--internal{border-top-color:var(--blue-3,#2D8ABF);}
+  .bias-card--external{border-top-color:#7c3aed;}
+  .bias-card--reliability{border-top-color:#d97706;}
+  .bias-card--generalizability{border-top-color:#dc2626;}
+  .bias-card__type{font-family:var(--font-mono,monospace);font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-dim,#9CA3AF);}
+  .bias-card__name{font-family:var(--font-heading,'Plus Jakarta Sans',sans-serif);font-size:0.92rem;font-weight:700;color:var(--text,#0F1117);margin:0;}
+  .bias-card__desc{font-size:0.84rem;color:var(--text-sec,#3D4455);line-height:1.6;margin:0;}
+  .bias-card__fix{font-size:0.78rem;color:var(--text-muted,#6B7280);line-height:1.55;margin:0;margin-top:auto;padding-top:0.4rem;border-top:1px solid var(--border-lt,#EAEEF4);}
+  .bias-card__fix strong{color:var(--text-sec,#3D4455);}
+  .bias-card a{color:var(--accent,#2D8ABF);text-decoration:none;}
+  .bias-card a:hover{text-decoration:underline;}
+</style>
 
     <h3>Building a Validation Plan</h3>
     <p>
@@ -2056,6 +2240,197 @@ const math = {
       modifications made based on validation results. This is not optional
       transparency: it is the minimum for replicable research.
     </p>
+
+    <p>
+      How large does your gold-standard set need to be? The answer depends
+      on how precise your kappa estimate needs to be: a small sample produces
+      a wide confidence interval, making it impossible to distinguish
+      &ldquo;good&rdquo; from &ldquo;adequate&rdquo; agreement. The
+      calculator below shows how sample size, expected agreement, and the
+      number of categories interact.
+    </p>
+
+    <!-- Validation Sample Size Calculator -->
+<div class="vs-widget" id="vs-widget">
+  <div class="vs-widget__title">Validation Sample Size Calculator</div>
+  <div class="vs-widget__subtitle">
+    How many texts do you need to label for a stable &kappa; estimate?
+    Adjust expected agreement and desired precision to find your minimum sample size.
+  </div>
+
+  <div class="vs-presets" id="vs-presets">
+    <button class="vs-pre-btn vs-pre-btn--active" data-idx="0">Binary, good agreement</button>
+    <button class="vs-pre-btn" data-idx="1">Binary, moderate</button>
+    <button class="vs-pre-btn" data-idx="2">3-class task</button>
+    <button class="vs-pre-btn" data-idx="3">5-class task</button>
+  </div>
+
+  <div class="vs-grid">
+    <div class="vs-controls">
+      <div class="vs-controls__label">Parameters</div>
+
+      <div class="vs-slider">
+        <div class="vs-slider__hdr"><span class="vs-slider__name">Expected &kappa;</span><span class="vs-slider__val" id="vs-disp-kappa">0.70</span></div>
+        <input class="vs-slider__range" type="range" id="vs-sl-kappa" min="0" max="16" step="1" value="12">
+        <div class="vs-slider__hint">Your best guess of true human&ndash;model agreement</div>
+      </div>
+
+      <div class="vs-slider">
+        <div class="vs-slider__hdr"><span class="vs-slider__name">Number of categories</span><span class="vs-slider__val" id="vs-disp-cats">2</span></div>
+        <input class="vs-slider__range" type="range" id="vs-sl-cats" min="0" max="4" step="1" value="0">
+        <div class="vs-slider__hint">More categories require more samples for stable estimates</div>
+      </div>
+
+      <div class="vs-slider">
+        <div class="vs-slider__hdr"><span class="vs-slider__name">Desired CI half-width</span><span class="vs-slider__val" id="vs-disp-ci">&plusmn;0.10</span></div>
+        <input class="vs-slider__range" type="range" id="vs-sl-ci" min="0" max="4" step="1" value="2">
+        <div class="vs-slider__hint">Narrower intervals require more samples. &plusmn;0.10 is typical; &plusmn;0.05 is precise.</div>
+      </div>
+    </div>
+
+    <div class="vs-results">
+      <div class="vs-rcard">
+        <div class="vs-rcard__hdr"><span class="vs-rcard__name">Recommended sample size</span><span class="vs-rcard__val" id="vs-val-n">200</span></div>
+        <div class="vs-rcard__desc" id="vs-desc-n">texts to label for your gold-standard set</div>
+      </div>
+
+      <div class="vs-rcard">
+        <div class="vs-rcard__hdr"><span class="vs-rcard__name">Expected &kappa; range (95% CI)</span></div>
+        <div class="vs-range-bar">
+          <div class="vs-range-bar__track">
+            <div class="vs-range-bar__fill" id="vs-bar-fill"></div>
+            <div class="vs-range-bar__marker" id="vs-bar-marker"></div>
+          </div>
+          <div class="vs-range-bar__labels">
+            <span id="vs-lbl-lo">0.60</span>
+            <span id="vs-lbl-mid" style="font-weight:700;">0.70</span>
+            <span id="vs-lbl-hi">0.80</span>
+          </div>
+        </div>
+        <div class="vs-rcard__desc" id="vs-desc-ci">With 200 texts, your &kappa; estimate will be within &plusmn;0.10 of the true value 95% of the time.</div>
+      </div>
+
+      <div class="vs-rcard">
+        <div class="vs-rcard__hdr"><span class="vs-rcard__name">Interpretation</span></div>
+        <div class="vs-interp" id="vs-interp">
+          <div class="vs-interp__scale">
+            <div class="vs-interp__seg vs-interp__seg--poor">Poor</div>
+            <div class="vs-interp__seg vs-interp__seg--fair">Fair</div>
+            <div class="vs-interp__seg vs-interp__seg--moderate">Moderate</div>
+            <div class="vs-interp__seg vs-interp__seg--substantial">Substantial</div>
+            <div class="vs-interp__seg vs-interp__seg--perfect">Almost perfect</div>
+          </div>
+          <div class="vs-interp__pointer" id="vs-interp-ptr" style="left:70%"></div>
+        </div>
+        <div class="vs-rcard__desc" id="vs-desc-interp">At &kappa; = 0.70, agreement is &ldquo;substantial&rdquo; by the Landis &amp; Koch scale.</div>
+      </div>
+
+      <div class="vs-insight"><div class="vs-insight__text" id="vs-insight-text">
+        For binary classification with expected &kappa; = 0.70, <strong>200 texts</strong> gives a confidence interval of &plusmn;0.10. This is enough to distinguish &ldquo;substantial&rdquo; from &ldquo;moderate&rdquo; agreement.
+      </div></div>
+    </div>
+  </div>
+</div>
+
+<style is:inline>
+  .vs-widget__title{font-size:1.05rem;font-weight:700;color:var(--text,#0F1117);margin-bottom:0.15rem;}
+  .vs-widget__subtitle{font-size:0.82rem;color:var(--text-muted,#6B7280);margin-bottom:1.25rem;line-height:1.5;}
+  .vs-presets{display:flex;gap:0.4rem;margin-bottom:1.25rem;flex-wrap:wrap;}
+  .vs-pre-btn{font-family:var(--font-body,sans-serif);font-size:0.78rem;font-weight:600;padding:0.35rem 0.75rem;border-radius:100px;border:1.5px solid var(--border,#E2E6EE);background:var(--surface,#fff);color:var(--text-sec,#3D4455);cursor:pointer;transition:all 0.15s;white-space:nowrap;}
+  .vs-pre-btn:hover{border-color:var(--accent,#2D8ABF);color:var(--accent,#2D8ABF);}
+  .vs-pre-btn--active{border-color:var(--accent,#2D8ABF);background:var(--accent,#2D8ABF);color:#fff;}
+  .vs-grid{display:grid;grid-template-columns:280px 1fr;gap:1.25rem;align-items:start;}
+  @media(max-width:700px){.vs-grid{grid-template-columns:1fr;}}
+  .vs-controls{background:var(--surface,#fff);border:1px solid var(--border,#E2E6EE);border-radius:8px;padding:1.15rem;display:flex;flex-direction:column;gap:1rem;}
+  .vs-controls__label{font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted,#6B7280);margin-bottom:-0.2rem;}
+  .vs-slider{display:flex;flex-direction:column;gap:0.3rem;}
+  .vs-slider__hdr{display:flex;justify-content:space-between;align-items:baseline;}
+  .vs-slider__name{font-size:0.82rem;font-weight:600;color:var(--text-sec,#3D4455);}
+  .vs-slider__val{font-family:var(--font-mono,monospace);font-size:0.88rem;font-weight:600;color:var(--accent,#2D8ABF);}
+  .vs-slider__range{-webkit-appearance:none;appearance:none;width:100%;height:6px;background:var(--surface,#F2F4F8);border-radius:3px;outline:none;border:1px solid var(--border,#E2E6EE);cursor:pointer;}
+  .vs-slider__range::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--accent,#2D8ABF);border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.2);cursor:pointer;}
+  .vs-slider__range::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--accent,#2D8ABF);border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.2);cursor:pointer;}
+  .vs-slider__hint{font-size:0.7rem;color:var(--text-dim,#9CA3AF);line-height:1.4;}
+  .vs-results{display:flex;flex-direction:column;gap:0.75rem;}
+  .vs-rcard{background:var(--surface,#fff);border:1px solid var(--border,#E2E6EE);border-radius:8px;padding:0.85rem 1rem;}
+  .vs-rcard__hdr{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:0.15rem;}
+  .vs-rcard__name{font-size:0.78rem;font-weight:700;color:var(--text-sec,#3D4455);}
+  .vs-rcard__val{font-family:var(--font-mono,monospace);font-size:1.4rem;font-weight:700;color:var(--text,#0F1117);}
+  .vs-rcard__desc{font-size:0.72rem;color:var(--text-muted,#6B7280);line-height:1.4;}
+  .vs-range-bar{margin:0.5rem 0 0.3rem;}
+  .vs-range-bar__track{position:relative;height:10px;background:var(--surface,#F2F4F8);border-radius:5px;border:1px solid var(--border,#E2E6EE);overflow:visible;}
+  .vs-range-bar__fill{position:absolute;height:100%;background:var(--accent,#2D8ABF);border-radius:5px;opacity:0.25;transition:left 0.3s,width 0.3s;}
+  .vs-range-bar__marker{position:absolute;top:-3px;width:4px;height:16px;background:var(--accent,#2D8ABF);border-radius:2px;transition:left 0.3s;transform:translateX(-50%);}
+  .vs-range-bar__labels{display:flex;justify-content:space-between;font-family:var(--font-mono,monospace);font-size:0.7rem;color:var(--text-muted,#6B7280);margin-top:0.2rem;}
+  .vs-interp{position:relative;margin:0.4rem 0;}
+  .vs-interp__scale{display:flex;height:22px;border-radius:6px;overflow:hidden;border:1px solid var(--border,#E2E6EE);}
+  .vs-interp__seg{flex:1;display:flex;align-items:center;justify-content:center;font-size:0.6rem;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;}
+  .vs-interp__seg--poor{background:#fee2e2;color:#dc2626;}
+  .vs-interp__seg--fair{background:#fef3c7;color:#d97706;}
+  .vs-interp__seg--moderate{background:#fef9c3;color:#a16207;}
+  .vs-interp__seg--substantial{background:#dcfce7;color:#16a34a;}
+  .vs-interp__seg--perfect{background:#d1fae5;color:#047857;}
+  .vs-interp__pointer{position:absolute;top:-6px;width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:8px solid var(--text,#0F1117);transform:translateX(-50%);transition:left 0.3s;}
+  .vs-insight{background:var(--blue-9,#E8EEF6);border-left:3px solid var(--accent,#2D8ABF);border-radius:0 8px 8px 0;padding:0.8rem 1rem;}
+  .vs-insight__text{font-size:0.78rem;color:var(--accent-dark,#1E5A8A);line-height:1.55;font-weight:500;}
+  .vs-insight__text strong{font-weight:700;}
+</style>
+
+<script is:inline>
+(function(){
+  var $=function(id){return document.getElementById(id)};
+  var kappaSteps=[0.10,0.15,0.20,0.25,0.30,0.35,0.40,0.45,0.50,0.55,0.60,0.65,0.70,0.75,0.80,0.85,0.90];
+  var catSteps=[2,3,4,5,7];
+  var ciSteps=[0.20,0.15,0.10,0.07,0.05];
+  var presets=[
+    {kappa:12,cats:0,ci:2,insight:'For binary classification with expected \u03ba = 0.70, <strong>200 texts</strong> gives a confidence interval of \u00b10.10. This is enough to distinguish \u201csubstantial\u201d from \u201cmoderate\u201d agreement.'},
+    {kappa:10,cats:0,ci:2,insight:'With moderate expected agreement (\u03ba = 0.60), you need more texts to confirm the classifier is adequate. At <strong>\u00b10.10</strong>, the CI might dip into \u201cmoderate\u201d territory \u2014 consider tightening to \u00b10.07.'},
+    {kappa:12,cats:1,ci:2,insight:'With <strong>3 categories</strong>, chance agreement is lower (p_e \u2248 0.33 vs 0.50 for binary), so the same \u03ba requires somewhat more samples. The kappa variance formula accounts for this.'},
+    {kappa:11,cats:3,ci:3,insight:'<strong>5 categories</strong> with tight precision (\u00b10.07) requires a substantial gold-standard set. For complex coding schemes, invest in sample size \u2014 a wide CI makes your \u03ba estimate uninformative.'}
+  ];
+  var sls={kappa:$('vs-sl-kappa'),cats:$('vs-sl-cats'),ci:$('vs-sl-ci')};
+  function calcN(k,q,hw){
+    var pe=1/q;
+    var pmax=pe+k*(1-pe);
+    var varK=(pmax*(1-pmax))/((1-pe)*(1-pe));
+    var z=1.96;
+    var n=Math.ceil((z*z*varK)/(hw*hw));
+    return Math.max(n,50);
+  }
+  function interpLabel(k){
+    if(k>=0.80)return'almost perfect';if(k>=0.60)return'substantial';if(k>=0.40)return'moderate';if(k>=0.20)return'fair';return'poor';
+  }
+  function interpPct(k){
+    return Math.min(Math.max(k*100,0),100);
+  }
+  function update(ins){
+    var ki=parseInt(sls.kappa.value),ci2=parseInt(sls.cats.value),cii=parseInt(sls.ci.value);
+    var k=kappaSteps[ki],q=catSteps[ci2],hw=ciSteps[cii];
+    var n=calcN(k,q,hw);
+    $('vs-disp-kappa').textContent=k.toFixed(2);
+    $('vs-disp-cats').textContent=q;
+    $('vs-disp-ci').textContent='\u00b1'+hw.toFixed(2);
+    $('vs-val-n').textContent=n.toLocaleString();
+    $('vs-desc-n').textContent='texts to label for your gold-standard set (95% confidence)';
+    var lo=Math.max(k-hw,0),hi=Math.min(k+hw,1);
+    $('vs-lbl-lo').textContent=lo.toFixed(2);
+    $('vs-lbl-mid').textContent=k.toFixed(2);
+    $('vs-lbl-hi').textContent=hi.toFixed(2);
+    var barLo=lo*100,barHi=hi*100,barMid=k*100;
+    $('vs-bar-fill').style.left=barLo+'%';
+    $('vs-bar-fill').style.width=(barHi-barLo)+'%';
+    $('vs-bar-marker').style.left=barMid+'%';
+    $('vs-desc-ci').textContent='With '+n+' texts, your \u03ba estimate will be within \u00b1'+hw.toFixed(2)+' of the true value 95% of the time.';
+    $('vs-interp-ptr').style.left=interpPct(k)+'%';
+    $('vs-desc-interp').textContent='At \u03ba = '+k.toFixed(2)+', agreement is \u201c'+interpLabel(k)+'\u201d by the Landis & Koch scale.';
+    if(ins){$('vs-insight-text').innerHTML=ins;}
+  }
+  var btns=document.querySelectorAll('.vs-pre-btn');
+  btns.forEach(function(btn){btn.addEventListener('click',function(){btns.forEach(function(b){b.classList.remove('vs-pre-btn--active');});btn.classList.add('vs-pre-btn--active');var p=presets[parseInt(btn.dataset.idx)];sls.kappa.value=p.kappa;sls.cats.value=p.cats;sls.ci.value=p.ci;update(p.insight);});});
+  Object.values(sls).forEach(function(s){s.addEventListener('input',function(){btns.forEach(function(b){b.classList.remove('vs-pre-btn--active');});$('vs-insight-text').innerHTML='Custom configuration. Adjust the sliders to match your research design.';update();});});
+  update(presets[0].insight);
+})();
+</script>
 
     <!-- Validation Pipeline Diagram -->
     <div class="visual-diagram">
@@ -2197,7 +2572,7 @@ const math = {
     </p>
     <p>
       <strong>Stage 1: Prototype with prompting
-      (<a href="/course/day-2">Day 2</a>).</strong>
+      (<a href="/course/day-2">Module 2</a>).</strong>
       Write a classification prompt with clear definitions and a few
       examples of each category. Test it on 50&ndash;100 speeches using a
       capable model (e.g., Sonnet, GPT-5). Iterate until the prompt
@@ -2276,19 +2651,26 @@ const math = {
       </p>
     </div>
 
-    <div class="course-note">
+    <div class="course-note course-note--research">
       <svg class="course-note__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
       </svg>
       <p>
-        <strong>Spirling (2023),</strong>
-        <a href="https://doi.org/10.1038/s43588-023-00534-8" target="_blank" rel="noopener"><em>Why open-source generative AI models are an ethical imperative for social science.</em></a>
-        Nature Computational Science. Argues that reliance on closed-source
-        models undermines reproducibility, transparency, and equitable
-        access, all core scientific values. For the deployment decisions
-        covered today, the implication is concrete: when possible, use
-        open-weight models that can be version-pinned, inspected, and
-        shared. When closed models are necessary, document every detail.
+        <strong>Social Science Application.</strong>
+        <a href="https://doi.org/10.1038/s43588-023-00534-8" target="_blank" rel="noopener">Spirling (2023)</a>,
+        <em>Why open-source generative AI models are an ethical imperative
+        for social science.</em> Nature Computational Science. Reliance on
+        closed-source models undermines three core scientific values:
+        <strong>reproducibility</strong> (the model may change between your
+        study and replication, as documented by
+        <a href="https://arxiv.org/abs/2307.09009" target="_blank" rel="noopener">Chen et al., 2023</a>
+        in Module 2), <strong>transparency</strong> (you cannot inspect
+        training data, safety filters, or alignment choices), and
+        <strong>equitable access</strong> (API costs exclude researchers
+        without well-funded labs). For the deployment decisions covered
+        today, the implication is concrete: when possible, use open-weight
+        models that can be version-pinned, inspected, and shared. When
+        closed models are necessary, document every detail.
       </p>
     </div>
 
@@ -2303,15 +2685,69 @@ const math = {
         if needed, deploy at scale with structured outputs and
         checkpointing, and validate again on the full corpus. Document
         every methodological choice. Use open models when possible.
-        <a href="/course/day-4">Day 4</a> moves beyond classification to
+        <a href="/course/day-4">Module 4</a> moves beyond classification to
         ask what else language models can do for social science research:
         extracting structured information from unstructured text, retrieving
-        and synthesising evidence from large corpora, and simulating human
-        survey responses to explore hypothetical scenarios.
+        and synthesising evidence from large corpora with RAG, and
+        evaluating these pipelines rigorously enough to publish on.
+      </p>
+    </div>
+  </section>
+
+  <!-- ===================================================================
+       MODULE SUMMARY
+       =================================================================== -->
+  <section id="summary" class="opening-narrative">
+    <h2>Module Summary</h2>
+    <p>
+      This module addressed the gap between a working prototype and a
+      publishable research pipeline. <strong>Fine-tuning</strong> adapts
+      models when prompting hits a ceiling: LoRA makes this feasible on
+      consumer hardware by training only a small low-rank update, while
+      encoder models like DeBERTa offer a faster, often more accurate
+      alternative for pure classification tasks. The decision between
+      prompting, RAG, and fine-tuning is not purely technical; it is a
+      research design choice that determines how your theoretical construct
+      gets operationalized into a measurement procedure.
+    </p>
+    <p>
+      <strong>Working at scale</strong> turns a notebook experiment into a
+      reliable data pipeline. Structured outputs guarantee parseable results
+      across thousands of texts, async batching cuts processing time by
+      orders of magnitude, and cost estimation prevents budget surprises.
+      Whether you use a cloud API, a self-hosted open model, or a local
+      encoder, the infrastructure choices shape what is practically feasible
+      for your research.
+    </p>
+    <p>
+      <strong>Validation</strong> is the thread that connects everything.
+      The model is another coder, and it requires the same scrutiny: kappa
+      corrects for chance agreement, per-class F1 reveals where performance
+      breaks down, qualitative error analysis identifies fixable patterns,
+      and the five systematic biases (positional, sycophancy, cultural,
+      temporal, distribution shift) are measurement validity threats that
+      must be documented and mitigated. Every concept from
+      <a href="/course/day-1">Module 1</a> (embeddings, attention,
+      scaling) and <a href="/course/day-2">Module 2</a> (post-training,
+      prompting, model selection) feeds into the pipeline built here.
+    </p>
+
+    <div class="course-note">
+      <svg class="course-note__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+      </svg>
+      <p>
+        <strong>Coming in Module 4:</strong> We move beyond classification to
+        ask what else language models can do for social science research.
+        You will learn how to extract structured information from
+        unstructured text, retrieve and synthesise evidence from large
+        corpora using RAG, and evaluate these pipelines with metrics
+        that go far beyond accuracy.
       </p>
     </div>
   </section>
 
 </CourseLayout>
+
 
 

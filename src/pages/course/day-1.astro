@@ -1,4 +1,4 @@
----
+﻿---
 import CourseLayout from '../../layouts/CourseLayout.astro';
 
 const sections = [
@@ -14,7 +14,7 @@ const sections = [
 const math = {
   embeddingDef: String.raw`A learned mapping $f: \mathcal{V} \to \mathbb{R}^d$ from a vocabulary $\mathcal{V}$ to a $d$-dimensional real vector space, where semantic and syntactic relationships between words are encoded as geometric relationships between their vectors.`,
   cosine: String.raw`$$\text{cosine\_similarity}(\mathbf{a}, \mathbf{b}) = \frac{\mathbf{a} \cdot \mathbf{b}}{\|\mathbf{a}\| \cdot \|\mathbf{b}\|}$$`,
-  cosineCaption: String.raw`Result is the cosine of the angle between the two vectors: <strong>1.0</strong> = identical direction, <strong>0.0</strong> = orthogonal (no overlap), <strong>−1.0</strong> = opposite.`,
+  cosineCaption: String.raw`Result is the cosine of the angle between the two vectors: <strong>1.0</strong> = identical direction, <strong>0.0</strong> = orthogonal (no overlap), <strong>âˆ’1.0</strong> = opposite.`,
   analogy: String.raw`$$\vec{v}_{\text{king}} - \vec{v}_{\text{man}} + \vec{v}_{\text{woman}} \approx \vec{v}_{\text{queen}}$$`,
   bpeDef: String.raw`A tokenization strategy that splits text into units smaller than words but larger than characters. Starting from individual bytes or characters, BPE iteratively merges the most frequent adjacent pair until a target vocabulary size is reached.`,
   contextualDef: String.raw`A representation where each token's vector depends on the entire surrounding sequence. The same word produces <em>different</em> vectors in different contexts, resolving ambiguity that static embeddings cannot.`,
@@ -454,7 +454,7 @@ const math = {
           <button class="bpe-explorer__word-btn bpe-explorer__word-btn--active" data-word="unhappiness">unhappiness</button>
           <button class="bpe-explorer__word-btn" data-word="strawberry">strawberry</button>
           <button class="bpe-explorer__word-btn" data-word="tokenization">tokenization</button>
-          <button class="bpe-explorer__word-btn" data-word="Übersetzung">Übersetzung</button>
+          <button class="bpe-explorer__word-btn" data-word="Ãœbersetzung">Ãœbersetzung</button>
         </div>
       </div>
       <div class="bpe-explorer__step-label" id="bpe-step-label">Step 0: Start with characters</div>
@@ -828,10 +828,10 @@ const math = {
       This shift, from one vector per word type to one vector per word
       <em>token in context</em>, is what makes modern language models so
       powerful. Every downstream task you will encounter in this course
-      depends on it. When you <strong>classify text</strong> (Day 3), you
+      depends on it. When you <strong>classify text</strong> (Module 3), you
       use the model's contextual representation of the input. When you build
-      a <strong>RAG pipeline</strong> (Day 4), contextual embeddings power
-      the retrieval step. When you <strong>prompt a model</strong> (Day 2),
+      a <strong>RAG pipeline</strong> (Module 4), contextual embeddings power
+      the retrieval step. When you <strong>prompt a model</strong> (Module 2),
       you are writing input that the model processes through layers of
       contextual attention.
     </p>
@@ -1132,7 +1132,7 @@ const math = {
         <rect x="186" y="210" width="42" height="36" rx="3" style="fill: var(--accent-bg, #EBF7FD); stroke: var(--accent, #2D8ABF);" stroke-width="1"/>
         <rect x="228" y="210" width="42" height="36" rx="3" style="fill: var(--blue-8, #B0ECF9); stroke: var(--blue-2, #2272A8);" stroke-width="1.5"/>
         <rect x="270" y="210" width="42" height="36" rx="3" style="fill: var(--accent-bg, #EBF7FD); stroke: var(--accent, #2D8ABF);" stroke-width="1"/>
-        <!-- "river" is highlighted because bank→river is the key attention weight -->
+        <!-- "river" is highlighted because bankâ†’river is the key attention weight -->
         <text x="249" y="233" text-anchor="middle" style="fill: var(--blue-0, #1E3A5F);" font-size="9" font-weight="700">river</text>
         <!-- Legend -->
         <rect x="60"  y="258" width="12" height="12" rx="2" style="fill: var(--accent-bg, #EBF7FD); stroke: var(--accent, #2D8ABF);" stroke-width="1"/>
@@ -1182,9 +1182,9 @@ const math = {
     <!-- Side-by-side comparison SVG -->
     <div class="visual-diagram">
       <svg viewBox="0 0 500 228" xmlns="http://www.w3.org/2000/svg" style="font-family: var(--font-body, Inter, system-ui, sans-serif); font-size: 11px; width: 100%; max-width: 500px; display: block; margin: 0 auto;">
-        <!-- ── Left panel: Encoder-Only ── -->
+        <!-- â”€â”€ Left panel: Encoder-Only â”€â”€ -->
         <text x="118" y="15" text-anchor="middle" style="fill: var(--blue-0, #1E3A5F);" font-weight="700" font-size="12">Encoder-Only</text>
-        <text x="118" y="27" text-anchor="middle" style="fill: var(--text-muted, #6B7280);" font-size="10">BERT · RoBERTa · DeBERTa</text>
+        <text x="118" y="27" text-anchor="middle" style="fill: var(--text-muted, #6B7280);" font-size="10">BERT Â· RoBERTa Â· DeBERTa</text>
         <!-- Column headers -->
         <text x="66"  y="44" text-anchor="middle" style="fill: var(--blue-0, #1E3A5F);" font-size="10">I</text>
         <text x="102" y="44" text-anchor="middle" style="fill: var(--blue-0, #1E3A5F);" font-size="10">sat</text>
@@ -1195,7 +1195,7 @@ const math = {
         <text x="42"  y="95"  text-anchor="end" style="fill: var(--blue-0, #1E3A5F);" font-size="10">sat</text>
         <text x="42"  y="125" text-anchor="end" style="fill: var(--blue-0, #1E3A5F);" font-size="10">by</text>
         <text x="42"  y="155" text-anchor="end" style="fill: var(--blue-0, #1E3A5F);" font-size="10">bank</text>
-        <!-- 4×4 full grid (all cells blue) -->
+        <!-- 4Ã—4 full grid (all cells blue) -->
         <rect x="48"  y="50" width="36" height="26" rx="3" style="fill: var(--accent-bg, #EBF7FD); stroke: var(--accent, #2D8ABF);" stroke-width="1"/>
         <rect x="84"  y="50" width="36" height="26" rx="3" style="fill: var(--accent-bg, #EBF7FD); stroke: var(--accent, #2D8ABF);" stroke-width="1"/>
         <rect x="120" y="50" width="36" height="26" rx="3" style="fill: var(--accent-bg, #EBF7FD); stroke: var(--accent, #2D8ABF);" stroke-width="1"/>
@@ -1215,14 +1215,14 @@ const math = {
         <!-- Encoder labels -->
         <text x="118" y="182" text-anchor="middle" style="fill: var(--text-sec, #3D4455);" font-size="10" font-weight="600">Training: predict [MASK] tokens</text>
         <text x="118" y="196" text-anchor="middle" style="fill: var(--text-muted, #6B7280);" font-size="10">Every token sees every other token</text>
-        <text x="118" y="213" text-anchor="middle" style="fill: var(--accent-dark, #1E5A8A);" font-size="10" font-weight="600">Classification · Embeddings · Extraction</text>
+        <text x="118" y="213" text-anchor="middle" style="fill: var(--accent-dark, #1E5A8A);" font-size="10" font-weight="600">Classification Â· Embeddings Â· Extraction</text>
 
         <!-- Divider -->
         <line x1="248" y1="10" x2="248" y2="220" style="stroke: var(--border, #E2E6EE);" stroke-width="1" stroke-dasharray="4,3"/>
 
-        <!-- ── Right panel: Decoder-Only ── -->
+        <!-- â”€â”€ Right panel: Decoder-Only â”€â”€ -->
         <text x="382" y="15" text-anchor="middle" style="fill: var(--blue-0, #1E3A5F);" font-weight="700" font-size="12">Decoder-Only</text>
-        <text x="382" y="27" text-anchor="middle" style="fill: var(--text-muted, #6B7280);" font-size="10">GPT · Llama · Mistral · Claude</text>
+        <text x="382" y="27" text-anchor="middle" style="fill: var(--text-muted, #6B7280);" font-size="10">GPT Â· Llama Â· Mistral Â· Claude</text>
         <!-- Column headers -->
         <text x="330" y="44" text-anchor="middle" style="fill: var(--blue-0, #1E3A5F);" font-size="10">I</text>
         <text x="366" y="44" text-anchor="middle" style="fill: var(--blue-0, #1E3A5F);" font-size="10">sat</text>
@@ -1233,7 +1233,7 @@ const math = {
         <text x="306" y="95"  text-anchor="end" style="fill: var(--blue-0, #1E3A5F);" font-size="10">sat</text>
         <text x="306" y="125" text-anchor="end" style="fill: var(--blue-0, #1E3A5F);" font-size="10">by</text>
         <text x="306" y="155" text-anchor="end" style="fill: var(--blue-0, #1E3A5F);" font-size="10">bank</text>
-        <!-- 4×4 lower-triangular grid -->
+        <!-- 4Ã—4 lower-triangular grid -->
         <!-- Row 0: col 0 blue, cols 1–3 grey -->
         <rect x="312" y="50" width="36" height="26" rx="3" style="fill: var(--accent-bg, #EBF7FD); stroke: var(--accent, #2D8ABF);" stroke-width="1"/>
         <rect x="348" y="50" width="36" height="26" rx="3" style="fill: var(--surface, #F2F4F8); stroke: var(--border, #E2E6EE);" stroke-width="1"/>
@@ -1263,7 +1263,7 @@ const math = {
         <!-- Decoder labels -->
         <text x="382" y="182" text-anchor="middle" style="fill: var(--text-sec, #3D4455);" font-size="10" font-weight="600">Training: predict next token</text>
         <text x="382" y="196" text-anchor="middle" style="fill: var(--text-muted, #6B7280);" font-size="10">Each token sees only past tokens</text>
-        <text x="382" y="213" text-anchor="middle" style="fill: var(--accent-dark, #1E5A8A);" font-size="10" font-weight="600">Generation · Chat · Prompting</text>
+        <text x="382" y="213" text-anchor="middle" style="fill: var(--accent-dark, #1E5A8A);" font-size="10" font-weight="600">Generation Â· Chat Â· Prompting</text>
       </svg>
       <p class="visual-diagram__caption">
         Left: an encoder-only model's attention matrix — every token attends to
@@ -1306,7 +1306,7 @@ const math = {
     <ul>
       <li><strong>Text classification:</strong> sentiment, ideology, topic, relevance labelling. Fine-tune the [CLS] representation on labelled examples and the model learns to separate categories in its embedding space.</li>
       <li><strong>Named-entity recognition and extraction:</strong> token-level predictions (per-position output rather than a single sequence label).</li>
-      <li><strong>Semantic similarity and dense retrieval:</strong> sentence-transformer models (e.g. SBERT) use pooled encoder outputs to embed documents into a comparable vector space — the same space powering RAG pipelines (Day&nbsp;4).</li>
+      <li><strong>Semantic similarity and dense retrieval:</strong> sentence-transformer models (e.g. SBERT) use pooled encoder outputs to embed documents into a comparable vector space — the same space powering RAG pipelines (Module&nbsp;4).</li>
     </ul>
     <p>
       The key limitation: encoder-only models are not designed to generate free
@@ -1351,7 +1351,7 @@ const math = {
         labelled sample of your corpus, then apply it at scale. The performance
         gains from moving to RoBERTa over earlier methods were large
         (<a href="https://arxiv.org/abs/2202.02233" target="_blank" rel="noopener">Laurer et al., 2024</a>).
-        Day&nbsp;3 covers how to build, evaluate, and validate this pipeline
+        Module&nbsp;3 covers how to build, evaluate, and validate this pipeline
         rigorously — including the question of when a fine-tuned encoder beats
         a prompted decoder-only model, and when it does not.
       </p>
@@ -1553,7 +1553,7 @@ const math = {
         <line x1="112" y1="35" x2="130" y2="35" style="stroke: var(--text-dim, #9CA3AF);" stroke-width="1.5" marker-end="url(#arrUE)"/>
         <!-- Box 2: hidden state -->
         <rect x="131" y="18" width="82" height="34" rx="5" style="fill: var(--accent-bg, #EBF7FD); stroke: var(--accent, #2D8ABF);" stroke-width="1.5"/>
-        <text x="172" y="33" text-anchor="middle" style="fill: var(--blue-0, #1E3A5F);" font-weight="600" font-size="10"><tspan font-weight="700">h</tspan><tspan font-size="8" dy="3">t</tspan><tspan dy="-3"> ∈ ℝ</tspan><tspan font-size="8" dy="-3">d</tspan></text>
+        <text x="172" y="33" text-anchor="middle" style="fill: var(--blue-0, #1E3A5F);" font-weight="600" font-size="10"><tspan font-weight="700">h</tspan><tspan font-size="8" dy="3">t</tspan><tspan dy="-3"> âˆˆ â„</tspan><tspan font-size="8" dy="-3">d</tspan></text>
         <text x="172" y="47" text-anchor="middle" style="fill: var(--text-muted, #6B7280);" font-size="9">hidden state</text>
         <!-- Arrow -->
         <line x1="213" y1="35" x2="231" y2="35" style="stroke: var(--text-dim, #9CA3AF);" stroke-width="1.5" marker-end="url(#arrUE)"/>
@@ -1565,7 +1565,7 @@ const math = {
         <line x1="314" y1="35" x2="332" y2="35" style="stroke: var(--text-dim, #9CA3AF);" stroke-width="1.5" marker-end="url(#arrUE)"/>
         <!-- Box 4: logits -->
         <rect x="333" y="18" width="82" height="34" rx="5" style="fill: var(--accent-bg, #EBF7FD); stroke: var(--accent, #2D8ABF);" stroke-width="1.5"/>
-        <text x="374" y="33" text-anchor="middle" style="fill: var(--blue-0, #1E3A5F);" font-weight="600" font-size="10"><tspan font-weight="700">z</tspan><tspan font-size="8" dy="3">t</tspan><tspan dy="-3"> ∈ ℝ</tspan><tspan font-size="8" dy="-3">|𝒱|</tspan></text>
+        <text x="374" y="33" text-anchor="middle" style="fill: var(--blue-0, #1E3A5F);" font-weight="600" font-size="10"><tspan font-weight="700">z</tspan><tspan font-size="8" dy="3">t</tspan><tspan dy="-3"> âˆˆ â„</tspan><tspan font-size="8" dy="-3">|ð’±|</tspan></text>
         <text x="374" y="47" text-anchor="middle" style="fill: var(--text-muted, #6B7280);" font-size="9">logits</text>
         <!-- Arrow -->
         <line x1="415" y1="35" x2="433" y2="35" style="stroke: var(--text-dim, #9CA3AF);" stroke-width="1.5" marker-end="url(#arrUE)"/>
@@ -2015,7 +2015,7 @@ const math = {
         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
       </svg>
       <p>
-        <strong>Coming in Day 2:</strong> We explore
+        <strong>Coming in Module 2:</strong> We explore
         <strong>test-time compute scaling</strong>: using prompting
         strategies like chain-of-thought reasoning to extract more capability
         at inference. This represents a fundamental shift: instead of only
@@ -2476,7 +2476,7 @@ const math = {
       <strong>Context window limits.</strong> Every model has a maximum
       context length (4K, 32K, 128K, or more tokens). If your documents
       exceed this, you need a strategy: summarisation, chunking, or
-      retrieval-augmented generation (Day 4). The context window is not
+      retrieval-augmented generation (Module 4). The context window is not
       just a technical limit; it shapes what questions you can ask of
       a single model call.
     </p>
@@ -2539,8 +2539,8 @@ const math = {
     </p>
     <p>
       Every concept introduced here recurs throughout the course. Prompting
-      (Day 2) works because of next-token prediction. Classification and
-      RAG (Days 3&ndash;4) rely on contextual embeddings. Model selection
+      (Module 2) works because of next-token prediction. Classification and
+      RAG (Modules 3&ndash;4) rely on contextual embeddings. Model selection
       requires understanding the scaling and cost tradeoffs introduced here.
     </p>
 
@@ -2549,7 +2549,7 @@ const math = {
         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
       </svg>
       <p>
-        <strong>Coming in Day 2:</strong> We move from understanding these
+        <strong>Coming in Module 2:</strong> We move from understanding these
         foundations to <em>using</em> them. You will learn how post-training
         transforms a next-token predictor into a useful assistant, and how
         prompting lets you steer model behaviour for research tasks.
@@ -2594,7 +2594,7 @@ const math = {
   var VV=EMB.map(function(e){return matVec(WV,e)});
 
   /* Brand-aligned diverging color scale:
-     v=0 → #F2F4F8 (--surface), v>0 → #1E5A8A (--blue-1), v<0 → #D4854A (amber) */
+     v=0 â†’ #F2F4F8 (--surface), v>0 â†’ #1E5A8A (--blue-1), v<0 â†’ #D4854A (amber) */
   function hc(v) {
     var t=Math.min(Math.abs(v)/1.6,1);
     var r0=242,g0=244,b0=248;
@@ -2664,7 +2664,7 @@ const math = {
     allWeights.push(softmax(sc));
   }
 
-  /* Build the 6×6 attention heatmap SVG */
+  /* Build the 6Ã—6 attention heatmap SVG */
   function buildSingleHeatmap(selRow){
     var cs=22,gap=2,pad=40;
     var gw=N*(cs+gap)-gap;
@@ -2777,7 +2777,7 @@ const math = {
     nextBtn.textContent=(curStep>=TOTAL)?'Done \u2713':'Next step \u2192';
     formulaEl.innerHTML=s.formula;
 
-    /* ── Token area ── */
+    /* â”€â”€ Token area â”€â”€ */
     var th='';
     if(curStep<=1){
       /* Full chips with vector strips */
@@ -2811,7 +2811,7 @@ const math = {
       });
     }
 
-    /* ── Viz area ── */
+    /* â”€â”€ Viz area â”€â”€ */
     var vh='';
     if(curStep===2){
       vh+='<div class="attn-matrix-wrap">';
@@ -3710,3 +3710,4 @@ const math = {
   render();
 })();
 </script>
+
