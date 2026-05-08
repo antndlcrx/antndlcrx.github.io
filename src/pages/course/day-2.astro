@@ -10,7 +10,7 @@ const sections = [
 ];
 
 const math = {
-  tempSoftmax: String.raw`$$P(w) = \frac{\exp(z_w / T)}{\sum_{w' \in \mathcal{V}} \exp(z_{w'} / T)}$$`,
+  tempSoftmax: String.raw`$$P(w) = \frac{\exp(z_w / T)}{\sum\limits_{w^{\prime} \in \mathcal{V}} \exp\!\left(z_{w^{\prime}} / T\right)}$$`,
   tempSoftmaxCaption: String.raw`Temperature $T$ scales the logits before softmax. At $T = 1$ the distribution is unchanged. As $T \to 0$ all mass concentrates on the highest-scoring token (greedy decoding). As $T \to \infty$ the distribution approaches uniform, making rare tokens as likely as common ones.`,
   precision: String.raw`$$\text{Precision} = \frac{\text{True Positives}}{\text{True Positives} + \text{False Positives}}$$`,
   precisionCaption: String.raw`Of all the items the model labelled positive, how many actually are? High precision means few false alarms.`,
@@ -695,7 +695,7 @@ const math = {
       oppose.&rdquo;</em> A structured JSON response to the same prompt
       might return:
     </p>
-    <pre style="background: var(--surface, #F2F4F8); border: 1px solid var(--border, #E2E6EE); border-radius: 6px; padding: 1rem; font-size: 0.85rem; overflow-x: auto; margin: 1rem 0;"><code set:html={`{\n  "label": "oppose",\n  "confidence": "high",\n  "reasoning": "Sarcastic framing ('really changed the world') signals opposition."\n}`} /></pre>
+    <pre style="background: var(--surface, #F2F4F8); border: 1px solid var(--border, #E2E6EE); border-radius: 6px; padding: 1rem; font-size: 0.85rem; color: var(--text, #0F172A); font-family: var(--font-mono, monospace); line-height: 1.5; overflow-x: auto; margin: 1rem 0;"><code set:html={`{\n  "label": "oppose",\n  "confidence": "high",\n  "reasoning": "Sarcastic framing ('really changed the world') signals opposition."\n}`} /></pre>
     <p>
       The first version requires custom parsing that will inevitably break
       on edge cases. The second can be processed with a single line of
