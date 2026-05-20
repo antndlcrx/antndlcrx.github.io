@@ -52,14 +52,6 @@
 .section-v3--marker {
   border-top: 1px solid var(--border-lt);
 }
-.section-v3--marker::before {
-  content: "";
-  position: absolute;
-  top: -1px; left: 0;
-  width: 96px; height: 2px;
-  background: var(--grad-spectrum);
-  opacity: 0.85;
-}
 .section-number {
   position: absolute;
   top: clamp(28px, 4vw, 44px);
@@ -86,22 +78,6 @@
   .section-head-v3 { grid-template-columns: 1fr; gap: 14px; margin-bottom: 36px; }
 }
 
-/* Tinted section — radial wash ------------------------------ */
-.section-tinted-v3 {
-  background: var(--bg);
-  isolation: isolate;
-  position: relative;
-}
-.section-tinted-v3::before {
-  content: "";
-  position: absolute; inset: 0;
-  pointer-events: none; z-index: -1;
-  background:
-    radial-gradient(80% 110% at 18% 0%,   color-mix(in srgb, var(--blue-7) 36%, transparent) 0%, transparent 58%),
-    radial-gradient(70% 100% at 86% 100%, color-mix(in srgb, var(--blue-8) 55%, transparent) 0%, transparent 62%),
-    radial-gradient(120% 100% at 50% 50%, color-mix(in srgb, var(--blue-9) 78%, transparent) 0%, transparent 78%);
-}
-.section-tinted-v3 > *:not(.section-number) { position: relative; }
 
 /* NAV v3 (palette cycler button, sticky scroll state) ------- */
 .nav-v3 {
@@ -519,9 +495,17 @@
   padding: clamp(96px, 11vw, 144px) 0 clamp(72px, 8vw, 112px);
   overflow: hidden; isolation: isolate;
   background:
-    radial-gradient(120% 80% at 100% 0%, color-mix(in srgb, var(--blue-8) 32%, transparent) 0%, transparent 60%),
-    radial-gradient(80% 60% at 0% 100%, color-mix(in srgb, var(--blue-9) 60%, transparent) 0%, transparent 60%),
+    radial-gradient(120% 80% at 100% 0%, color-mix(in srgb, var(--c-a) 14%, transparent) 0%, transparent 60%),
+    radial-gradient(80% 60% at 0% 100%, color-mix(in srgb, var(--c-b) 14%, transparent) 0%, transparent 60%),
     var(--bg);
+}
+.hero-manuscript::after,
+.hero-event::after {
+  content: "";
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: clamp(80px, 12vw, 140px);
+  background: linear-gradient(to bottom, transparent, var(--bg));
+  pointer-events: none; z-index: 1;
 }
 .hero-ms-inner {
   position: relative;
@@ -682,8 +666,8 @@
   padding: clamp(72px, 9vw, 124px) 0 clamp(56px, 7vw, 96px);
   overflow: hidden; isolation: isolate;
   background:
-    radial-gradient(70% 80% at 100% 100%, color-mix(in srgb, var(--blue-9) 55%, transparent) 0%, transparent 60%),
-    radial-gradient(60% 70% at 0% 0%, color-mix(in srgb, var(--blue-8) 28%, transparent) 0%, transparent 60%),
+    radial-gradient(70% 80% at 100% 100%, color-mix(in srgb, var(--c-b) 14%, transparent) 0%, transparent 60%),
+    radial-gradient(60% 70% at 0% 0%, color-mix(in srgb, var(--c-a) 14%, transparent) 0%, transparent 60%),
     var(--bg);
 }
 .hero-event-inner {
