@@ -14,7 +14,7 @@ import SpeakerModal from '../../components/SpeakerModal.astro';
       <span class="status-dot" aria-hidden="true"></span>
       <span class="status-label">Applications open</span>
       <span class="sep"></span>
-      <span>Deadline 1 June</span>
+      <span>Deadline 3 June</span>
       <span class="sep"></span>
       <a href="/summer-school/" style="color:inherit; text-decoration:none;">Summer School</a>
       <span class="sep"></span>
@@ -40,15 +40,15 @@ import SpeakerModal from '../../components/SpeakerModal.astro';
             </a>
           </li>
           <li>
-            <a href="#support">
+            <a href="#speakers">
               <span class="t-num">02</span>
-              <span class="t-name">Support</span>
+              <span class="t-name">Speakers</span>
             </a>
           </li>
           <li>
-            <a href="#speakers">
+            <a href="#support">
               <span class="t-num">03</span>
-              <span class="t-name">Speakers</span>
+              <span class="t-name">Arrangements</span>
             </a>
           </li>
           <li>
@@ -70,7 +70,7 @@ import SpeakerModal from '../../components/SpeakerModal.astro';
           Fourth edition.<br>Nuffield College,<br>Oxford.
         </h1>
         <p class="lede-v3">
-          Programme details, confirmed topics, and funding information for the 2026 school.
+          Programme details, confirmed topics, and costs and support for the 2026 school.
           The page will fill in as confirmations land; applications are open now.
         </p>
       </div>
@@ -87,20 +87,51 @@ import SpeakerModal from '../../components/SpeakerModal.astro';
           <div class="eyebrow-v3" style="margin-bottom:14px">Scope &amp; priorities</div>
           <h2 class="h-section">What the 2026 programme will cover.</h2>
         </div>
+        <p class="lede-v3">
+          Five days combining technical depth with research application.
+          The week is built around three interlocking components.
+        </p>
       </div>
 
-      <div class="reveal" style="max-width: 72ch;">
-        <p class="copy" style="margin: 0 0 18px;">
-          The 2026 school continues the programme's focus on large language models for social
-          science, combining technical depth with research application. The week will cover
-          foundations alongside new terrain: inference economics (cost, latency, and deployment
-          trade-offs at scale) and agents for science and research (LLM-driven workflows for
-          literature review, data extraction, and experiment design). Further topics will be
-          added as speakers confirm.
-        </p>
-        <p class="copy" style="margin: 0; color: var(--text-dim);">
+      <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 20px;"
+           class="reveal-stagger">
+
+        <article class="fb">
+          <span class="rule-soft"></span>
+          <h3 class="h-sub" style="margin-bottom:10px">Industry lectures &amp; seminars</h3>
+          <p class="copy" style="margin:0; font-size:14px;">
+            Technical foundations from practitioners working on language models in industry.
+            Confirmed topics include inference economics and agents for research;
+            more to follow as speakers confirm.
+          </p>
+        </article>
+
+        <article class="fb">
+          <span class="rule-soft"></span>
+          <h3 class="h-sub" style="margin-bottom:10px">Collaborative research project</h3>
+          <p class="copy" style="margin:0; font-size:14px;">
+            A Kaggle-style prediction competition on a real social science research problem.
+            Teams work through afternoon lab sessions, with guidance available from
+            industry participants.
+          </p>
+        </article>
+
+        <article class="fb">
+          <span class="rule-soft"></span>
+          <h3 class="h-sub" style="margin-bottom:10px">Social science guest talks</h3>
+          <p class="copy" style="margin:0; font-size:14px;">
+            Invited researchers present social science applications: opinion prediction,
+            document classification, and text-as-data methods, connecting the technical
+            sessions to real research problems.
+          </p>
+        </article>
+
+      </div>
+
+      <div class="reveal" style="margin-top:28px;">
+        <p class="copy" style="color:var(--text-dim); max-width:64ch; margin:0;">
           The day-by-day schedule will be published here as it is finalised.
-          To get a sense of how the week is structured, see the
+          For a sense of how the week runs, see the
           <a href="/summer-school/2025/#programme">2025 programme</a>.
           Materials from past editions are on
           <a href="https://github.com/antndlcrx/oxford-llms-workshop" target="_blank" rel="noopener">GitHub</a>.
@@ -109,9 +140,56 @@ import SpeakerModal from '../../components/SpeakerModal.astro';
     </div>
   </section>
 
-  <!-- ── § 02 Support ───────────────────────────────────────── -->
-  <section class="section-v3 section-v3--marker section-tinted-v3" id="support">
-    <span class="section-number">§ 02 · Support</span>
+  <!-- ── § 02 Speakers ──────────────────────────────────────── -->
+  <section class="section-v3 section-v3--marker section-tinted-v3" id="speakers">
+    <span class="section-number">§ 02 · Speakers</span>
+    <div class="shell">
+      <div class="section-head-v3 reveal">
+        <div>
+          <div class="eyebrow-v3" style="margin-bottom:14px">Confirmed · more to follow</div>
+          <h2 class="h-section">Speakers.</h2>
+        </div>
+      </div>
+
+      <div class="speaker-grid speaker-grid--team reveal-stagger">
+
+        <button class="speaker-chip" data-speaker="tatiana-shavrina-26" data-name="Tatiana Shavrina" data-role="Research Scientist, Meta" data-tag="Lecturer" data-img="/img/speakers/tatiana_shavrina.jpg">
+          <div class="sc-portrait"><img src="/img/speakers/tatiana_shavrina.jpg" alt="" /></div>
+          <div class="sc-info"><span class="sc-tag">Lecturer</span><p class="sc-name">Tatiana Shavrina</p><p class="sc-role">Research Scientist, Meta</p></div>
+        </button>
+
+        <button class="speaker-chip" data-speaker="sergei-skvortsov-26" data-name="Sergei Skvortsov" data-role="Lead MLE, Nebius" data-tag="Lecturer" data-img="/img/speakers/sergei_skvortsov.jpg">
+          <div class="sc-portrait"><img src="/img/speakers/sergei_skvortsov.jpg" alt="" /></div>
+          <div class="sc-info"><span class="sc-tag">Lecturer</span><p class="sc-name">Sergei Skvortsov</p><p class="sc-role">Lead MLE, Nebius</p></div>
+        </button>
+
+        <button class="speaker-chip" data-speaker="piotr-mazurek" data-name="Piotr Mazurek" data-role="Member of Technical Staff, Liquid.AI" data-tag="Lecturer" data-img="/img/speakers/piotr_mazurek.jpg">
+          <div class="sc-portrait"><img src="/img/speakers/piotr_mazurek.jpg" alt="" /></div>
+          <div class="sc-info"><span class="sc-tag">Lecturer</span><p class="sc-name">Piotr Mazurek</p><p class="sc-role">Member of Technical Staff, Liquid.AI</p></div>
+        </button>
+
+        <button class="speaker-chip" data-speaker="ilya-boytsov-26" data-name="Ilya Boytsov" data-role="ML Performance Engineering, Nebius" data-tag="Organiser · Lecturer" data-img="/img/speakers/ilya_boystov.jpg">
+          <div class="sc-portrait"><img src="/img/speakers/ilya_boystov.jpg" alt="" /></div>
+          <div class="sc-info"><span class="sc-tag">Organiser · Lecturer</span><p class="sc-name">Ilya Boytsov</p><p class="sc-role">ML Performance Engineering, Nebius</p></div>
+        </button>
+
+      </div>
+
+      <div class="reveal" style="margin-top:32px;">
+        <p class="copy" style="color:var(--text-dim); max-width:52ch; margin:0 0 12px;">
+          More speakers will be announced as confirmations land. If you are interested in
+          contributing as a speaker or social science presenter, reach out directly.
+        </p>
+        <a class="btn-link-v3" href="mailto:oxford@llmsforsocialscience.net">
+          Get in touch <span class="arrow">→</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── § 03 Arrangements ──────────────────────────────────── -->
+  <section class="section-v3 section-v3--marker" id="support">
+    <span class="section-number">§ 03 · Arrangements</span>
     <div class="shell">
       <div class="section-head-v3 reveal">
         <div>
@@ -132,7 +210,7 @@ import SpeakerModal from '../../components/SpeakerModal.astro';
           <h3 class="h-sub" style="margin-bottom:10px">Tuition</h3>
           <p class="copy" style="margin:0; font-size:14px;">
             The full programme (lectures, seminars, coding labs, and research project
-            supervision) is free of charge for all admitted participants.
+            support) is free of charge for all admitted participants.
           </p>
         </article>
 
@@ -167,58 +245,7 @@ import SpeakerModal from '../../components/SpeakerModal.astro';
     </div>
   </section>
 
-  <!-- ── § 03 Speakers ──────────────────────────────────────── -->
-  <section class="section-v3 section-v3--marker" id="speakers">
-    <span class="section-number">§ 03 · Speakers</span>
-    <div class="shell">
-      <div class="section-head-v3 reveal">
-        <div>
-          <div class="eyebrow-v3" style="margin-bottom:14px">Confirmed · more to follow</div>
-          <h2 class="h-section">Speakers.</h2>
-        </div>
-        <p class="lede-v3">
-          The programme brings together ML researchers, social scientists, and industry
-          practitioners. Further confirmations will be added here as they land.
-        </p>
-      </div>
-
-      <div class="speaker-grid speaker-grid--team reveal-stagger">
-
-        <button class="speaker-chip" data-speaker="tatiana-shavrina-26" data-name="Tatiana Shavrina" data-role="Research Scientist, Meta" data-tag="Lecturer" data-img="/img/speakers/tatiana_shavrina.jpg">
-          <div class="sc-portrait"><img src="/img/speakers/tatiana_shavrina.jpg" alt="" /></div>
-          <div class="sc-info"><span class="sc-tag">Lecturer</span><p class="sc-name">Tatiana Shavrina</p><p class="sc-role">Research Scientist, Meta</p></div>
-        </button>
-
-        <button class="speaker-chip" data-speaker="sergei-skvortsov-26" data-name="Sergei Skvortsov" data-role="Lead MLE, Nebius" data-tag="Lecturer" data-img="/img/speakers/sergei_skvortsov.jpg">
-          <div class="sc-portrait"><img src="/img/speakers/sergei_skvortsov.jpg" alt="" /></div>
-          <div class="sc-info"><span class="sc-tag">Lecturer</span><p class="sc-name">Sergei Skvortsov</p><p class="sc-role">Lead MLE, Nebius</p></div>
-        </button>
-
-        <button class="speaker-chip" data-speaker="piotr-mazurek" data-name="Piotr Mazurek" data-role="Member of Technical Staff, Liquid.AI" data-tag="Lecturer" data-img="/img/speakers/piotr_mazurek.jpg">
-          <div class="sc-portrait"><img src="/img/speakers/piotr_mazurek.jpg" alt="" /></div>
-          <div class="sc-info"><span class="sc-tag">Lecturer</span><p class="sc-name">Piotr Mazurek</p><p class="sc-role">Member of Technical Staff, Liquid.AI</p></div>
-        </button>
-
-        <button class="speaker-chip" data-speaker="ilya-boytsov-26" data-name="Ilya Boytsov" data-role="ML Performance Engineering, Nebius" data-tag="Lecturer" data-img="/img/speakers/ilya_boystov.jpg">
-          <div class="sc-portrait"><img src="/img/speakers/ilya_boystov.jpg" alt="" /></div>
-          <div class="sc-info"><span class="sc-tag">Lecturer</span><p class="sc-name">Ilya Boytsov</p><p class="sc-role">ML Performance Engineering, Nebius</p></div>
-        </button>
-
-      </div>
-
-      <div class="reveal" style="margin-top:32px;">
-        <p class="copy" style="font-size:13px; color:var(--text-dim); max-width:52ch; margin:0 0 12px;">
-          More speakers will be announced as confirmations land. If you are interested in
-          contributing as a speaker or social science presenter, reach out directly.
-        </p>
-        <a class="btn-link-v3" href="mailto:oxford@llmsforsocialscience.net">
-          Get in touch <span class="arrow">→</span>
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <!-- ── § 04 Apply ─────────────────────────────────────────── -->
+  <!-- ── § 04 Eligibility ──────────────────────────────────── -->
   <section class="section-v3 section-v3--marker section-tinted-v3" id="apply"
            style="padding-bottom: clamp(56px, 7vw, 88px);">
     <span class="section-number">§ 04 · Eligibility</span>
@@ -228,7 +255,7 @@ import SpeakerModal from '../../components/SpeakerModal.astro';
           <div class="eyebrow-v3" style="margin-bottom:14px">Eligibility &amp; deadlines</div>
           <h2 class="h-section">Applications are open.</h2>
         </div>
-        <p class="lede-v3">Reviewed on a rolling basis. Deadline 1 June; all decisions out by 3 June.</p>
+        <p class="lede-v3">Reviewed on a rolling basis. Deadline 3 June; all decisions out by 5 June.</p>
       </div>
 
       <div style="display:grid; grid-template-columns: 1fr 1fr; gap: clamp(40px, 6vw, 80px);"
@@ -259,11 +286,11 @@ import SpeakerModal from '../../components/SpeakerModal.astro';
             </div>
             <div class="dt-item">
               <span class="dt-label">Deadline</span>
-              <span class="dt-value">Mon 1 June 2026</span>
+              <span class="dt-value">Wed 3 June 2026</span>
             </div>
             <div class="dt-item">
               <span class="dt-label">Decisions sent</span>
-              <span class="dt-value">Wed 3 June 2026</span>
+              <span class="dt-value">Fri 5 June 2026</span>
             </div>
             <div class="dt-item">
               <span class="dt-label">Summer school</span>
