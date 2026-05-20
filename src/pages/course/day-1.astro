@@ -13,8 +13,8 @@ const sections = [
 /* LaTeX strings defined here so braces don't clash with JSX. */
 const math = {
   embeddingDef: String.raw`A learned mapping $f: \mathcal{V} \to \mathbb{R}^d$ from a vocabulary $\mathcal{V}$ to a $d$-dimensional real vector space, where semantic and syntactic relationships between words are encoded as geometric relationships between their vectors.`,
-  cosine: String.raw`$$\text{cosine\_similarity}(\mathbf{a}, \mathbf{b}) = \frac{\mathbf{a} \cdot \mathbf{b}}{\|\mathbf{a}\| \cdot \|\mathbf{b}\|}$$`,
-  cosineCaption: String.raw`Result is the cosine of the angle between the two vectors: <strong>1.0</strong> = identical direction, <strong>0.0</strong> = orthogonal (no overlap), <strong>âˆ’1.0</strong> = opposite.`,
+  cosine: String.raw`$$\text{cosine sim}(\mathbf{a}, \mathbf{b}) = \frac{\mathbf{a} \cdot \mathbf{b}}{\|\mathbf{a}\| \,\|\mathbf{b}\|}$$`,
+  cosineCaption: String.raw`Result is the cosine of the angle between the two vectors: <strong>1.0</strong> = identical direction, <strong>0.0</strong> = orthogonal (no overlap), <strong>&minus;1.0</strong> = opposite.`,
   analogy: String.raw`$$\vec{v}_{\text{king}} - \vec{v}_{\text{man}} + \vec{v}_{\text{woman}} \approx \vec{v}_{\text{queen}}$$`,
   bpeDef: String.raw`A tokenization strategy that splits text into units smaller than words but larger than characters. Starting from individual bytes or characters, BPE iteratively merges the most frequent adjacent pair until a target vocabulary size is reached.`,
   contextualDef: String.raw`A representation where each token's vector depends on the entire surrounding sequence. The same word produces <em>different</em> vectors in different contexts, resolving ambiguity that static embeddings cannot.`,
@@ -22,7 +22,7 @@ const math = {
   chainCaption: String.raw`The joint probability of a sequence equals the product of each token's probability given all preceding tokens $x_{\lt t}$.`,
   mleLogLikelihood: String.raw`$$\log P_\theta(x_1, \ldots, x_T) = \sum_{t=1}^{T} \log P_\theta(x_t \mid x_{\lt t})$$`,
   mleLogLikelihoodCaption: String.raw`Maximum likelihood estimation chooses $\theta$ to make the observed sequence as probable as possible under the model. Parameters $\theta$ enter through the neural network that defines each conditional $P_\theta(\cdot \mid x_{\lt t})$.`,
-  softmaxNextToken: String.raw`$$P_\theta(w \mid x_{\lt t}) = \frac{\exp(z_w)}{\sum_{w' \in \mathcal{V}} \exp(z_{w'})}$$`,
+  softmaxNextToken: String.raw`$$P_\theta(w \mid x_{\lt t}) = \frac{\exp(z_w)}{\sum\limits_{w^{\prime} \in \mathcal{V}} \exp\!\left(z_{w^{\prime}}\right)}$$`,
   softmaxNextTokenCaption: String.raw`Logits $z$ come from the last linear layer of the model; <strong>softmax</strong> turns them into a valid probability distribution over the entire vocabulary $\mathcal{V}$. Learning adjusts $\theta$ so that mass concentrates on the token that actually appears in the data—by competing across <em>all</em> alternatives, not by ignoring the rest.`,
   crossEntropyStep: String.raw`$$\ell_t = -\log P_\theta(x_t^\ast \mid x_{\lt t})$$`,
   crossEntropyStepCaption: String.raw`At position $t$, $x_t^\ast$ is the true next token from the training text. This is the <strong>cross-entropy</strong> (log loss) for a single step: it is high when the model assigns low probability to the correct token.`,
@@ -44,8 +44,8 @@ const math = {
   attentionCostCaption: String.raw`The KV cache stores two matrices (Keys and Values) for every layer, for every token generated so far. This is why long conversations consume GPU memory and why context windows have hard limits.`,
   ffnFormula: String.raw`$$\text{FFN}(\mathbf{x}) = \mathbf{W}_2\,\sigma(\mathbf{W}_1\mathbf{x} + \mathbf{b}_1) + \mathbf{b}_2$$`,
   ffnCaption: String.raw`Two learned linear transformations with a nonlinearity $\sigma$ between them. The inner dimension $d_\text{ff}$ is typically $4 \times d_\text{model}$, so the FFN first expands each token's representation and then compresses it back. $\sigma$ is GELU in GPT-style models, SwiGLU in Llama.`,
-  unembedFormula: String.raw`$$\mathbf{z}_t = \mathbf{h}_t\,W_U^\top, \qquad W_U \in \mathbb{R}^{|\mathcal{V}| \times d}$$`,
-  unembedCaption: String.raw`The final hidden state $\mathbf{h}_t \in \mathbb{R}^d$ is projected to a vector of $|\mathcal{V}|$ raw scores (logits) by the unembedding matrix $W_U$. Softmax then turns these into the next-token probability distribution. In some model families (GPT-2, BERT), $W_U = W_E^\top$ (weight tying): the embedding and unembedding matrices share parameters. Many recent LLMs (Llama, Mistral) use separate matrices instead.`,
+  unembedFormula: String.raw`$$\mathbf{z}_t = \mathbf{h}_t\,W_U^\top, \qquad W_U \in \mathbb{R}^{\lvert\mathcal{V}\rvert \times d}$$`,
+  unembedCaption: String.raw`The final hidden state $\mathbf{h}_t \in \mathbb{R}^d$ is projected to a vector of $\lvert\mathcal{V}\rvert$ raw scores (logits) by the unembedding matrix $W_U$. Softmax then turns these into the next-token probability distribution. In some model families (GPT-2, BERT), $W_U = W_E^\top$ (weight tying): the embedding and unembedding matrices share parameters. Many recent LLMs (Llama, Mistral) use separate matrices instead.`,
   mlmDef: String.raw`A training objective in which a random subset of input tokens (typically 15 %) is replaced by a special <code>[MASK]</code> token, and the model is trained to predict the original tokens from the surrounding context. Unlike causal language modeling, the model can use context from <em>both directions</em> simultaneously.`,
 };
 ---
@@ -859,13 +859,12 @@ const math = {
       <var class="fc-q">q</var><sub><var>i</var></sub> &middot;
       <var class="fc-k">k</var><sub><var>j</var></sub> / &radic;<var>d<sub>k</sub></var>
       (here <var>d<sub>k</sub></var> = 4), then a weighted sum of
-      <var class="fc-v">v</var> vectors. <strong>Head&nbsp;2</strong> reuses the
-      exact same W<sub>Q</sub>, W<sub>K</sub>, W<sub>V</sub> as in the
-      single-head widget above, so its heatmap matches that computation;
-      Heads&nbsp;1 and 3 use different weights so you can compare patterns.
+      <var class="fc-v">v</var> vectors. <strong>Head&nbsp;2</strong> uses one
+      shared set of W<sub>Q</sub>, W<sub>K</sub>, W<sub>V</sub>; Heads&nbsp;1 and
+      3 use different weights so you can compare across heads.
     </p>
 
-    <!-- Multi-head attention: same card + formula language as single-head widget -->
+    <!-- Multi-head attention (same card shell as the single-head block) -->
     <div class="attention-explorer attention-explorer--multihead" id="mh-explorer">
       <div class="attn-step__header">
         <span class="attn-step__label">Multi-head attention</span>
@@ -884,8 +883,8 @@ const math = {
         <var>j</var> (darker = higher). Hover a cell for the exact percentage;
         click any cell in a row to pin that query token across all heads. The
         panel below shows each head&rsquo;s contextual output as a
-        <strong>heatmap strip</strong> (same encoding as the single-head
-        widget), then a toy projection back to 4-D.
+        <strong>heatmap strip</strong> (darker = larger magnitude in each
+        direction), then a toy projection back to 4-D.
       </p>
 
       <div class="multihead-viz" id="mh-viz">
@@ -897,7 +896,7 @@ const math = {
         </div>
         <div class="multihead-viz__head" id="mh-head-1">
           <p class="multihead-viz__title" style="color: #E88D4F;">Head 2: Semantic</p>
-          <p class="multihead-viz__meta multihead-viz__meta--match">Same <var>W</var><sub>Q</sub>, <var>W</var><sub>K</sub>, <var>W</var><sub>V</sub> as the single-head demo</p>
+          <p class="multihead-viz__meta multihead-viz__meta--match">Single shared <var>W</var><sub>Q</sub>, <var>W</var><sub>K</sub>, <var>W</var><sub>V</sub></p>
           <div id="mh-svg-1"></div>
           <p class="multihead-viz__desc" id="mh-desc-1">"bank" &rarr; "river": meaning from context</p>
         </div>
@@ -1553,7 +1552,7 @@ const math = {
         <line x1="112" y1="35" x2="130" y2="35" style="stroke: var(--text-dim, #9CA3AF);" stroke-width="1.5" marker-end="url(#arrUE)"/>
         <!-- Box 2: hidden state -->
         <rect x="131" y="18" width="82" height="34" rx="5" style="fill: var(--accent-bg, #EBF7FD); stroke: var(--accent, #2D8ABF);" stroke-width="1.5"/>
-        <text x="172" y="33" text-anchor="middle" style="fill: var(--blue-0, #1E3A5F);" font-weight="600" font-size="10"><tspan font-weight="700">h</tspan><tspan font-size="8" dy="3">t</tspan><tspan dy="-3"> âˆˆ â„</tspan><tspan font-size="8" dy="-3">d</tspan></text>
+        <text x="172" y="33" text-anchor="middle" style="fill: var(--blue-0, #1E3A5F);" font-weight="600" font-size="10"><tspan font-weight="700">h</tspan><tspan font-size="8" dy="3">t</tspan><tspan dy="-3">&#x2208;&#xA0;&#x211D;</tspan><tspan font-size="8" dy="-3">d</tspan></text>
         <text x="172" y="47" text-anchor="middle" style="fill: var(--text-muted, #6B7280);" font-size="9">hidden state</text>
         <!-- Arrow -->
         <line x1="213" y1="35" x2="231" y2="35" style="stroke: var(--text-dim, #9CA3AF);" stroke-width="1.5" marker-end="url(#arrUE)"/>
@@ -1565,7 +1564,7 @@ const math = {
         <line x1="314" y1="35" x2="332" y2="35" style="stroke: var(--text-dim, #9CA3AF);" stroke-width="1.5" marker-end="url(#arrUE)"/>
         <!-- Box 4: logits -->
         <rect x="333" y="18" width="82" height="34" rx="5" style="fill: var(--accent-bg, #EBF7FD); stroke: var(--accent, #2D8ABF);" stroke-width="1.5"/>
-        <text x="374" y="33" text-anchor="middle" style="fill: var(--blue-0, #1E3A5F);" font-weight="600" font-size="10"><tspan font-weight="700">z</tspan><tspan font-size="8" dy="3">t</tspan><tspan dy="-3"> âˆˆ â„</tspan><tspan font-size="8" dy="-3">|ð’±|</tspan></text>
+        <text x="374" y="33" text-anchor="middle" style="fill: var(--blue-0, #1E3A5F);" font-weight="600" font-size="10"><tspan font-weight="700">z</tspan><tspan font-size="8" dy="3">t</tspan><tspan dy="-3">&#x2208;&#xA0;&#x211D;</tspan><tspan font-size="8" dy="-3">&#124;&#x1D4A1;&#124;</tspan></text>
         <text x="374" y="47" text-anchor="middle" style="fill: var(--text-muted, #6B7280);" font-size="9">logits</text>
         <!-- Arrow -->
         <line x1="415" y1="35" x2="433" y2="35" style="stroke: var(--text-dim, #9CA3AF);" stroke-width="1.5" marker-end="url(#arrUE)"/>
@@ -2869,7 +2868,7 @@ const math = {
 })();
 </script>
 
-<!-- Multi-head attention interactive heatmaps (same embeddings + math as single-head widget) -->
+<!-- Multi-head attention interactive heatmaps -->
 <script is:inline>
 (function() {
   var vizRoot = document.getElementById("mh-viz");

@@ -1,6 +1,9 @@
 ---
 import Nav from '../components/Nav.astro';
+import LogoMark from '../components/LogoMark.astro';
 import '../styles/global.css';
+import '../styles/palette.css';
+import '../styles/site-v3.css';
 
 interface Props {
   title: string;
@@ -19,20 +22,6 @@ const fullTitle = title === 'Oxford LLMs' ? title : `${title} | Oxford LLMs`;
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content={description} />
   <title>{fullTitle}</title>
-
-  <script is:inline>
-    (function() {
-      try {
-        var root = document.documentElement;
-        var stored = window.localStorage.getItem('oxford-llms-theme');
-        if (!stored || stored === 'blue') {
-          root.removeAttribute('data-theme');
-        } else {
-          root.setAttribute('data-theme', stored);
-        }
-      } catch (e) {}
-    })();
-  </script>
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous" />
   <script is:inline defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
@@ -65,6 +54,164 @@ const fullTitle = title === 'Oxford LLMs' ? title : `${title} | Oxford LLMs`;
     <main>
       <slot />
     </main>
+
+    <footer class="footer-v3">
+      <div class="footer-v3-inner">
+        <div>
+          <div class="footer-v3-brand">
+            <LogoMark size={26} />
+            <span class="footer-v3-brand-name">Oxford LLMs</span>
+          </div>
+          <p class="colophon">
+            An independent research lab at Nuffield College, University of Oxford.
+            Building open methods and curriculum for social scientists using language models.
+          </p>
+        </div>
+        <div>
+          <h4>School</h4>
+          <ul>
+            <li><a href="/summer-school/2026/">2026 cohort</a></li>
+            <li><a href="/summer-school/2025/">2025 highlights</a></li>
+            <li><a href="/summer-school/2024/">2024 highlights</a></li>
+            <li><a href="/summer-school/2023/">2023 highlights</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Resources</h4>
+          <ul>
+            <li><a href="/course/">LLMs course</a></li>
+            <li>
+              <a href="https://github.com/antndlcrx/Intro-to-LLMs-DPIR/tree/main/preliminaries" target="_blank" rel="noopener">Python for social scientists</a>
+            </li>
+            <li>
+              <a href="https://github.com/antndlcrx/oxford-llms-workshop" target="_blank" rel="noopener">Workshop materials</a>
+            </li>
+            <li>
+              <a href="https://github.com/antndlcrx/synthetic_sampling" target="_blank" rel="noopener">Synthetic data</a>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <h4>Contact</h4>
+          <ul>
+            <li>
+              <a href="mailto:oxford@llmsforsocialscience.net">oxford@llmsforsocialscience.net</a>
+            </li>
+            <li>Nuffield College, New Road</li>
+            <li>Oxford OX1 1NF, UK</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-v3-bottom">
+        <span class="copy">&copy; {new Date().getFullYear()} Oxford LLMs</span>
+        <div class="footer-v3-icons">
+          <a href="https://github.com/Oxford-LLMs-Research" target="_blank" rel="noopener"
+             aria-label="Oxford LLMs on GitHub">
+            <img src="/img/icons/github-mark.svg" alt="GitHub" style="width:20px;height:20px;" />
+          </a>
+          <a href="https://huggingface.co/oxford-llms" target="_blank" rel="noopener"
+             aria-label="Oxford LLMs on Hugging Face">
+            <img src="/img/icons/hf-logo.svg" alt="Hugging Face" style="width:26px;height:26px;" />
+          </a>
+          <a href="https://www.linkedin.com/company/oxford-llms/" target="_blank" rel="noopener"
+             aria-label="Oxford LLMs on LinkedIn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
+              <rect x="2" y="9" width="4" height="12"/>
+              <circle cx="4" cy="4" r="2"/>
+            </svg>
+          </a>
+          <a href="mailto:oxford@llmsforsocialscience.net" aria-label="Email Oxford LLMs">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <rect x="4" y="7" width="16" height="10" rx="2" stroke="currentColor" stroke-width="1.4"/>
+              <path d="M5 8.5L12 13l7-4.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </footer>
+
   </div>
+
+  <script is:inline>
+    /* ── Sticky-nav scrolled state ── */
+    var nav = document.querySelector('.nav');
+    if (nav) {
+      var onScroll = function() { nav.classList.toggle('is-scrolled', window.scrollY > 8); };
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+    }
+
+    /* ── Scroll reveals ── */
+    if (typeof IntersectionObserver !== 'undefined') {
+      var io = new IntersectionObserver(function(es) {
+        es.forEach(function(e) {
+          if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); }
+        });
+      }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+      document.querySelectorAll('.reveal, .reveal-stagger').forEach(function(el) { io.observe(el); });
+    }
+
+    /* ── Constellation widget (Summer school page) ── */
+    function buildConstellation(svg) {
+      if (!svg || svg.dataset.built === '1') return;
+      svg.dataset.built = '1';
+      var W = 800, H = 320;
+      var clusters = [
+        { cx: 0.20, cy: 0.42, n: 22, hue: 'var(--blue-3)', label: 'Oxford',      lx: 0.20, ly: 0.10 },
+        { cx: 0.52, cy: 0.66, n: 18, hue: 'var(--blue-4)', label: 'Sciences Po', lx: 0.52, ly: 0.96 },
+        { cx: 0.82, cy: 0.40, n: 20, hue: 'var(--blue-5)', label: 'EUI',         lx: 0.82, ly: 0.08 },
+      ];
+      var s = 23;
+      var r = function() { s = (s * 9301 + 49297) % 233280; return s / 233280; };
+      var NS = 'http://www.w3.org/2000/svg';
+      var frag = document.createDocumentFragment();
+      [[0,1],[0,2],[1,2]].forEach(function(pair) {
+        var l = document.createElementNS(NS, 'line');
+        l.setAttribute('class', 'c-edge');
+        l.setAttribute('x1', clusters[pair[0]].cx * W);
+        l.setAttribute('y1', clusters[pair[0]].cy * H);
+        l.setAttribute('x2', clusters[pair[1]].cx * W);
+        l.setAttribute('y2', clusters[pair[1]].cy * H);
+        l.setAttribute('stroke', 'color-mix(in srgb, var(--blue-3) 70%, transparent)');
+        l.setAttribute('stroke-width', '1');
+        frag.appendChild(l);
+      });
+      clusters.forEach(function(c) {
+        var spread = 32;
+        for (var i = 0; i < c.n; i++) {
+          var dx = (r() + r() + r() - 1.5) * spread;
+          var dy = (r() + r() + r() - 1.5) * spread;
+          var cx = c.cx * W + dx, cy = c.cy * H + dy;
+          var ang = r() * Math.PI * 2;
+          var dist = 200 + r() * 160;
+          var dot = document.createElementNS(NS, 'circle');
+          dot.setAttribute('class', 'c-dot');
+          dot.setAttribute('cx', cx.toFixed(2));
+          dot.setAttribute('cy', cy.toFixed(2));
+          dot.setAttribute('r', (2.2 + r() * 2).toFixed(2));
+          dot.setAttribute('fill', c.hue);
+          dot.style.transformOrigin = cx.toFixed(2) + 'px ' + cy.toFixed(2) + 'px';
+          dot.style.setProperty('--fx', (Math.cos(ang) * dist).toFixed(0) + 'px');
+          dot.style.setProperty('--fy', (Math.sin(ang) * dist).toFixed(0) + 'px');
+          dot.style.setProperty('--o', (0.7 + r() * 0.25).toFixed(2));
+          dot.style.transitionDelay = (0.25 + r() * 0.9).toFixed(2) + 's';
+          frag.appendChild(dot);
+        }
+      });
+      clusters.forEach(function(c) {
+        var t = document.createElementNS(NS, 'text');
+        t.setAttribute('class', 'c-label');
+        t.setAttribute('x', c.lx * W);
+        t.setAttribute('y', c.ly * H);
+        t.setAttribute('text-anchor', 'middle');
+        t.textContent = c.label.toUpperCase();
+        frag.appendChild(t);
+      });
+      svg.appendChild(frag);
+    }
+    document.querySelectorAll('.w-const-svg').forEach(buildConstellation);
+  </script>
 </body>
 </html>

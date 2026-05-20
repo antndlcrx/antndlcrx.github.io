@@ -2,175 +2,279 @@
 import Base from '../../layouts/Base.astro';
 ---
 
-<Base title="Course" description="LLMs for Social Science: a hands-on course from embeddings to agentic workflows, built for social scientists.">
-  <div class="container container--content">
+<Base
+  title="Course — LLMs for Social Science"
+  description="LLMs for Social Science: five modules from embeddings to agentic workflows, built for early-career social scientists."
+>
 
-    <div class="page-header">
-      <p class="section-label">Course</p>
-      <h1 class="page-header__title">LLMs for Social Science</h1>
-      <p class="page-header__desc">
-        Language models are reshaping how social scientists collect, annotate, and
-        analyze text. But treating them as black-box APIs leaves enormous
-        potential on the table, and introduces risks you cannot diagnose
-        without understanding what happens inside.
-      </p>
-      <p class="page-header__desc" style="margin-top: var(--sp-3);">
-        This course takes you from the mathematical foundations of word
-        embeddings and transformers through to building autonomous research
-        agents, giving you the conceptual depth and hands-on skills to use
-        LLMs critically and creatively in your own work.
-      </p>
+  <!-- ── Status strip ───────────────────────────────────────── -->
+  <aside class="status-strip" aria-label="Page breadcrumb">
+    <div class="status-strip-inner">
+      <span>Course</span>
+      <span class="sep"></span>
+      <span>LLMs for Social Science</span>
+      <a class="status-cta" href="/course/day-1/">Begin Module 1 <span class="arrow">→</span></a>
     </div>
-  </div>
+  </aside>
 
-  <div class="blend-to-tint"></div>
+  <!-- ── Manuscript hero with TOC rail ──────────────────────── -->
+  <section class="hero-manuscript">
+    <div class="hero-ms-inner">
 
-  <div class="section-tinted" style="padding: var(--sp-9) 0;">
-    <div class="container container--content">
-      <h2 style="margin-bottom: var(--sp-7);">What You Will Learn</h2>
-      <div class="topic-flow">
-
-        <div class="topic-flow__item">
-          <span class="topic-flow__dot"></span>
-          <p class="topic-flow__day">Module 1</p>
-          <h3 class="topic-flow__title"><a href="/course/day-1/">Foundations</a></h3>
-          <p class="topic-flow__desc">
-            From bag-of-words to embeddings and tokenization, then contextual
-            representations, language modeling, the Transformer, scaling laws,
-            and how this stack shows up in social science workflows—the conceptual
-            spine for the rest of the course.
-          </p>
+      <aside class="hero-ms-rail">
+        <span class="rail-label">Course</span>
+        <ol class="rail-toc">
+          <li>
+            <a href="#modules">
+              <span class="t-num">01</span>
+              <span class="t-name">Modules</span>
+            </a>
+          </li>
+          <li>
+            <a href="#begin">
+              <span class="t-num">02</span>
+              <span class="t-name">Begin</span>
+            </a>
+          </li>
+          <li>
+            <a href="#dates">
+              <span class="t-num">03</span>
+              <span class="t-name">Dates</span>
+            </a>
+          </li>
+        </ol>
+        <div class="rail-foot">
+          <span>5 modules</span>
+          <span>Open access</span>
         </div>
+      </aside>
 
-        <div class="topic-flow__item">
-          <span class="topic-flow__dot"></span>
-          <p class="topic-flow__day">Module 2</p>
-          <h3 class="topic-flow__title"><a href="/course/day-2/">From Models to Tools</a></h3>
-          <p class="topic-flow__desc">
-            Post-training alignment (SFT, RLHF, DPO), prompting from zero-shot to
-            chain-of-thought, reasoning techniques, and how to evaluate models and
-            choose one that fits your task.
-          </p>
-        </div>
+      <div class="hero-ms-content">
+        <p class="eyebrow-v3">LLMs for Social Science</p>
+        <h1 class="hero-title h-display" style="margin: 16px 0 24px;">
+          From embeddings<br>to agents.
+        </h1>
+        <p class="lede-v3">
+          Language models are reshaping how social scientists collect, annotate, and
+          analyze text. This course builds the conceptual depth and hands-on skills
+          to use them critically. Beginner Python required; everything else is taught
+          from first principles.
+        </p>
+      </div>
 
-        <div class="topic-flow__item">
-          <span class="topic-flow__dot"></span>
-          <p class="topic-flow__day">Module 3</p>
-          <h3 class="topic-flow__title"><a href="/course/day-3/">Deploying for Research</a></h3>
-          <p class="topic-flow__desc">
-            Fine-tuning (including LoRA-style adaptation and encoder heads), moving
-            from notebooks to APIs and self-hosted inference, and rigorous
-            validation—so a classifier works as a measurement instrument you can
-            defend in publication.
-          </p>
-        </div>
+    </div>
+  </section>
 
-        <div class="topic-flow__item">
-          <span class="topic-flow__dot"></span>
-          <p class="topic-flow__day">Module 4</p>
-          <h3 class="topic-flow__title"><a href="/course/day-4/">Extraction, Summarization, and RAG</a></h3>
-          <p class="topic-flow__desc">
-            Faithful extraction and summarization (hallucination, omission, and
-            distortion), then retrieval-augmented generation: chunking, embeddings,
-            retrieval, and grounded answers with provenance checks over your own
-            corpora.
-          </p>
+  <!-- ── § 01 Modules ───────────────────────────────────────── -->
+  <section class="section-v3 section-v3--marker" id="modules">
+    <span class="section-number">§ 01 · Modules</span>
+    <div class="shell">
+      <div class="section-head-v3 reveal">
+        <div>
+          <div class="eyebrow-v3" style="margin-bottom:14px">Five weeks of material</div>
+          <h2 class="h-section">What you will learn.</h2>
         </div>
+        <p class="lede-v3">
+          The course runs from mathematical foundations to autonomous research agents.
+          Each module builds on the last; start at Module 1.
+        </p>
+      </div>
 
-        <div class="topic-flow__item">
-          <span class="topic-flow__dot"></span>
-          <p class="topic-flow__day">Module 5</p>
-          <h3 class="topic-flow__title"><a href="/course/day-5/">Agentic Workflows</a></h3>
-          <p class="topic-flow__desc">
-            Building autonomous research agents with tool use, ReAct
-            patterns, and multi-step orchestration: the frontier of what
-            LLMs can do for your research pipeline.
-          </p>
-        </div>
+      <div class="days reveal-stagger">
+
+        <a class="day" href="/course/day-1/" style="text-decoration:none;">
+          <span class="d-tag">Module 1</span>
+          <div>
+            <h3 class="d-title">Foundations</h3>
+            <p class="d-body">
+              From bag-of-words to embeddings and tokenization, then contextual representations,
+              language modeling, the Transformer, scaling laws, and how this stack shows up in
+              social science workflows. The conceptual spine for everything that follows.
+            </p>
+            <span class="btn-link-v3" style="margin-top:14px; display:inline-block;">
+              Open module <span class="arrow">→</span>
+            </span>
+          </div>
+        </a>
+
+        <a class="day" href="/course/day-2/" style="text-decoration:none;">
+          <span class="d-tag">Module 2</span>
+          <div>
+            <h3 class="d-title">From Models to Tools</h3>
+            <p class="d-body">
+              Post-training alignment (SFT, RLHF, DPO), prompting from zero-shot to
+              chain-of-thought, reasoning techniques, and how to evaluate models and
+              choose one that fits your task.
+            </p>
+            <span class="btn-link-v3" style="margin-top:14px; display:inline-block;">
+              Open module <span class="arrow">→</span>
+            </span>
+          </div>
+        </a>
+
+        <a class="day" href="/course/day-3/" style="text-decoration:none;">
+          <span class="d-tag">Module 3</span>
+          <div>
+            <h3 class="d-title">Deploying for Research</h3>
+            <p class="d-body">
+              Fine-tuning (including LoRA-style adaptation and encoder heads), moving from
+              notebooks to APIs and self-hosted inference, and rigorous validation — so a
+              classifier works as a measurement instrument you can defend in publication.
+            </p>
+            <span class="btn-link-v3" style="margin-top:14px; display:inline-block;">
+              Open module <span class="arrow">→</span>
+            </span>
+          </div>
+        </a>
+
+        <a class="day" href="/course/day-4/" style="text-decoration:none;">
+          <span class="d-tag">Module 4</span>
+          <div>
+            <h3 class="d-title">Extraction, Summarization, and RAG</h3>
+            <p class="d-body">
+              Faithful extraction and summarization (hallucination, omission, and distortion),
+              then retrieval-augmented generation: chunking, embeddings, retrieval, and grounded
+              answers with provenance checks over your own corpora.
+            </p>
+            <span class="btn-link-v3" style="margin-top:14px; display:inline-block;">
+              Open module <span class="arrow">→</span>
+            </span>
+          </div>
+        </a>
+
+        <a class="day" href="/course/day-5/" style="text-decoration:none;">
+          <span class="d-tag">Module 5</span>
+          <div>
+            <h3 class="d-title">Agentic Workflows</h3>
+            <p class="d-body">
+              Building autonomous research agents with tool use, ReAct patterns, and
+              multi-step orchestration. The frontier of what language models can do for
+              your research pipeline.
+            </p>
+            <span class="btn-link-v3" style="margin-top:14px; display:inline-block;">
+              Open module <span class="arrow">→</span>
+            </span>
+          </div>
+        </a>
 
       </div>
     </div>
-  </div>
+  </section>
 
-  <div class="blend-to-white"></div>
+  <!-- ── § 02 Begin ─────────────────────────────────────────── -->
+  <section class="section-v3 section-v3--marker section-tinted-v3" id="begin">
+    <span class="section-number">§ 02 · Begin</span>
+    <div class="shell">
+      <div class="section-head-v3 reveal">
+        <div>
+          <div class="eyebrow-v3" style="margin-bottom:14px">Getting started</div>
+          <h2 class="h-section">Open access. No registration required.</h2>
+        </div>
+      </div>
 
-  <div style="padding: var(--sp-8) 0 var(--sp-9);">
-    <div class="container container--content">
-      <div class="grid-3">
+      <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 20px;"
+           class="reveal-stagger">
 
-        <div class="card card--accent-1">
-          <h3 class="card__title">Prerequisites</h3>
-          <p class="card__text">
+        <article class="fb">
+          <span class="rule-soft"></span>
+          <h3 class="h-sub" style="margin-bottom:10px">Prerequisites</h3>
+          <p class="copy" style="margin:0 0 16px; font-size:14px;">
             Beginner-to-intermediate Python. A Google account for Colab.
-            No prior deep learning or NLP experience required; we build from
-            fundamentals.
+            No prior deep learning or NLP experience required; the course builds from
+            mathematical foundations.
           </p>
-          <a
-            href="https://github.com/antndlcrx/Intro-to-LLMs-DPIR/tree/main/preliminaries"
-            target="_blank"
-            rel="noopener"
-            class="card__link"
-          >Preliminary notebooks →</a>
-        </div>
-
-        <div class="card card--accent-3">
-          <h3 class="card__title">Materials</h3>
-          <p class="card__text">
-            All exercises are open-source Jupyter notebooks. Clone the repo,
-            open in Colab, and follow along.
-          </p>
-          <a href="https://github.com/antndlcrx/Intro-to-LLMs-DPIR" target="_blank" rel="noopener" class="card__link">
-            GitHub Repository →
+          <a class="btn-link-v3" href="https://github.com/antndlcrx/Intro-to-LLMs-DPIR/tree/main/preliminaries"
+             target="_blank" rel="noopener">
+            Preliminary notebooks <span class="arrow">→</span>
           </a>
-        </div>
+        </article>
 
-        <div class="card card--accent-5">
-          <h3 class="card__title">Begin the Course</h3>
-          <p class="card__text">
-            Start with Module 1: the mathematical and conceptual foundations that
+        <article class="fb">
+          <span class="rule-soft"></span>
+          <h3 class="h-sub" style="margin-bottom:10px">Materials</h3>
+          <p class="copy" style="margin:0 0 16px; font-size:14px;">
+            All exercises are open-source Jupyter notebooks. Clone the repository,
+            open in Colab, and follow along at your own pace.
+          </p>
+          <a class="btn-link-v3" href="https://github.com/antndlcrx/Intro-to-LLMs-DPIR"
+             target="_blank" rel="noopener">
+            GitHub repository <span class="arrow">→</span>
+          </a>
+        </article>
+
+        <article class="fb">
+          <span class="rule-soft"></span>
+          <h3 class="h-sub" style="margin-bottom:10px">Start here</h3>
+          <p class="copy" style="margin:0 0 16px; font-size:14px;">
+            Begin with Module 1: the mathematical and conceptual foundations that
             everything else builds on.
           </p>
-          <a href="/course/day-1/" class="btn btn--primary" style="margin-top: var(--sp-4); display: inline-flex;">
-            Begin →
+          <a class="btn-primary" href="/course/day-1/">
+            Begin Module 1 <span class="arrow">→</span>
           </a>
-        </div>
+        </article>
 
       </div>
     </div>
-  </div>
+  </section>
 
-  <div class="blend-to-tint"></div>
+  <!-- ── § 03 Taught at ────────────────────────────────────── -->
+  <section class="section-v3 section-v3--marker" id="dates"
+           style="padding-bottom: clamp(56px, 7vw, 88px);">
+    <span class="section-number">§ 03 · Taught at</span>
+    <div class="shell">
+      <div class="section-head-v3 reveal">
+        <div>
+          <div class="eyebrow-v3" style="margin-bottom:14px">Spring 2026</div>
+          <h2 class="h-section">Three institutions across Europe.</h2>
+        </div>
+        <p class="lede-v3">
+          The course was delivered in person at three institutions in spring 2026.
+          All materials remain freely available online.
+        </p>
+      </div>
 
-  <div class="section-tinted" style="padding: var(--sp-8) 0 var(--sp-9);">
-    <div class="container container--content">
-      <h2 style="margin-bottom: var(--sp-4);">2026 Dates &amp; Locations</h2>
-      <div class="grid-3 mt-4">
-        <div class="card card--accent-1">
-          <span class="tag">Upcoming</span>
-          <h3 class="card__title" style="margin-top: var(--sp-3);">Oxford</h3>
-          <p class="card__text">
-            March 23–27, 2026<br />
-            5-day intensive. DPIR, University of Oxford.
+      <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 20px;"
+           class="reveal-stagger">
+
+        <article class="fb">
+          <img src="/img/partners/dpir_spring_school.png" alt="DPIR Spring School"
+               style="height:44px; width:auto; max-width:200px; object-fit:contain;
+                      object-position:left center; margin-bottom:16px;" />
+          <span class="rule-soft"></span>
+          <h3 class="h-sub" style="margin-bottom:6px">Oxford</h3>
+          <p class="copy" style="margin:0; font-size:14px;">
+            23–27 March 2026<br>
+            <span style="color:var(--text-muted);">5-day intensive · DPIR, University of Oxford</span>
           </p>
-        </div>
-        <div class="card card--accent-3">
-          <h3 class="card__title">ESSCA Paris</h3>
-          <p class="card__text">
-            April 7, 2026<br />
-            1-day workshop.
+        </article>
+
+        <article class="fb">
+          <img src="/img/partners/essca.png" alt="ESSCA"
+               style="height:56px; width:auto; max-width:120px; object-fit:contain;
+                      object-position:left center; margin-bottom:16px;" />
+          <span class="rule-soft"></span>
+          <h3 class="h-sub" style="margin-bottom:6px">ESSCA Paris</h3>
+          <p class="copy" style="margin:0; font-size:14px;">
+            7 April 2026<br>
+            <span style="color:var(--text-muted);">1-day workshop</span>
           </p>
-        </div>
-        <div class="card card--accent-5">
-          <h3 class="card__title">EUI Florence</h3>
-          <p class="card__text">
-            April 20–21, 2026<br />
-            2-day workshop. European University Institute.
+        </article>
+
+        <article class="fb">
+          <img src="/img/partners/eui.png" alt="European University Institute"
+               style="height:44px; width:auto; max-width:160px; object-fit:contain;
+                      object-position:left center; margin-bottom:16px;" />
+          <span class="rule-soft"></span>
+          <h3 class="h-sub" style="margin-bottom:6px">EUI Florence</h3>
+          <p class="copy" style="margin:0; font-size:14px;">
+            20–21 April 2026<br>
+            <span style="color:var(--text-muted);">2-day workshop · European University Institute</span>
           </p>
-        </div>
+        </article>
+
       </div>
     </div>
-  </div>
-
-  <div class="blend-to-white"></div>
+  </section>
 
 </Base>

@@ -3,60 +3,158 @@ import Base from '../layouts/Base.astro';
 ---
 
 <Base title="Research" description="Papers, code, and datasets from the Oxford LLMs research programme.">
-  <div class="container container--content">
 
-    <div class="page-header">
-      <p class="section-label">Research</p>
-      <h1 class="page-header__title">Research Programme</h1>
-      <p class="page-header__desc">
-        We develop methods for applying language models to social science, with a focus on
-        synthetic data, opinion prediction, and model evaluation.
-      </p>
+  <aside class="status-strip" aria-label="Applications status">
+    <div class="status-strip-inner">
+      <span class="status-dot" aria-hidden="true"></span>
+      <span class="status-label">Applications open</span>
+      <span class="sep"></span>
+      <span>Deadline 1 June</span>
+      <span class="sep"></span>
+      <span>13–17 July 2026</span>
+      <span class="sep"></span>
+      <span>30 places</span>
+      <div style="margin-left:auto; display:flex; gap:10px; align-items:center;">
+        <a class="status-cta" style="margin-left:0" href="https://forms.gle/VQ5qrdQ5Pk1Rtogg7" target="_blank" rel="noopener">Apply now <span class="arrow">→</span></a>
+        <a class="status-cta" style="margin-left:0" href="/summer-school/2026/">Details <span class="arrow">→</span></a>
+      </div>
     </div>
+  </aside>
 
-    <div class="prose">
-      <h2>Papers</h2>
-      <p>
-        <!-- Add papers here as they become public -->
-        Our current research focuses on using LLMs as condensed representations of internet-scale
-        text from which we can learn how people organise relationships between concepts.
-        Papers in progress. Details coming soon.
-      </p>
+  <!-- ── Hero ───────────────────────────────────────────────── -->
+  <section class="hero-manuscript">
+    <div class="hero-ms-inner">
+      <aside class="hero-ms-rail">
+        <span class="rail-label">Contents</span>
+        <ol class="rail-toc">
+          <li>
+            <a href="#themes">
+              <span class="t-num">01</span>
+              <span class="t-name">Themes</span>
+            </a>
+          </li>
+          <li>
+            <a href="#open">
+              <span class="t-num">02</span>
+              <span class="t-name">Open</span>
+            </a>
+          </li>
+        </ol>
+        <div class="rail-foot">
+          <span>Open source</span>
+          <span>Oxford</span>
+        </div>
+      </aside>
 
-      <h2>Code & Data</h2>
+      <div class="hero-ms-content">
+        <p class="eyebrow-v3">Research</p>
+        <h1 class="hero-title h-display" style="margin: 16px 0 24px;">
+          Methods for LLMs<br>in social science.
+        </h1>
+        <p class="lede-v3">
+          Synthetic data generation, opinion prediction, annotator disagreement, and model evaluation.
+          Code and datasets are open source on GitHub and Hugging Face.
+        </p>
+      </div>
     </div>
+  </section>
 
-    <!-- Repo cards: same theme palette edges as main page (Research / Materials / Course) -->
-    <div class="grid-3 mt-6">
-      <a href="https://github.com/Oxford-LLMs-Research/synthetic_sampling" class="card card--accent-1 card--pillar" target="_blank" rel="noopener">
-        <span class="tag">Research</span>
-        <h3 class="card__title" style="margin-top: var(--sp-3);">synthetic_sampling</h3>
-        <p class="card__text">Research code for synthetic sampling methods. LLM-based opinion prediction and benchmarking.</p>
-        <span class="card__link">View on GitHub →</span>
-      </a>
+  <!-- ── § 01 Themes ────────────────────────────────────────── -->
+  <section class="section-v3 section-v3--marker section-tinted-v3" id="themes">
+    <span class="section-number">§ 01 · Themes</span>
+    <div class="shell">
+      <div class="section-head-v3 reveal">
+        <div>
+          <div class="eyebrow-v3" style="margin-bottom:14px">Research themes</div>
+          <h2 class="h-section">What we work on, and why.</h2>
+        </div>
+        <p class="lede-v3">
+          Three intertwined questions sit underneath most of what we publish,
+          and most of what we teach.
+        </p>
+      </div>
 
-      <a href="https://github.com/antndlcrx/oxford-llms-workshop" class="card card--accent-3 card--pillar" target="_blank" rel="noopener">
-        <span class="tag">Materials</span>
-        <h3 class="card__title" style="margin-top: var(--sp-3);">oxford-llms-workshop</h3>
-        <p class="card__text">Summer school materials: lecture slides, notebooks, and code samples from 2023 to 2025.</p>
-        <span class="card__link">View on GitHub →</span>
-      </a>
+      <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 20px;"
+           class="reveal-stagger">
 
-      <a href="https://github.com/antndlcrx/Intro-to-LLMs-DPIR" class="card card--accent-5 card--pillar" target="_blank" rel="noopener">
-        <span class="tag">Course</span>
-        <h3 class="card__title" style="margin-top: var(--sp-3);">Intro-to-LLMs-DPIR</h3>
-        <p class="card__text">Teaching materials for the Oxford / Paris / Florence courses on LLMs for social science.</p>
-        <span class="card__link">View on GitHub →</span>
-      </a>
+        <article class="fb">
+          <span class="rule-soft"></span>
+          <h3 class="h-sub" style="margin-bottom:10px">Synthetic data</h3>
+          <p class="copy" style="margin:0; font-size:14px;">
+            Can LLMs generate respondent panels that pass standard quality checks?
+            When they do not, where do they fail, and can we measure it before we use them?
+          </p>
+        </article>
+
+        <article class="fb">
+          <span class="rule-soft"></span>
+          <h3 class="h-sub" style="margin-bottom:10px">Opinion prediction</h3>
+          <p class="copy" style="margin:0; font-size:14px;">
+            How well do open-weights models recover real survey responses across languages,
+            age cohorts, and political contexts, and what drives the gaps?
+          </p>
+        </article>
+
+        <article class="fb">
+          <span class="rule-soft"></span>
+          <h3 class="h-sub" style="margin-bottom:10px">Evaluation</h3>
+          <p class="copy" style="margin:0; font-size:14px;">
+            Building eval sets that survive contamination, treating annotator disagreement
+            as a measurement rather than a problem, and reporting confidence honestly.
+          </p>
+        </article>
+
+      </div>
     </div>
+  </section>
 
-    <div class="prose mt-8">
-      <h2>HuggingFace</h2>
-      <p>
-        Models and datasets from the collaborative research projects are published on the
-        <a href="https://huggingface.co/oxford-llms" target="_blank" rel="noopener">Oxford LLMs HuggingFace profile</a>.
-      </p>
+  <!-- ── § 03 Open ──────────────────────────────────────────── -->
+  <section class="section-v3 section-v3--marker" id="open"
+           style="padding-bottom: clamp(56px, 7vw, 88px);">
+    <span class="section-number">§ 02 · Open</span>
+    <div class="shell">
+      <div class="section-head-v3 reveal">
+        <div>
+          <div class="eyebrow-v3" style="margin-bottom:14px">Open by default</div>
+          <h2 class="h-section">Code on GitHub.<br>Weights on Hugging Face.</h2>
+        </div>
+        <p class="lede-v3">
+          Replication code ships with the paper, not six months after. Model checkpoints
+          are released under permissive licences whenever we control the training data.
+        </p>
+      </div>
+
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 20px;"
+           class="reveal-stagger">
+
+        <a class="fb" href="https://github.com/Oxford-LLMs-Research"
+           target="_blank" rel="noopener" style="display:block;">
+          <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
+            <img src="/img/icons/github-mark.svg" alt="" style="width:24px; height:24px; opacity:0.85;">
+            <h3 class="h-sub" style="margin:0;">Oxford-LLMs-Research</h3>
+          </div>
+          <p class="copy" style="margin:0 0 12px; font-size:14px;">
+            Code and evaluation tooling for our research projects, including harnesses
+            for running LLMs at survey scale. All repositories are public.
+          </p>
+          <span class="btn-link-v3">Open on GitHub <span class="arrow">→</span></span>
+        </a>
+
+        <a class="fb" href="https://huggingface.co/oxford-llms"
+           target="_blank" rel="noopener" style="display:block;">
+          <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
+            <img src="/img/icons/hf-logo.svg" alt="" style="width:24px; height:24px;">
+            <h3 class="h-sub" style="margin:0;">oxford-llms</h3>
+          </div>
+          <p class="copy" style="margin:0 0 12px; font-size:14px;">
+            Model checkpoints and datasets from our research on synthetic data
+            generation and opinion prediction.
+          </p>
+          <span class="btn-link-v3">Open on Hugging Face <span class="arrow">→</span></span>
+        </a>
+
+      </div>
     </div>
+  </section>
 
-  </div>
 </Base>

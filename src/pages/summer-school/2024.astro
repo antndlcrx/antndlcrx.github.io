@@ -1,466 +1,302 @@
 ---
 import Base from '../../layouts/Base.astro';
+import SpeakerModal from '../../components/SpeakerModal.astro';
 ---
 
-<Base title="Summer School 2024" description="Oxford LLMs 2024 — intensive workshop on AI for social science.">
-  <div class="container container--content">
+<Base
+  title="Oxford LLMs 2024"
+  description="Oxford LLMs 2024 — second annual workshop on AI for social science. Nuffield College, September 2024."
+>
 
-    <div class="page-header">
-      <p class="section-label">Summer School · 2024</p>
-      <h1 class="page-header__title">Oxford LLMs 2024</h1>
-      <p class="page-header__desc">
-        In late September 2024, Nuffield College ran an intensive five-day workshop on AI for social science.
-      </p>
+  <!-- ── Breadcrumb strip ───────────────────────────────────── -->
+  <aside class="status-strip" aria-label="Page breadcrumb">
+    <div class="status-strip-inner">
+      <a href="/summer-school/" style="color:inherit; text-decoration:none;">Summer School</a>
+      <span class="sep"></span>
+      <span>2024 — Second edition</span>
+    </div>
+  </aside>
+
+  <!-- ── Report hero ────────────────────────────────────────── -->
+  <div class="report-hero">
+    <div class="rh-inner">
+      <div>
+        <p class="rh-kicker">Second edition · September 2024</p>
+        <span class="rh-year">2024</span>
+        <p class="rh-title">Nuffield College, Oxford — five-day intensive on AI for social science.</p>
+        <div class="rh-stats">
+          <div class="rh-stat"><span class="rh-n">30</span><span class="rh-l">Participants</span></div>
+          <div class="rh-stat"><span class="rh-n">~200</span><span class="rh-l">Applications</span></div>
+          <div class="rh-stat"><span class="rh-n">5</span><span class="rh-l">Days</span></div>
+          <div class="rh-stat"><span class="rh-n">16</span><span class="rh-l">Speakers</span></div>
+        </div>
+      </div>
+      <div class="rh-photo">
+        <img src="/img/posts/report_2024/group_llms_2024.jpg" alt="Oxford LLMs 2024 cohort at Nuffield College" />
+      </div>
+    </div>
+  </div>
+
+  <!-- ── § 01 About ─────────────────────────────────────────── -->
+  <section class="section-v3 section-v3--marker" id="about">
+    <span class="section-number">§ 01 · About</span>
+    <div class="shell">
+      <div class="section-head-v3 reveal">
+        <div>
+          <div class="eyebrow-v3" style="margin-bottom:14px">Second edition</div>
+          <h2 class="h-section">RAG, fine-tuning, and a live research project.</h2>
+        </div>
+        <p class="lede-v3">
+          Nuffield College, supported by the Oxford Van Houten Fund, ran an intensive five-day workshop
+          on AI for social science in late September 2024.
+        </p>
+      </div>
+      <div class="reveal" style="max-width: 72ch;">
+        <p class="copy" style="margin: 0 0 18px;">
+          We received just under 200 applications and selected 30 participants. The lecture series
+          developed by Grigory Sapunov, Tatiana Shavrina, and Ilya Boytsov covered LLM foundations,
+          transformer architecture, in-context learning, emergent reasoning, agent-based systems,
+          fine-tuning methods, and self-hosting. Applied tutorials demonstrated retrieval-augmented
+          generation and observability tools for model monitoring.
+        </p>
+        <p class="copy" style="margin: 0 0 18px;">
+          Established scholars including Lisa P. Argyle, Chris Barrie, Raymond Duch, Thomas Hegghammer,
+          Neil Ketchley, Alison Koh, and Alexis Palmer shared current research using LLMs.
+          Guest practitioners from Qdrant, Ori Cloud, Arize, and Google led practical seminars on
+          vector search, GPU infrastructure, observability, and AI deployment.
+        </p>
+        <p class="copy" style="margin: 0;">
+          All participants contributed to the main research project: developing an approach for
+          survey data preprocessing aimed at training LLMs to predict people's opinions and
+          self-reported behaviours.
+          <a href="https://www.ori.co/" target="_blank" rel="noopener">Ori Cloud</a> provided GPU
+          support. Models and datasets are published on the
+          <a href="https://huggingface.co/oxford-llms" target="_blank" rel="noopener">Oxford LLMs Hugging Face profile</a>.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── § 02 People ────────────────────────────────────────── -->
+  <section class="section-v3 section-v3--marker section-tinted-v3" id="people">
+    <span class="section-number">§ 02 · People</span>
+    <div class="shell">
+      <div class="section-head-v3 reveal">
+        <div>
+          <div class="eyebrow-v3" style="margin-bottom:14px">Speakers &amp; organisers</div>
+          <h2 class="h-section">The people who made the week.</h2>
+        </div>
+        <p class="lede-v3">Click any card to read the full profile.</p>
+      </div>
+
+      <div class="speaker-grid reveal-stagger">
+
+        <button class="speaker-chip" data-speaker="humeyra-biricik" data-name="Humeyra Biricik" data-role="Pembroke College, Oxford" data-tag="Organiser" data-img="/img/speakers/humeyra_biricik.png">
+          <div class="sc-portrait"><img src="/img/speakers/humeyra_biricik.png" alt="" /></div>
+          <div class="sc-info"><span class="sc-tag">Organiser</span><p class="sc-name">Humeyra Biricik</p><p class="sc-role">Pembroke College, Oxford</p></div>
+        </button>
+
+        <button class="speaker-chip" data-speaker="ilya-boytsov" data-name="Ilya Boytsov" data-role="NLP Lead, Wayfair" data-tag="Organiser" data-initials="IB">
+          <div class="sc-portrait">IB</div>
+          <div class="sc-info"><span class="sc-tag">Organiser</span><p class="sc-name">Ilya Boytsov</p><p class="sc-role">NLP Lead, Wayfair</p></div>
+        </button>
+
+        <button class="speaker-chip" data-speaker="maksim-zubok" data-name="Maksim Zubok" data-role="DPIR, Oxford" data-tag="Organiser" data-img="/img/speakers/maksim_zubok.png">
+          <div class="sc-portrait"><img src="/img/speakers/maksim_zubok.png" alt="" /></div>
+          <div class="sc-info"><span class="sc-tag">Organiser</span><p class="sc-name">Maksim Zubok</p><p class="sc-role">DPIR, Oxford</p></div>
+        </button>
+
+        <button class="speaker-chip" data-speaker="grigory-sapunov" data-name="Grigory Sapunov" data-role="CTO, Intento" data-tag="Lecturer" data-img="/img/speakers/grigory_sapunov.jpeg">
+          <div class="sc-portrait"><img src="/img/speakers/grigory_sapunov.jpeg" alt="" /></div>
+          <div class="sc-info"><span class="sc-tag">Lecturer</span><p class="sc-name">Grigory Sapunov</p><p class="sc-role">CTO, Intento</p></div>
+        </button>
+
+        <button class="speaker-chip" data-speaker="tatiana-shavrina" data-name="Tatiana Shavrina" data-role="Research Scientist, Meta Llama" data-tag="Lecturer" data-img="/img/speakers/tatiana_shavrina.jpg">
+          <div class="sc-portrait"><img src="/img/speakers/tatiana_shavrina.jpg" alt="" /></div>
+          <div class="sc-info"><span class="sc-tag">Lecturer</span><p class="sc-name">Tatiana Shavrina</p><p class="sc-role">Research Scientist, Meta Llama</p></div>
+        </button>
+
+        <button class="speaker-chip" data-speaker="atita-arora" data-name="Atita Arora" data-role="Solution Architect, Qdrant" data-tag="Seminar" data-img="/img/speakers/atita_arora.jpg">
+          <div class="sc-portrait"><img src="/img/speakers/atita_arora.jpg" alt="" /></div>
+          <div class="sc-info"><span class="sc-tag">Seminar</span><p class="sc-name">Atita Arora</p><p class="sc-role">Solution Architect, Qdrant</p></div>
+        </button>
+
+        <button class="speaker-chip" data-speaker="ciera-fowler" data-name="Ciera Fowler" data-role="ML Engineering Lead, Ori Cloud" data-tag="Seminar" data-img="/img/speakers/ciera_fowler.png">
+          <div class="sc-portrait"><img src="/img/speakers/ciera_fowler.png" alt="" /></div>
+          <div class="sc-info"><span class="sc-tag">Seminar</span><p class="sc-name">Ciera Fowler</p><p class="sc-role">ML Engineering Lead, Ori Cloud</p></div>
+        </button>
+
+        <button class="speaker-chip" data-speaker="john-gilhuly" data-name="John Gilhuly" data-role="Developer Advocate, Arize AI" data-tag="Seminar" data-img="/img/speakers/john_gilhuly.jpg">
+          <div class="sc-portrait"><img src="/img/speakers/john_gilhuly.jpg" alt="" /></div>
+          <div class="sc-info"><span class="sc-tag">Seminar</span><p class="sc-name">John Gilhuly</p><p class="sc-role">Developer Advocate, Arize AI</p></div>
+        </button>
+
+        <button class="speaker-chip" data-speaker="christian-silva" data-name="Christian Silva" data-role="AI/ML Customer Engineer, Google Cloud" data-tag="Seminar" data-img="/img/speakers/christian_silva.jpg">
+          <div class="sc-portrait"><img src="/img/speakers/christian_silva.jpg" alt="" /></div>
+          <div class="sc-info"><span class="sc-tag">Seminar</span><p class="sc-name">Christian Silva</p><p class="sc-role">AI/ML Customer Engineer, Google Cloud</p></div>
+        </button>
+
+        <button class="speaker-chip" data-speaker="lisa-argyle" data-name="Lisa P. Argyle" data-role="Brigham Young University" data-tag="Research Talk" data-img="/img/speakers/lisa_argyle.jpg">
+          <div class="sc-portrait"><img src="/img/speakers/lisa_argyle.jpg" alt="" /></div>
+          <div class="sc-info"><span class="sc-tag">Research Talk</span><p class="sc-name">Lisa P. Argyle</p><p class="sc-role">Brigham Young University</p></div>
+        </button>
+
+        <button class="speaker-chip" data-speaker="chris-barrie" data-name="Chris Barrie" data-role="NYU" data-tag="Research Talk" data-img="/img/speakers/chris_bairre.png">
+          <div class="sc-portrait"><img src="/img/speakers/chris_bairre.png" alt="" /></div>
+          <div class="sc-info"><span class="sc-tag">Research Talk</span><p class="sc-name">Chris Barrie</p><p class="sc-role">NYU</p></div>
+        </button>
+
+        <button class="speaker-chip" data-speaker="raymond-duch" data-name="Raymond Duch" data-role="Nuffield College, Oxford" data-tag="Research Talk" data-img="/img/speakers/ray_duch.png">
+          <div class="sc-portrait"><img src="/img/speakers/ray_duch.png" alt="" /></div>
+          <div class="sc-info"><span class="sc-tag">Research Talk</span><p class="sc-name">Raymond Duch</p><p class="sc-role">Nuffield College, Oxford</p></div>
+        </button>
+
+        <button class="speaker-chip" data-speaker="thomas-hegghammer" data-name="Thomas Hegghammer" data-role="All Souls College, Oxford" data-tag="Research Talk" data-img="/img/speakers/thomas_hegghammer.png">
+          <div class="sc-portrait"><img src="/img/speakers/thomas_hegghammer.png" alt="" /></div>
+          <div class="sc-info"><span class="sc-tag">Research Talk</span><p class="sc-name">Thomas Hegghammer</p><p class="sc-role">All Souls College, Oxford</p></div>
+        </button>
+
+        <button class="speaker-chip" data-speaker="neil-ketchley" data-name="Neil Ketchley" data-role="St Antony's College, Oxford" data-tag="Research Talk" data-img="/img/speakers/neil_ketchley.png">
+          <div class="sc-portrait"><img src="/img/speakers/neil_ketchley.png" alt="" /></div>
+          <div class="sc-info"><span class="sc-tag">Research Talk</span><p class="sc-name">Neil Ketchley</p><p class="sc-role">St Antony's College, Oxford</p></div>
+        </button>
+
+        <button class="speaker-chip" data-speaker="alison-koh" data-name="Alison Koh" data-role="University of Birmingham" data-tag="Research Talk" data-img="/img/speakers/alison_koh.png">
+          <div class="sc-portrait"><img src="/img/speakers/alison_koh.png" alt="" /></div>
+          <div class="sc-info"><span class="sc-tag">Research Talk</span><p class="sc-name">Alison Koh</p><p class="sc-role">University of Birmingham</p></div>
+        </button>
+
+        <button class="speaker-chip" data-speaker="alexis-palmer" data-name="Alexis Palmer" data-role="Dartmouth College" data-tag="Research Talk" data-img="/img/speakers/alexis_palmer.png">
+          <div class="sc-portrait"><img src="/img/speakers/alexis_palmer.png" alt="" /></div>
+          <div class="sc-info"><span class="sc-tag">Research Talk</span><p class="sc-name">Alexis Palmer</p><p class="sc-role">Dartmouth College</p></div>
+        </button>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── § 03 Materials ─────────────────────────────────────── -->
+  <section class="section-v3 section-v3--marker" id="materials" style="padding-bottom: clamp(56px, 7vw, 88px);">
+    <span class="section-number">§ 03 · Materials</span>
+    <div class="shell">
+      <div class="section-head-v3 reveal">
+        <div>
+          <div class="eyebrow-v3" style="margin-bottom:14px">Open access</div>
+          <h2 class="h-section">Slides, notebooks, and datasets.</h2>
+        </div>
+        <p class="lede-v3">All lecture slides, coding notebooks, and the survey preprocessing datasets are published openly.</p>
+      </div>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 20px;" class="reveal-stagger">
+        <a class="fb" href="https://github.com/antndlcrx/oxford-llms-workshop" target="_blank" rel="noopener" style="display:block;">
+          <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
+            <img src="/img/icons/github-mark.svg" alt="" style="width:24px; height:24px; opacity:0.85;">
+            <h3 class="h-sub" style="margin:0;">Workshop materials</h3>
+          </div>
+          <p class="copy" style="margin:0 0 12px; font-size:14px;">Lecture slides, Python notebooks, and RAG tutorials from the 2024 edition.</p>
+          <span class="btn-link-v3">Open on GitHub <span class="arrow">→</span></span>
+        </a>
+        <a class="fb" href="https://huggingface.co/oxford-llms" target="_blank" rel="noopener" style="display:block;">
+          <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
+            <img src="/img/icons/hf-logo.svg" alt="" style="width:24px; height:24px;">
+            <h3 class="h-sub" style="margin:0;">Models &amp; datasets</h3>
+          </div>
+          <p class="copy" style="margin:0 0 12px; font-size:14px;">Survey preprocessing datasets and model checkpoints from the research project.</p>
+          <span class="btn-link-v3">Open on Hugging Face <span class="arrow">→</span></span>
+        </a>
+      </div>
+      <div class="reveal" style="margin-top:40px; display:flex; gap:24px; align-items:center; flex-wrap:wrap;">
+        <a class="btn-ghost" href="/summer-school/2023/">← 2023 edition</a>
+        <a class="btn-ghost" href="/summer-school/2025/">2025 edition →</a>
+        <a class="btn-primary" href="/summer-school/">All cohorts <span class="arrow">→</span></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Bio data (used by speaker modal) ───────────────────── -->
+  <div hidden aria-hidden="true">
+
+    <div id="bio-humeyra-biricik">
+      <p>Humeyra Biricik is co-organiser of Oxford LLMs 2024 and a doctoral candidate in Politics at Pembroke College, Oxford. Her research focuses on political speech, populism, and democratic backsliding in Turkey, Hungary, India, and Arabic-speaking Middle Eastern countries, using large language models and text analysis alongside econometric methods.</p>
+      <p>She also coordinates a series of politics talks at Pembroke College on topics ranging from local British elections and the housing crisis to AI regulation and machine learning in political science.</p>
     </div>
 
-    <div class="prose">
-      <img
-        src="/img/posts/report_2024/group_llms_2024.jpg"
-        alt="Oxford LLMs 2024 group photo"
-      />
+    <div id="bio-ilya-boytsov">
+      <p>Ilya Boytsov is an applied Deep Learning Scientist and NLP Lead at Wayfair in Berlin. His main professional interests include information retrieval, aspect-based sentiment analysis, and generative AI. He has extensive experience designing machine-learning bootcamps and lectures for diverse audiences.</p>
+      <p>Ilya has spoken at conferences including the World Data Summit and DSC Europe. He is also co-founder of the Street Smart AI community in Berlin. More details on his <a href="https://ieboytsov.github.io/about-me.html" target="_blank" rel="noopener">personal website</a>.</p>
+    </div>
 
-      <p>
-        In late September 2024, Nuffield College, supported by the Oxford Van Houten Fund, ran an
-        intensive five-day workshop on AI for social science. Early-career researchers attended
-        lectures on large language models, completed hands-on Python tutorials, and collaborated on
-        research projects with AI experts.
-      </p>
+    <div id="bio-maksim-zubok">
+      <p>Maksim Zubok is a doctoral candidate in Politics at Oxford University, <a href="https://www.nuffield.ox.ac.uk/people/profiles/maksim-zubok/" target="_blank" rel="noopener">Nuffield College</a>. His research explores how large language models can be used for social science, from standard data labelling tasks to using models as snapshots of the internet to study how people structure concepts and beliefs.</p>
+      <p>He has helped organise multiple academic events, including previous sessions of the Oxford LLMs workshop and the <a href="https://sicss.io/2022/oxford/" target="_blank" rel="noopener">Oxford Summer Institute for Computational Social Science</a>.</p>
+    </div>
 
-      <p>
-        We received a little short of 200 applications and selected 30 participants.
-      </p>
+    <div id="bio-grigory-sapunov">
+      <p>Grigory Sapunov is CTO and co-founder of <a href="https://inten.to/" target="_blank" rel="noopener">Intento</a>. With over 20 years of software engineering experience and around 15 years in data analysis, AI, and machine learning, he has been deeply engaged in deep learning since 2011.</p>
+      <p>He is a Google Developer Expert in Machine Learning and holds a PhD in Artificial Intelligence. Connect with him on <a href="https://www.linkedin.com/in/grigorysapunov/" target="_blank" rel="noopener">LinkedIn</a>.</p>
+    </div>
 
-      <h2>Workshop Themes and Materials</h2>
-      <p>
-        Our lecture series, developed by Grigory Sapunov (Intento), Tatiana Shavrina (Meta), and
-        Ilya Boytsov (Wayfair), covered LLM foundations, transformer architecture, in-context
-        learning, and emergent reasoning. We introduced advanced techniques such as agent-based
-        systems, fine-tuning methods, and self-hosting considerations.
-      </p>
-      <p>
-        Applied tutorials demonstrated retrieval-augmented generation for social science data and
-        observability tools for model monitoring. All lecture slides, notebooks, and code samples
-        are collected on the
-        <a href="/resources/summer-school/">Summer School Materials</a>
-        page and on
-        <a href="https://github.com/antndlcrx/oxford-llms-workshop" target="_blank" rel="noopener"
-          >GitHub</a
-        >.
-      </p>
-      <p>
-        Established scholars from political science, sociology, and history – Lisa P. Argyle, Chris
-        Barrie, Raymond Duch, Thomas Hegghammer, Neil Ketchley, Alison Koh, and Alexis Palmer –
-        shared examples of research using LLMs from their work. Guest presenters from companies like
-        Qdrant, Ori Cloud, Arize, and Google led practical seminars, with contributions from Atita
-        Arora, John Githuly, Christian Silva, and Ciera Fowler.
-      </p>
+    <div id="bio-tatiana-shavrina">
+      <p>Tatiana Shavrina works on the Llama team at Meta and has previously worked at Snap and AIRI. She focuses on multilingualism and under-resourced languages in large language models, and has contributed to BLOOM, mGPT, and Russian SuperGLUE. She also works on benchmarking and evaluation methods for LLMs.</p>
+      <p>See her <a href="https://scholar.google.com/citations?user=sdmdZh8AAAAJ" target="_blank" rel="noopener">Google Scholar profile</a> for publications.</p>
+    </div>
 
-      <h2>Collaborative Research Projects</h2>
-      <p>
-        All participants contributed to the main project: developing an approach for survey data
-        preprocessing aimed at training LLMs to predict people’s opinions and self-reported
-        behaviors.
-        <a href="https://www.ori.co/" target="_blank" rel="noopener">Ori Cloud</a>
-        provided GPU support for this project. The models and datasets are published on the
-        <a href="https://huggingface.co/oxford-llms" target="_blank" rel="noopener"
-          >Oxford LLMs HuggingFace profile</a
-        >, and the group is polishing the work before submission.
-      </p>
+    <div id="bio-atita-arora">
+      <p>Atita Arora is a solution architect and relevance strategist with over 15 years of experience in information retrieval. She has contributed to multiple open-source projects and is currently writing a book on vector databases.</p>
+      <p>Her seminar focused on retrieval-augmented generation (RAG), covering end-to-end implementation, experimentation, and evaluation, and how to identify where in the RAG pipeline improvements can be made.</p>
+    </div>
 
-      <h2>Looking Ahead</h2>
-      <p>
-        Feedback highlighted that the collaborative project was the workshop’s most valuable
-        component and that participants wanted more coding exercises. As a result, the September
-        2025 workshop will be slightly more technical, with increased focus on coding sessions and
-        research projects.
-      </p>
-      <p>
-        If you are an early-career researcher eager to master LLM architectures, coding workflows,
-        and participate in interdisciplinary research projects,
-        <a href="/apply">apply for the 2025 workshop</a>!
-      </p>
+    <div id="bio-ciera-fowler">
+      <p>Ciera Fowler is ML Engineering Lead at <a href="https://www.ori.co/" target="_blank" rel="noopener">Ori Cloud</a>, an AI-native GPU cloud provider, and an MBA student at London Business School. She works on benchmarking and analysing LLMs and regularly gives talks and tutorials on building LLM-powered agents and applications.</p>
+      <p>At LBS, she is active in student leadership through the Black in Business Club and the Technology &amp; Media Club.</p>
+    </div>
 
-      <h2>Organisers</h2>
+    <div id="bio-john-gilhuly">
+      <p>John Gilhuly is a developer advocate at <a href="https://arize.com/" target="_blank" rel="noopener">Arize AI</a> focused on open-source LLM observability and evaluation tooling. His seminar covered core principles of LLM observability, including tracing and OpenTelemetry.</p>
+      <p>It compared different evaluation strategies such as LLM-as-a-judge and assertion-based methods, illustrated via a hands-on walkthrough of detecting bias and misinformation in an LLM-based research agent.</p>
+    </div>
 
-      <div class="speaker">
-        <span class="speaker-name">Humeyra Biricik (Co-Organiser)</span>
-        <span class="speaker-affil"><em>DPIR Oxford University</em></span>
-        <img
-          src="/img/speakers/humeyra_biricik.png"
-          alt="Portrait of Humeyra Biricik"
-          class="speaker-photo"
-        />
-        <div class="speaker-bio">
-          <p>
-          Humeyra Biricik is co-organiser of Oxford LLMs 2024 and a doctoral candidate in Politics
-          at Pembroke College. Her research focuses on political speech, populism, and democratic
-          backsliding in Turkey, Hungary, India, and Arabic-speaking Middle Eastern countries, using
-          large language models and text analysis alongside econometric methods. She also coordinates
-          a series of politics talks at Pembroke College on topics ranging from local British
-          elections and the housing crisis to AI regulation and machine learning in political
-          science.
-          </p>
-        </div>
-      </div>
+    <div id="bio-christian-silva">
+      <p>Christian Silva is an AI/ML Customer Engineer at Google Cloud with more than 15 years of experience in analytics, data management, and machine learning. Working across sectors such as financial services and healthcare, he focuses on helping organisations apply AI and data for decision-making.</p>
+      <p>His seminar introduced practical approaches to deploying and governing AI solutions in production environments.</p>
+    </div>
 
-      <div class="speaker">
-        <span class="speaker-name">Ilya Boytsov (Lecturer, Co-Organiser)</span>
-        <span class="speaker-affil"><em>NLP Lead, Wayfair</em></span>
-        <img
-          src="/img/speakers/ilya_boytsov.JPEG"
-          alt="Portrait of Ilya Boytsov"
-          class="speaker-photo"
-        />
-        <div class="speaker-bio">
-          <p>
-          Ilya is an applied Deep Learning Scientist with a focus on Natural Language Processing
-          (NLP). He is the NLP lead at Wayfair in Berlin and has extensive experience designing
-          machine-learning bootcamps and lectures for diverse audiences. He has spoken at
-          conferences including the
-          <a href="https://worlddatasummit.com/" target="_blank" rel="noopener">World Data Summit</a>
-          and
-          <a href="https://datasciconference.com/" target="_blank" rel="noopener">DSC Europe</a>, and
-          co-founded the
-          <a
-            href="https://www.meetup.com/street-smart-ai-berlin-meetup/"
-            target="_blank"
-            rel="noopener"
-            >Street Smart AI community</a
-          >
-          in Berlin. More details are available on his
-          <a
-            href="https://ieboytsov.github.io/about-me.html"
-            target="_blank"
-            rel="noopener"
-            >personal website</a
-          >.
-          </p>
-        </div>
-      </div>
+    <div id="bio-lisa-argyle">
+      <p>Lisa P. Argyle is Assistant Professor of Political Science at Brigham Young University and a Faculty Fellow at the Center for the Study of Elections and Democracy. Her research blends political psychology with computational social science to study political attitudes and participation.</p>
+      <p>She has been particularly focused on generative AI since the release of GPT-3, using surveys, experiments, and AI tools to understand how people talk about politics in their everyday lives. More information on her <a href="https://www.lpargyle.com/" target="_blank" rel="noopener">website</a>.</p>
+    </div>
 
-      <div class="speaker">
-        <span class="speaker-name">Maksim Zubok (Co-Organiser)</span>
-        <span class="speaker-affil"><em>DPIR Oxford University</em></span>
-        <img
-          src="/img/speakers/maksim_zubok.png"
-          alt="Portrait of Maksim Zubok"
-          class="speaker-photo"
-        />
-        <div class="speaker-bio">
-          <p>
-          Maksim is a doctoral candidate in Politics at Oxford University,
-          <a
-            href="https://www.nuffield.ox.ac.uk/people/profiles/maksim-zubok/"
-            target="_blank"
-            rel="noopener"
-            >Nuffield College</a
-          >. His research explores how large language models can be used for social science, from
-          standard data labelling tasks to using models as snapshots of the internet to study how
-          people structure concepts and beliefs. He has helped organise multiple academic events,
-          including the Oxford Summer Institute for Computational Social Science.
-          </p>
-        </div>
-      </div>
+    <div id="bio-chris-barrie">
+      <p>Chris Barrie is Assistant Professor in Sociology at New York University. His research focuses on political sociology, especially conflict, communication, and political attitudes, using NLP and digital trace data.</p>
+      <p>He founded the <a href="https://sds-hub.ed.ac.uk/" target="_blank" rel="noopener">Social Data Science Hub</a> at the University of Edinburgh. Learn more on his <a href="https://www.cjbarrie.com/" target="_blank" rel="noopener">website</a>.</p>
+    </div>
 
-      <h2>Lecture and Seminar Leaders</h2>
+    <div id="bio-raymond-duch">
+      <p>Ray Duch is co-founder and Director of the <a href="https://cess-nuffield.nuff.ox.ac.uk/" target="_blank" rel="noopener">Centre for Experimental Social Sciences (CESS)</a> at Nuffield College and co-Director of the Candour Project and the REAL Demand Centre.</p>
+      <p>His work uses experiments to study decision making across politics, finance, health, and economics, and has appeared in the <em>American Political Science Review</em>, <em>Journal of Politics</em>, and <em>Nature Medicine</em>. More on his <a href="https://www.raymondduch.com/" target="_blank" rel="noopener">website</a>.</p>
+    </div>
 
-      <div class="speaker">
-        <span class="speaker-name">Grigory Sapunov (Lecturer)</span>
-        <span class="speaker-affil"><em>CTO and co-founder of Intento</em></span>
-        <img
-          src="/img/speakers/grigory_sapunov.jpeg"
-          alt="Portrait of Grigory Sapunov"
-          class="speaker-photo"
-        />
-        <div class="speaker-bio">
-          <p>
-          Grigory Sapunov is CTO and co-founder of Intento. With over 20 years of software
-          engineering experience and around 15 years working in data analysis, AI, and machine
-          learning, he has been engaged in deep learning since 2011. He is a Google Developer Expert
-          in Machine Learning and holds a Ph.D. in Artificial Intelligence. You can connect with him
-          on
-          <a
-            href="https://www.linkedin.com/in/grigorysapunov/"
-            target="_blank"
-            rel="noopener"
-            >LinkedIn</a
-          >.
-          </p>
-        </div>
-      </div>
+    <div id="bio-thomas-hegghammer">
+      <p>Thomas Hegghammer is Senior Fellow in Politics at All Souls College, Oxford. He is a political scientist and historian specialising in political violence in the Muslim world, especially transnational jihadi groups.</p>
+      <p>His books include <em>The Caravan: Abdallah Azzam and the Rise of Global Jihad</em> and <em>Jihadi Culture: The Art and Social Practices of Militant Islamists</em>. More on his <a href="https://hegghammer.com/" target="_blank" rel="noopener">website</a>.</p>
+    </div>
 
-      <div class="speaker">
-        <span class="speaker-name">Tatiana Shavrina (Lecturer)</span>
-        <span class="speaker-affil"><em>Research Scientist Manager, Meta, Llama team</em></span>
-        <img
-          src="/img/speakers/tatiana_shavrina.jpg"
-          alt="Portrait of Tatiana Shavrina"
-          class="speaker-photo"
-        />
-        <div class="speaker-bio">
-          <p>
-          Tatiana Shavrina works on the Llama team at Meta and has previously worked at Snap and
-          AIRI. She focuses on multilingualism and under-resourced languages in large language
-          models and has contributed to projects such as BLOOM, mGPT, and Russian SuperGLUE. She
-          also works on benchmarking and evaluation methods for LLMs. See her
-          <a
-            href="https://scholar.google.com/citations?user=sdmdZh8AAAAJ"
-            target="_blank"
-            rel="noopener"
-            >Google Scholar profile</a
-          >
-          for more details.
-          </p>
-        </div>
-      </div>
+    <div id="bio-neil-ketchley">
+      <p>Neil Ketchley is Associate Professor in Politics and Fellow of St Antony's College, Oxford. He is a political scientist of the Arabic-speaking Middle East and North Africa whose work focuses on political sociology and comparative politics.</p>
+      <p>His book <em>Egypt in a Time of Revolution</em> won the Charles Tilly Distinguished Contribution to Scholarship Award. Learn more on his <a href="https://www.politics.ox.ac.uk/person/neil-ketchley" target="_blank" rel="noopener">profile</a>.</p>
+    </div>
 
-      <div class="speaker">
-        <span class="speaker-name">Atita Arora (Seminar)</span>
-        <span class="speaker-affil"><em>Solution Architect, Qdrant</em></span>
-        <img
-          src="/img/speakers/atita_arora.jpg"
-          alt="Portrait of Atita Arora"
-          class="speaker-photo"
-        />
-        <div class="speaker-bio">
-          <p>
-          Atita Arora is a solution architect and relevance strategist with over 15 years of
-          experience in information retrieval. She has contributed to multiple open-source projects
-          and is currently writing a book on vector databases. Her seminar focuses on retrieval
-          augmented generation (RAG), covering end-to-end implementation, experimentation, and
-          evaluation, and how to identify where in the RAG pipeline improvements can be made.
-          </p>
-        </div>
-      </div>
+    <div id="bio-alison-koh">
+      <p>Alison Koh is a Research Fellow in Natural Language Processing at the University of Birmingham's Centre for Artificial Intelligence in Government. Her research lies at the intersection of international relations, political communication, and computational social science, with a focus on the geopolitics of emerging technologies and generative AI in conflict research.</p>
+      <p>Read more on her <a href="https://www.hertie-school.org/en/who-we-are/profile/person/allison-koh" target="_blank" rel="noopener">profile</a>.</p>
+    </div>
 
-      <div class="speaker">
-        <span class="speaker-name">Ciera Fowler (Seminar)</span>
-        <span class="speaker-affil"><em>ML Engineering Lead, Ori Cloud</em></span>
-        <img
-          src="/img/speakers/ciera_fowler.png"
-          alt="Portrait of Ciera Fowler"
-          class="speaker-photo"
-        />
-        <div class="speaker-bio">
-          <p>
-          Ciera Fowler is ML Engineering Lead at Ori, an AI-native GPU cloud provider, and an MBA
-          student at London Business School. She works on benchmarking and analysing LLMs and
-          regularly gives talks and tutorials on building LLM-powered agents and applications. At
-          LBS, she is active in student leadership through the Black in Business Club and the
-          Technology &amp; Media club.
-          </p>
-        </div>
-      </div>
-
-      <div class="speaker">
-        <span class="speaker-name">John Gilhuly (Seminar)</span>
-        <span class="speaker-affil"><em>Developer Advocate, Arize AI</em></span>
-        <img
-          src="/img/speakers/john_gilhuly.jpg"
-          alt="Portrait of John Gilhuly"
-          class="speaker-photo"
-        />
-        <div class="speaker-bio">
-          <p>
-          John Gilhuly is a developer advocate at Arize AI focused on open-source LLM observability
-          and evaluation tooling. His seminar covers core principles of LLM observability, including
-          tracing and OpenTelemetry, and compares different evaluation strategies such as
-          LLM-as-a-judge and assertion-based methods, illustrated via a hands-on walkthrough of
-          detecting bias and misinformation in an LLM-based research agent.
-          </p>
-        </div>
-      </div>
-
-      <div class="speaker">
-        <span class="speaker-name">Christian Silva (Seminar)</span>
-        <span class="speaker-affil"><em>AI/ML Customer Engineer, Google Cloud</em></span>
-        <img
-          src="/img/speakers/christian_silva.jpg"
-          alt="Portrait of Christian Silva"
-          class="speaker-photo"
-        />
-        <div class="speaker-bio">
-          <p>
-          Christian Silva is an AI/ML Customer Engineer at Google Cloud with more than 15 years of
-          experience in analytics, data management, and machine learning. Working across sectors
-          such as financial services and healthcare, he focuses on helping organisations apply AI
-          and data for decision-making. His seminar introduces practical approaches to deploying and
-          governing AI solutions in production environments.
-          </p>
-        </div>
-      </div>
-
-      <h2>Research Talk Speakers</h2>
-
-      <div class="speaker">
-        <span class="speaker-name">Lisa P. Argyle</span>
-        <span class="speaker-affil"><em>Assistant Professor of Political Science, Brigham Young University</em></span>
-        <img
-          src="/img/speakers/lisa_argyle.jpg"
-          alt="Portrait of Lisa P. Argyle"
-          class="speaker-photo"
-        />
-        <div class="speaker-bio">
-          <p>
-          Lisa P. Argyle is an Assistant Professor of Political Science at Brigham Young University
-          and a Faculty Fellow at the Center for the Study of Elections and Democracy. Her research
-          blends political psychology with computational social science to study political attitudes
-          and participation, with a recent focus on generative AI since the release of GPT-3. She
-          uses surveys, experiments, and AI tools to understand how people talk about politics in
-          their everyday lives. More information is available on her
-          <a href="https://www.lpargyle.com/" target="_blank" rel="noopener">website</a>.
-          </p>
-        </div>
-      </div>
-
-      <div class="speaker">
-        <span class="speaker-name">Chris Barrie</span>
-        <span class="speaker-affil"><em>Assistant Professor in Sociology, New York University</em></span>
-        <img
-          src="/img/speakers/chris_bairre.png"
-          alt="Portrait of Chris Barrie"
-          class="speaker-photo"
-        />
-        <div class="speaker-bio">
-          <p>
-          Chris Barrie is Assistant Professor in Sociology at New York University. His research
-          focuses on political sociology, especially conflict, communication, and political
-          attitudes, using NLP and digital trace data. He founded the
-          <a href="https://sds-hub.ed.ac.uk/" target="_blank" rel="noopener"
-            >Social Data Science Hub</a
-          >
-          at the University of Edinburgh. Learn more on his
-          <a href="https://www.cjbarrie.com/" target="_blank" rel="noopener">website</a>.
-          </p>
-        </div>
-      </div>
-
-      <div class="speaker">
-        <span class="speaker-name">Raymond Duch</span>
-        <span class="speaker-affil"
-          ><em
-            >Director of the Centre for Experimental Social Sciences, Nuffield College, Oxford
-            University</em
-          ></span
-        >
-        <img
-          src="/img/speakers/ray_duch.png"
-          alt="Portrait of Raymond Duch"
-          class="speaker-photo"
-        />
-        <div class="speaker-bio">
-          <p>
-          Ray Duch is Director of the
-          <a
-            href="https://cess-nuffield.nuff.ox.ac.uk/"
-            target="_blank"
-            rel="noopener"
-            >Centre for Experimental Social Sciences (CESS)</a
-          >
-          and co-Director of the Candour Project and the REAL Demand Centre. His work uses
-          experiments to study decision making across politics, finance, health, and economics and
-          has appeared in leading journals such as the
-          <em>American Political Science Review</em>,
-          <em>Journal of Politics</em>, and <em>Nature Medicine</em>. More information is available
-          on his
-          <a href="https://www.raymondduch.com/" target="_blank" rel="noopener">website</a>.
-          </p>
-        </div>
-      </div>
-
-      <div class="speaker">
-        <span class="speaker-name">Thomas Hegghammer</span>
-        <span class="speaker-affil"><em>Senior Fellow in Politics, All Souls College, Oxford University</em></span>
-        <img
-          src="/img/speakers/thomas_hegghammer.png"
-          alt="Portrait of Thomas Hegghammer"
-          class="speaker-photo"
-        />
-        <div class="speaker-bio">
-          <p>
-          Thomas Hegghammer is Senior Fellow in Politics at All Souls College, Oxford. He is a
-          political scientist and historian specialising in political violence in the Muslim world,
-          especially transnational jihadi groups. His books include
-          <em>The Caravan: Abdallah Azzam and the Rise of Global Jihad</em> and
-          <em>Jihadi Culture: The Art and Social Practices of Militant Islamists</em>. More details
-          are available on his
-          <a href="https://hegghammer.com/" target="_blank" rel="noopener">website</a>.
-          </p>
-        </div>
-      </div>
-
-      <div class="speaker">
-        <span class="speaker-name">Neil Ketchley</span>
-        <span class="speaker-affil"><em>Associate Professor in Politics, St Antony&apos;s College, Oxford University</em></span>
-        <img
-          src="/img/speakers/neil_ketchley.png"
-          alt="Portrait of Neil Ketchley"
-          class="speaker-photo"
-        />
-        <div class="speaker-bio">
-          <p>
-          Neil Ketchley is Associate Professor in Politics and Fellow of St Antony&apos;s College.
-          He is a political scientist of the Arabic-speaking Middle East and North Africa whose work
-          focuses on political sociology and comparative politics. His book
-          <em>Egypt in a Time of Revolution</em> won the Charles Tilly Distinguished Contribution to
-          Scholarship Award. Learn more on his
-          <a href="https://www.politics.ox.ac.uk/person/neil-ketchley" target="_blank" rel="noopener"
-            >profile</a
-          >.
-          </p>
-        </div>
-      </div>
-
-      <div class="speaker">
-        <span class="speaker-name">Alison Koh</span>
-        <span class="speaker-affil"
-          ><em
-            >Research Fellow in NLP, University of Birmingham’s Centre for Artificial Intelligence in
-            Government</em
-          ></span
-        >
-        <img
-          src="/img/speakers/alison_koh.png"
-          alt="Portrait of Alison Koh"
-          class="speaker-photo"
-        />
-        <div class="speaker-bio">
-          <p>
-          Allison Koh is a Research Fellow in Natural Language Processing at the University of
-          Birmingham’s Centre for Artificial Intelligence in Government. Her research lies at the
-          intersection of international relations, political communication, and computational social
-          science, with a focus on geopolitics of emerging technologies and generative AI in
-          conflict research. Read more on her
-          <a
-            href="https://www.hertie-school.org/en/who-we-are/profile/person/allison-koh"
-            target="_blank"
-            rel="noopener"
-            >profile</a
-          >.
-          </p>
-        </div>
-      </div>
-
-      <div class="speaker">
-        <span class="speaker-name">Alexis Palmer</span>
-        <span class="speaker-affil"><em>Neukom Fellow, Dartmouth College</em></span>
-        <img
-          src="/img/speakers/alexis_palmer.png"
-          alt="Portrait of Alexis Palmer"
-          class="speaker-photo"
-        />
-        <div class="speaker-bio">
-          <p>
-          Alexis Palmer recently completed her PhD in Politics at New York University and is
-          starting as a Neukom Fellow at Dartmouth College. Her research focuses on institutional
-          trust, storytelling, and text-as-data methods, using large language models and other tools
-          to study how people talk about politics and how narratives shape perceptions. More
-          information is available on her
-          <a href="https://lexipalmer13.github.io/" target="_blank" rel="noopener">website</a>.
-          </p>
-        </div>
-      </div>
+    <div id="bio-alexis-palmer">
+      <p>Alexis Palmer completed her PhD in Politics at New York University and joined Dartmouth College as a Neukom Fellow. Her research focuses on institutional trust, storytelling, and text-as-data methods, using large language models and other tools to study how people talk about politics and how narratives shape perceptions.</p>
+      <p>More information on her <a href="https://lexipalmer13.github.io/" target="_blank" rel="noopener">website</a>.</p>
     </div>
 
   </div>
+
+  <SpeakerModal />
+
 </Base>

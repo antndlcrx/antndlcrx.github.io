@@ -1,0 +1,62 @@
+<!-- Speaker modal — place once per report page, before </Base> -->
+<div class="speaker-modal" id="speaker-modal" role="dialog" aria-modal="true" aria-labelledby="sm-name">
+  <div class="sm-backdrop" id="sm-backdrop"></div>
+  <div class="sm-panel" role="document">
+    <button class="sm-close" id="sm-close-btn" aria-label="Close speaker profile">&#x2715;</button>
+    <div class="sm-header">
+      <div class="sm-portrait" id="sm-portrait"></div>
+      <div class="sm-head-text">
+        <div class="sm-tag" id="sm-tag"></div>
+        <h2 class="sm-name" id="sm-name"></h2>
+        <p class="sm-role" id="sm-role"></p>
+      </div>
+    </div>
+    <div class="sm-bio" id="sm-bio"></div>
+  </div>
+</div>
+
+<script is:inline>
+  (function () {
+    var modal    = document.getElementById('speaker-modal');
+    var portrait = document.getElementById('sm-portrait');
+    var tagEl    = document.getElementById('sm-tag');
+    var nameEl   = document.getElementById('sm-name');
+    var roleEl   = document.getElementById('sm-role');
+    var bioEl    = document.getElementById('sm-bio');
+
+    function openModal(chip) {
+      var id     = chip.dataset.speaker;
+      var bioDiv = document.getElementById('bio-' + id);
+      tagEl.textContent  = chip.dataset.tag  || '';
+      nameEl.textContent = chip.dataset.name || '';
+      roleEl.textContent = chip.dataset.role || '';
+      bioEl.innerHTML    = bioDiv ? bioDiv.innerHTML : '';
+      if (chip.dataset.img) {
+        portrait.innerHTML = '<img src="' + chip.dataset.img + '" alt="" />';
+      } else {
+        portrait.textContent = chip.dataset.initials || '';
+      }
+      modal.classList.add('is-open');
+      document.body.style.overflow = 'hidden';
+      document.getElementById('sm-close-btn').focus();
+    }
+
+    function closeModal() {
+      modal.classList.remove('is-open');
+      document.body.style.overflow = '';
+    }
+
+    document.querySelectorAll('.speaker-chip[data-speaker]').forEach(function (chip) {
+      chip.addEventListener('click', function () { openModal(chip); });
+      chip.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openModal(chip); }
+      });
+    });
+
+    document.getElementById('sm-backdrop').addEventListener('click', closeModal);
+    document.getElementById('sm-close-btn').addEventListener('click', closeModal);
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeModal();
+    });
+  })();
+</script>
