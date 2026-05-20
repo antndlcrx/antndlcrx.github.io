@@ -2,79 +2,141 @@
 import Base from '../layouts/Base.astro';
 ---
 
-<Base title="Resources" description="Open-source materials, code, and datasets from Oxford LLMs.">
-  <div class="container container--content">
+<Base
+  title="Resources"
+  description="Open-source course materials, summer school archives, research code, and models from Oxford LLMs."
+>
 
-    <div class="page-header">
-      <p class="section-label">Resources</p>
-      <h1 class="page-header__title">Materials & Resources</h1>
-      <p class="page-header__desc">
-        Lecture slides, workshop materials, code, and practical guides from across
-        the Oxford LLMs programme. All openly available.
-      </p>
+  <aside class="status-strip" aria-label="Applications status">
+    <div class="status-strip-inner">
+      <span class="status-dot" aria-hidden="true"></span>
+      <span class="status-label">Applications open</span>
+      <span class="sep"></span>
+      <span>Deadline 1 June</span>
+      <span class="sep"></span>
+      <span>13–17 July 2026</span>
+      <span class="sep"></span>
+      <span>30 places</span>
+      <div style="margin-left:auto; display:flex; gap:10px; align-items:center;">
+        <a class="status-cta" style="margin-left:0" href="https://forms.gle/VQ5qrdQ5Pk1Rtogg7" target="_blank" rel="noopener">Apply now <span class="arrow">→</span></a>
+        <a class="status-cta" style="margin-left:0" href="/summer-school/2026/">Details <span class="arrow">→</span></a>
+      </div>
     </div>
+  </aside>
 
-    <div class="grid-3 mt-4">
-      <a href="/resources/summer-school/" class="card card--accent-1 card--pillar">
-        <span class="tag">Summer School</span>
-        <h3 class="card__title" style="margin-top: var(--sp-3);">Summer School Materials</h3>
-        <p class="card__text">
-          Curated list of lecture slides, Jupyter notebooks, and code samples from the 2023 and 2024
-          summer schools.
-        </p>
-        <span class="card__link">Browse materials →</span>
-      </a>
+  <section class="section-v3" style="padding-top: clamp(72px, 8vw, 112px);">
+    <div class="shell">
 
-      <a href="https://github.com/antndlcrx/Intro-to-LLMs-DPIR" class="card card--accent-3 card--pillar" target="_blank" rel="noopener">
-        <span class="tag">Course</span>
-        <h3 class="card__title" style="margin-top: var(--sp-3);">Course Materials</h3>
-        <p class="card__text">
-          Teaching materials for the Oxford / Paris / Florence courses.
-          Structured curriculum from fundamentals to deployment.
+      <div class="section-head-v3 reveal">
+        <div>
+          <div class="eyebrow-v3" style="margin-bottom:14px">Open access</div>
+          <h1 class="h-section">Everything we make is open.</h1>
+        </div>
+        <p class="lede-v3">
+          Course materials, summer school archives, research code, and models.
+          All openly licensed and freely available — no registration required.
         </p>
-        <span class="card__link">View on GitHub →</span>
-      </a>
+      </div>
 
-      <a href="https://github.com/Oxford-LLMs-Research/synthetic_sampling" class="card card--accent-5 card--pillar" target="_blank" rel="noopener">
-        <span class="tag">Research</span>
-        <h3 class="card__title" style="margin-top: var(--sp-3);">Synthetic Sampling</h3>
-        <p class="card__text">
-          Research code for synthetic sampling methods.
-          LLM-based opinion prediction and benchmarking experiments.
-        </p>
-        <span class="card__link">View on GitHub →</span>
-      </a>
+      <!-- Primary resource cards -->
+      <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 20px;"
+           class="reveal-stagger">
+
+        <article class="fb">
+          <span class="rule-soft"></span>
+          <div class="eyebrow-v3" style="margin-bottom:12px">Course</div>
+          <h2 class="h-sub" style="margin-bottom:10px">LLMs for Social Science</h2>
+          <p class="copy" style="font-size:14px; margin:0 0 18px;">
+            Five modules from embeddings to agentic workflows. Built for
+            early-career social scientists; all notebooks run in Google Colab.
+          </p>
+          <div style="display:flex; flex-direction:column; gap:8px; margin-top:auto;">
+            <a class="btn-ghost" href="/course/" style="font-size:13px; padding:8px 16px;">
+              Browse the course <span class="arrow">→</span>
+            </a>
+            <a class="btn-link-v3" href="https://github.com/antndlcrx/Intro-to-LLMs-DPIR"
+               target="_blank" rel="noopener">
+              GitHub repository <span class="arrow">→</span>
+            </a>
+          </div>
+        </article>
+
+        <article class="fb">
+          <span class="rule-soft"></span>
+          <div class="eyebrow-v3" style="margin-bottom:12px">Summer School</div>
+          <h2 class="h-sub" style="margin-bottom:10px">Workshop Archives</h2>
+          <p class="copy" style="font-size:14px; margin:0 0 18px;">
+            Lecture slides, Jupyter notebooks, and seminars from the 2023 and
+            2024 summer schools. Covers transformers, evaluation, fine-tuning,
+            and agents.
+          </p>
+          <div style="display:flex; flex-direction:column; gap:8px; margin-top:auto;">
+            <a class="btn-ghost" href="/resources/summer-school/" style="font-size:13px; padding:8px 16px;">
+              Browse materials <span class="arrow">→</span>
+            </a>
+            <a class="btn-link-v3" href="https://github.com/antndlcrx/oxford-llms-workshop"
+               target="_blank" rel="noopener">
+              GitHub repository <span class="arrow">→</span>
+            </a>
+          </div>
+        </article>
+
+        <article class="fb">
+          <span class="rule-soft"></span>
+          <div class="eyebrow-v3" style="margin-bottom:12px">Research</div>
+          <h2 class="h-sub" style="margin-bottom:10px">Code &amp; Models</h2>
+          <p class="copy" style="font-size:14px; margin:0 0 18px;">
+            Replication code and pre-trained models from our research on
+            synthetic data generation and model evaluation. Weights hosted on
+            Hugging Face.
+          </p>
+          <div style="display:flex; flex-direction:column; gap:8px; margin-top:auto;">
+            <a class="btn-ghost" href="https://github.com/Oxford-LLMs-Research/synthetic_sampling"
+               target="_blank" rel="noopener" style="font-size:13px; padding:8px 16px;">
+              Synthetic data <span class="arrow">→</span>
+            </a>
+            <a class="btn-link-v3" href="https://huggingface.co/oxford-llms"
+               target="_blank" rel="noopener">
+              Models on Hugging Face <span class="arrow">→</span>
+            </a>
+          </div>
+        </article>
+
+      </div>
+
+      <!-- Secondary: Python intro -->
+      <div class="reveal" style="margin-top:48px; padding-top:32px; border-top:1px solid var(--border-lt);">
+        <div class="eyebrow-v3" style="margin-bottom:20px">Prerequisites</div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px; max-width:720px;">
+
+          <article class="fb" style="padding:20px 22px;">
+            <h3 class="h-sub" style="font-size:16px; margin-bottom:8px">Python for Social Scientists</h3>
+            <p class="copy" style="font-size:13.5px; margin:0 0 14px;">
+              Introductory notebooks covering the Python and data-science basics
+              required to follow the main course. No prior programming experience assumed.
+            </p>
+            <a class="btn-link-v3" href="https://github.com/antndlcrx/Intro-to-LLMs-DPIR/tree/main/preliminaries"
+               target="_blank" rel="noopener">
+              Open notebooks <span class="arrow">→</span>
+            </a>
+          </article>
+
+          <article class="fb" style="padding:20px 22px;">
+            <h3 class="h-sub" style="font-size:16px; margin-bottom:8px">Oxford LLMs on Hugging Face</h3>
+            <p class="copy" style="font-size:13.5px; margin:0 0 14px;">
+              All released models, datasets, and evaluation benchmarks in one
+              place — ready to download and use in your own research.
+            </p>
+            <a class="btn-link-v3" href="https://huggingface.co/oxford-llms"
+               target="_blank" rel="noopener">
+              Browse the org <span class="arrow">→</span>
+            </a>
+          </article>
+
+        </div>
+      </div>
+
     </div>
+  </section>
 
-    <div class="prose mt-8">
-      <h2>Datasets & Models</h2>
-      <p>
-        Pre-trained models and processed datasets from our collaborative research projects
-        are available on the
-        <a href="https://huggingface.co/oxford-llms" target="_blank" rel="noopener">Oxford LLMs HuggingFace profile</a>.
-      </p>
-
-      <h2>Videos</h2>
-      <p>
-        <!-- Phase 2: Lecture videos expected ~Apr 3 -->
-        <em>Lecture recordings from September 2025 are being edited and will be published here in April.</em>
-      </p>
-    </div>
-
-  </div>
 </Base>
-
-<style>
-  .card--pillar {
-    display: flex;
-    flex-direction: column;
-    text-decoration: none;
-    color: inherit;
-    transition: border-color 0.15s ease, transform 0.15s ease;
-  }
-  .card--pillar:hover {
-    border-color: var(--accent-soft);
-    transform: translateY(-2px);
-  }
-  .card--pillar .card__text { flex: 1; }
-</style>

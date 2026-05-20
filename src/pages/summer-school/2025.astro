@@ -1,435 +1,358 @@
 ---
 import Base from '../../layouts/Base.astro';
+import SpeakerModal from '../../components/SpeakerModal.astro';
 ---
 
 <Base
-  title="Summer School 2025"
-  description="Oxford LLMs 2025 — third annual workshop on large language models for social science."
+  title="Oxford LLMs 2025"
+  description="Oxford LLMs 2025 — third annual workshop on large language models for social science. Nuffield College, September 2025."
 >
-  <div class="container container--content">
 
-    <div class="page-header">
-      <p class="section-label">Summer School · 2025</p>
-      <h1 class="page-header__title">Oxford LLMs 2025</h1>
-      <p class="page-header__desc">
-        In late September 2025, Nuffield College hosted the third annual Oxford workshop on large language models for social science.
-      </p>
+  <!-- ── Breadcrumb strip ───────────────────────────────────── -->
+  <aside class="status-strip" aria-label="Page breadcrumb">
+    <div class="status-strip-inner">
+      <a href="/summer-school/" style="color:inherit; text-decoration:none;">Summer School</a>
+      <span class="sep"></span>
+      <span>2025 — Third edition</span>
+    </div>
+  </aside>
+
+  <!-- ── Report hero ────────────────────────────────────────── -->
+  <div class="report-hero">
+    <div class="rh-inner">
+      <div>
+        <p class="rh-kicker">Third edition · September 2025</p>
+        <span class="rh-year">2025</span>
+        <p class="rh-title">Nuffield College, Oxford — five-day intensive on LLMs for social science.</p>
+        <div class="rh-stats">
+          <div class="rh-stat"><span class="rh-n">30</span><span class="rh-l">Participants</span></div>
+          <div class="rh-stat"><span class="rh-n">~150</span><span class="rh-l">Applications</span></div>
+          <div class="rh-stat"><span class="rh-n">5</span><span class="rh-l">Days</span></div>
+          <div class="rh-stat"><span class="rh-n">1</span><span class="rh-l">Paper in review</span></div>
+        </div>
+      </div>
+      <div class="rh-photo">
+        <img src="/img/posts/report_2025/group_photo_2025.jpg" alt="Oxford LLMs 2025 cohort at Nuffield College" />
+      </div>
+    </div>
+  </div>
+
+  <!-- ── § 01 About ─────────────────────────────────────────── -->
+  <section class="section-v3 section-v3--marker" id="about">
+    <span class="section-number">§ 01 · About</span>
+    <div class="shell">
+      <div class="section-head-v3 reveal">
+        <div>
+          <div class="eyebrow-v3" style="margin-bottom:14px">Third edition</div>
+          <h2 class="h-section">From workshop to submitted paper.</h2>
+        </div>
+        <p class="lede-v3">
+          Nuffield College hosted the third Oxford workshop on LLMs for Social Science in late September
+          2025, supported by the Oxford Van Houten Fund and Nuffield College.
+        </p>
+      </div>
+      <div class="reveal" style="max-width: 72ch;">
+        <p class="copy" style="margin: 0 0 18px;">
+          We received just under 150 applications and selected 30 participants drawn from politics,
+          sociology, linguistics, economics, history, and law. The five-day programme paired morning
+          lectures with afternoon hands-on labs and a week-long collaborative research competition.
+        </p>
+        <p class="copy" style="margin: 0 0 18px;">
+          The lecture series covered LLM fundamentals, evaluation methods, fine-tuning, AI agents,
+          and AI safety. Social science guest talks from Raymond Duch, Joan Timoneda, Kosuke Imai,
+          Charles Rahal, and Brandon Stewart illustrated live applications at the intersection of NLP
+          and the social sciences. The Kaggle-style prediction competition gave participants direct
+          experience building systems that use LLMs to predict human survey responses across
+          countries and contexts.
+        </p>
+        <p class="copy" style="margin: 0 0 18px;">
+          A team of participants and speakers continued the project after September. They have since
+          submitted the work for review at a peer-reviewed conference.
+        </p>
+        <p class="copy" style="margin: 0;">
+          An opening pub evening and a guided walking tour of Oxford gave participants and speakers
+          time together outside the lecture room, and many of the most productive conversations
+          of the week happened along the way.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── § 02 Programme ────────────────────────────────────── -->
+  <section class="section-v3 section-v3--marker section-tinted-v3" id="programme">
+    <span class="section-number">§ 02 · Programme</span>
+    <div class="shell">
+      <div class="section-head-v3 reveal">
+        <div>
+          <div class="eyebrow-v3" style="margin-bottom:14px">22–26 September 2025</div>
+          <h2 class="h-section">Five days at Nuffield.</h2>
+        </div>
+        <p class="lede-v3">
+          Morning lectures and coding seminars, afternoon collaborative research, closing guest talks.
+          09:00–17:00 daily in the Large Lecture Room.
+        </p>
+      </div>
+
+      <div class="prog-week reveal">
+
+        <div class="prog-day">
+          <div class="prog-day-head">
+            <span class="prog-day-date">Mon · 22 Sep</span>
+            <span class="prog-day-theme">Fundamentals</span>
+          </div>
+          <ol class="prog-slots">
+            <li class="prog-slot"><span class="prog-time">09:15</span><span class="prog-title">Mikhail Burtsev — Fundamentals of LLMs</span></li>
+            <li class="prog-slot"><span class="prog-time">11:00</span><span class="prog-title">Ilya Boytsov — Fundamentals of LLMs · coding</span></li>
+            <li class="prog-slot"><span class="prog-time">14:00</span><span class="prog-title">Research — introduction to project</span></li>
+            <li class="prog-slot"><span class="prog-time">16:00</span><span class="prog-title">Ray Duch — Synthetic Agents for Benchmarking Experiments</span></li>
+            <li class="prog-slot"><span class="prog-time">19:00</span><span class="prog-title">Opening pub evening</span></li>
+          </ol>
+        </div>
+
+        <div class="prog-day">
+          <div class="prog-day-head">
+            <span class="prog-day-date">Tue · 23 Sep</span>
+            <span class="prog-day-theme">LLM Evaluation</span>
+          </div>
+          <ol class="prog-slots">
+            <li class="prog-slot"><span class="prog-time">09:15</span><span class="prog-title">Emeli Dral — LLM Evaluation · coding</span></li>
+            <li class="prog-slot"><span class="prog-time">11:00</span><span class="prog-title">Tatiana Shavrina — LLM Evaluation</span></li>
+            <li class="prog-slot"><span class="prog-time">14:00</span><span class="prog-title">Research</span></li>
+            <li class="prog-slot"><span class="prog-time">16:00</span><span class="prog-title">Joan Timoneda — Using LLMs to Identify Overt and Covert Racism in Spanish</span></li>
+          </ol>
+        </div>
+
+        <div class="prog-day">
+          <div class="prog-day-head">
+            <span class="prog-day-date">Wed · 24 Sep</span>
+            <span class="prog-day-theme">AI Agents &amp; Fine-Tuning</span>
+          </div>
+          <ol class="prog-slots">
+            <li class="prog-slot"><span class="prog-time">09:15</span><span class="prog-title">Grigory Sapunov — AI Agents</span></li>
+            <li class="prog-slot"><span class="prog-time">11:00</span><span class="prog-title">Sergei Skvortsov — LLM Fine-Tuning · coding</span></li>
+            <li class="prog-slot"><span class="prog-time">14:00</span><span class="prog-title">Brandon Stewart — <a href="https://metrics-and-models.github.io/" target="_blank" rel="noopener">Metrics &amp; Models seminar</a></span></li>
+            <li class="prog-slot"><span class="prog-time">15:30</span><span class="prog-title">Research</span></li>
+          </ol>
+        </div>
+
+        <div class="prog-day">
+          <div class="prog-day-head">
+            <span class="prog-day-date">Thu · 25 Sep</span>
+            <span class="prog-day-theme">Research &amp; Oxford Tour</span>
+          </div>
+          <ol class="prog-slots">
+            <li class="prog-slot"><span class="prog-time">09:15</span><span class="prog-title">Research</span></li>
+            <li class="prog-slot"><span class="prog-time">10:30</span><span class="prog-title">Oxford walking tour — participants &amp; speakers</span></li>
+            <li class="prog-slot"><span class="prog-time">14:15</span><span class="prog-title">Research</span></li>
+            <li class="prog-slot"><span class="prog-time">16:00</span><span class="prog-title">Kosuke Imai — <a href="https://imai.fas.harvard.edu/research/GPI.html" target="_blank" rel="noopener">GenAI-Powered Inference</a></span></li>
+          </ol>
+        </div>
+
+        <div class="prog-day">
+          <div class="prog-day-head">
+            <span class="prog-day-date">Fri · 26 Sep</span>
+            <span class="prog-day-theme">Safety, Presentations &amp; Outro</span>
+          </div>
+          <ol class="prog-slots">
+            <li class="prog-slot"><span class="prog-time">09:15</span><span class="prog-title">Denis Volk — AI Safety</span></li>
+            <li class="prog-slot"><span class="prog-time">11:00</span><span class="prog-title">Research</span></li>
+            <li class="prog-slot"><span class="prog-time">14:00</span><span class="prog-title">Participant research presentations</span></li>
+            <li class="prog-slot"><span class="prog-time">16:00</span><span class="prog-title">Charles Rahal — <a href="https://www.nature.com/articles/s43588-025-00776-y" target="_blank" rel="noopener">On the Unknowable Limits to Prediction</a></span></li>
+          </ol>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── § 03 People ────────────────────────────────────────── -->
+  <section class="section-v3 section-v3--marker" id="people">
+    <span class="section-number">§ 03 · People</span>
+    <div class="shell">
+      <div class="section-head-v3 reveal">
+        <div>
+          <div class="eyebrow-v3" style="margin-bottom:14px">Speakers &amp; organisers</div>
+          <h2 class="h-section">The people who made the week.</h2>
+        </div>
+      </div>
+
+      <div class="speaker-grid speaker-grid--team reveal-stagger">
+
+        <button class="speaker-chip" data-speaker="rachel-bernhard-25" data-name="Rachel Bernhard" data-role="Nuffield College, Oxford" data-tag="Organiser" data-img="/img/speakers/rachel_bernhard.jpg">
+          <div class="sc-portrait"><img src="/img/speakers/rachel_bernhard.jpg" alt="" /></div>
+          <div class="sc-info"><span class="sc-tag">Organiser</span><p class="sc-name">Rachel Bernhard</p><p class="sc-role">Nuffield College, Oxford</p></div>
+        </button>
+
+        <button class="speaker-chip" data-speaker="ilya-boytsov" data-name="Ilya Boytsov" data-role="NLP Lead, Wayfair" data-tag="Organiser" data-img="/img/speakers/ilya_boystov.jpg">
+          <div class="sc-portrait"><img src="/img/speakers/ilya_boystov.jpg" alt="" /></div>
+          <div class="sc-info"><span class="sc-tag">Organiser</span><p class="sc-name">Ilya Boytsov</p><p class="sc-role">NLP Lead, Wayfair</p></div>
+        </button>
+
+        <button class="speaker-chip" data-speaker="maksim-zubok" data-name="Maksim Zubok" data-role="DPIR, Oxford" data-tag="Organiser" data-img="/img/speakers/maksim_zubok.png">
+          <div class="sc-portrait"><img src="/img/speakers/maksim_zubok.png" alt="" /></div>
+          <div class="sc-info"><span class="sc-tag">Organiser</span><p class="sc-name">Maksim Zubok</p><p class="sc-role">DPIR, Oxford</p></div>
+        </button>
+
+        <button class="speaker-chip" data-speaker="mikhail-burtsev" data-name="Mikhail Burtsev" data-role="London Institute for Mathematical Sciences" data-tag="Lecturer" data-img="/img/speakers/mikhail_burtsev.jpg">
+          <div class="sc-portrait"><img src="/img/speakers/mikhail_burtsev.jpg" alt="" /></div>
+          <div class="sc-info"><span class="sc-tag">Lecturer</span><p class="sc-name">Mikhail Burtsev</p><p class="sc-role">London Institute for Mathematical Sciences</p></div>
+        </button>
+
+        <button class="speaker-chip" data-speaker="emeli-dral" data-name="Emeli Dral" data-role="Co-founder &amp; CTO, Evidently AI" data-tag="Lecturer" data-img="/img/speakers/emeli_dral.jpg">
+          <div class="sc-portrait"><img src="/img/speakers/emeli_dral.jpg" alt="" /></div>
+          <div class="sc-info"><span class="sc-tag">Lecturer</span><p class="sc-name">Emeli Dral</p><p class="sc-role">Co-founder &amp; CTO, Evidently AI</p></div>
+        </button>
+
+        <button class="speaker-chip" data-speaker="grigory-sapunov" data-name="Grigory Sapunov" data-role="CTO, Intento" data-tag="Lecturer" data-img="/img/speakers/grigory_sapunov.jpeg">
+          <div class="sc-portrait"><img src="/img/speakers/grigory_sapunov.jpeg" alt="" /></div>
+          <div class="sc-info"><span class="sc-tag">Lecturer</span><p class="sc-name">Grigory Sapunov</p><p class="sc-role">CTO, Intento</p></div>
+        </button>
+
+        <button class="speaker-chip" data-speaker="tatiana-shavrina" data-name="Tatiana Shavrina" data-role="Research Scientist, Meta Llama" data-tag="Lecturer" data-img="/img/speakers/tatiana_shavrina.jpg">
+          <div class="sc-portrait"><img src="/img/speakers/tatiana_shavrina.jpg" alt="" /></div>
+          <div class="sc-info"><span class="sc-tag">Lecturer</span><p class="sc-name">Tatiana Shavrina</p><p class="sc-role">Research Scientist, Meta Llama</p></div>
+        </button>
+
+        <button class="speaker-chip" data-speaker="sergei-skvortsov" data-name="Sergei Skvortsov" data-role="Lead MLE, Nebius" data-tag="Lecturer" data-img="/img/speakers/sergei_skvortsov.jpg">
+          <div class="sc-portrait"><img src="/img/speakers/sergei_skvortsov.jpg" alt="" /></div>
+          <div class="sc-info"><span class="sc-tag">Lecturer</span><p class="sc-name">Sergei Skvortsov</p><p class="sc-role">Lead MLE, Nebius</p></div>
+        </button>
+
+        <button class="speaker-chip" data-speaker="raymond-duch" data-name="Raymond Duch" data-role="Nuffield College, Oxford" data-tag="Research Talk" data-img="/img/speakers/ray_duch.png">
+          <div class="sc-portrait"><img src="/img/speakers/ray_duch.png" alt="" /></div>
+          <div class="sc-info"><span class="sc-tag">Research Talk</span><p class="sc-name">Raymond Duch</p><p class="sc-role">Nuffield College, Oxford</p></div>
+        </button>
+
+        <button class="speaker-chip" data-speaker="kosuke-imai" data-name="Kosuke Imai" data-role="Harvard University" data-tag="Research Talk" data-img="/img/speakers/kosuke_imai.jpg">
+          <div class="sc-portrait"><img src="/img/speakers/kosuke_imai.jpg" alt="" /></div>
+          <div class="sc-info"><span class="sc-tag">Research Talk</span><p class="sc-name">Kosuke Imai</p><p class="sc-role">Harvard University</p></div>
+        </button>
+
+        <button class="speaker-chip" data-speaker="charles-rahal" data-name="Charles Rahal" data-role="Oxford University" data-tag="Research Talk" data-img="/img/speakers/charles_rahal.jpg">
+          <div class="sc-portrait"><img src="/img/speakers/charles_rahal.jpg" alt="" /></div>
+          <div class="sc-info"><span class="sc-tag">Research Talk</span><p class="sc-name">Charles Rahal</p><p class="sc-role">Oxford University</p></div>
+        </button>
+
+        <button class="speaker-chip" data-speaker="joan-timoneda" data-name="Joan Timoneda" data-role="Purdue University" data-tag="Research Talk" data-img="/img/speakers/joan_timoneda.jpg">
+          <div class="sc-portrait"><img src="/img/speakers/joan_timoneda.jpg" alt="" /></div>
+          <div class="sc-info"><span class="sc-tag">Research Talk</span><p class="sc-name">Joan Timoneda</p><p class="sc-role">Purdue University</p></div>
+        </button>
+
+        <button class="speaker-chip" data-speaker="brandon-stewart" data-name="Brandon Stewart" data-role="Princeton University" data-tag="Research Talk" data-initials="BS">
+          <div class="sc-portrait">BS</div>
+          <div class="sc-info"><span class="sc-tag">Research Talk</span><p class="sc-name">Brandon Stewart</p><p class="sc-role">Princeton University</p></div>
+        </button>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── § 04 Materials ─────────────────────────────────────── -->
+  <section class="section-v3 section-v3--marker section-tinted-v3" id="materials" style="padding-bottom: clamp(56px, 7vw, 88px);">
+    <span class="section-number">§ 04 · Materials</span>
+    <div class="shell">
+      <div class="section-head-v3 reveal">
+        <div>
+          <div class="eyebrow-v3" style="margin-bottom:14px">Open access</div>
+          <h2 class="h-section">Slides, notebooks, and datasets.</h2>
+        </div>
+        <p class="lede-v3">All lecture slides, coding notebooks, and competition code are published openly.</p>
+      </div>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 20px;" class="reveal-stagger">
+        <a class="fb" href="https://github.com/antndlcrx/oxford-llms-workshop" target="_blank" rel="noopener" style="display:block;">
+          <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
+            <img src="/img/icons/github-mark.svg" alt="" style="width:24px; height:24px; opacity:0.85;">
+            <h3 class="h-sub" style="margin:0;">Workshop materials</h3>
+          </div>
+          <p class="copy" style="margin:0 0 12px; font-size:14px;">Lecture slides, Python notebooks, and competition code from the 2025 edition.</p>
+          <span class="btn-link-v3">Open on GitHub <span class="arrow">→</span></span>
+        </a>
+        <a class="fb" href="https://huggingface.co/oxford-llms" target="_blank" rel="noopener" style="display:block;">
+          <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
+            <img src="/img/icons/hf-logo.svg" alt="" style="width:24px; height:24px;">
+            <h3 class="h-sub" style="margin:0;">Models &amp; datasets</h3>
+          </div>
+          <p class="copy" style="margin:0 0 12px; font-size:14px;">Competition datasets and model checkpoints from the synthetic panel project.</p>
+          <span class="btn-link-v3">Open on Hugging Face <span class="arrow">→</span></span>
+        </a>
+      </div>
+      <div class="reveal" style="margin-top:40px; display:flex; gap:24px; align-items:center; flex-wrap:wrap;">
+        <a class="btn-ghost" href="/summer-school/2024/">← 2024 edition</a>
+        <a class="btn-primary" href="/summer-school/">All cohorts <span class="arrow">→</span></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Bio data (used by speaker modal) ───────────────────── -->
+  <div hidden aria-hidden="true">
+
+    <div id="bio-rachel-bernhard-25">
+      <p>Rachel Bernhard is Associate Professor of Quantitative Political Science Research Methods at Nuffield College and the University of Oxford. Before joining Nuffield, she was an Assistant Professor at the University of California, Davis, and a Postdoctoral Prize Fellow in Politics at Nuffield. She holds a PhD from UC Berkeley.</p>
+      <p>Her research focuses on appearance-based discrimination in politics — how candidate appearance shapes voter preferences and how parties select candidates. She is also a methodologist working on survey experiments and text-as-data approaches.</p>
     </div>
 
-    <div class="prose">
-      <img
-        src="/img/posts/report_2025/group_photo_2025.jpg"
-        alt="Oxford LLMs 2025 group photo"
-      />
+    <div id="bio-ilya-boytsov">
+      <p>Ilya Boytsov is an applied Deep Learning Scientist and NLP Lead at Wayfair in Berlin. His main professional interests include information retrieval, aspect-based sentiment analysis, and generative AI. He has extensive experience designing machine-learning bootcamps and lectures for diverse audiences.</p>
+      <p>Ilya has spoken at conferences including the World Data Summit and DSC Europe. He is also co-founder of the Street Smart AI community in Berlin.</p>
+    </div>
 
-      <p>
-        In late September 2025, Nuffield College hosted the third annual Oxford workshop on Large
-        Language Models for Social Science, with support from the Oxford Van Houten Fund and
-        Nuffield College. The five-day programme brought together early-career researchers for
-        lectures on large language models, hands-on Python tutorials, and a collaborative research
-        competition.
-      </p>
+    <div id="bio-maksim-zubok">
+      <p>Maksim Zubok is a doctoral candidate in Politics at Oxford University, <a href="https://www.nuffield.ox.ac.uk/people/profiles/maksim-zubok/" target="_blank" rel="noopener">Nuffield College</a>. His dissertation explores ways of harnessing LLMs for social science research, from classic data labelling to using models as condensed snapshots of the internet to study how people organise relationships between concepts and form beliefs about the world.</p>
+      <p>He has helped organise several academic events, including previous sessions of the Oxford LLM workshop and the <a href="https://sicss.io/2022/oxford/" target="_blank" rel="noopener">Oxford Summer Institute for Computational Social Science</a>.</p>
+    </div>
 
-      <p>
-        We received just under 150 applications and selected 30 participants. The cohort drew
-        researchers from politics, sociology, linguistics, economics, history, and law.
-      </p>
+    <div id="bio-mikhail-burtsev">
+      <p>Dr Mikhail Burtsev is a Landau AI Fellow at the London Institute for Mathematical Sciences. He studied microelectronics before completing his PhD in computer science at the Keldysh Institute of Applied Mathematics, and has held visiting positions at Cambridge.</p>
+      <p>As Scientific Director of the AI Research Institute in Moscow, he led development of the <a href="https://deeppavlov.ai/" target="_blank" rel="noopener">DeepPavlov</a> conversational AI framework. His research focuses on continual learning, memory-augmented neural networks, and AI-assisted mathematics.</p>
+    </div>
 
-      <h2>Workshop Themes and Materials</h2>
-      <p>
-        The lecture series featured Mikhail Burtsev (London Institute for Mathematical Sciences),
-        Tatiana Shavrina (Meta, Llama team), Grigory Sapunov (Intento), and Ilya Boytsov (Wayfair),
-        with coding seminars by Emeli Dral (Evidently AI) and Sergei Skvortsov (Nebius). Topics
-        spanned LLM fundamentals, evaluation methods, fine-tuning, AI agents, and AI safety.
-        Raymond Duch (Oxford), Joan Timoneda (Purdue), Kosuke Imai (Harvard), and Charles Rahal
-        (Oxford) each delivered guest talks covering applications at the intersection of NLP and the
-        social sciences. Brandon Stewart (Princeton) joined as part of a joint session with the
-        <a href="https://metrics-and-models.github.io/" target="_blank" rel="noopener"
-          >Metrics and Models seminar series</a
-        >. Several speakers presented online.
-      </p>
+    <div id="bio-emeli-dral">
+      <p>Emeli Dral is Co-founder and CTO at <a href="https://www.evidentlyai.com/" target="_blank" rel="noopener">Evidently AI</a>, a startup developing open-source tools to evaluate, test, and monitor machine learning models and LLM-based systems.</p>
+      <p>She previously co-founded an industrial AI startup and served as Chief Data Scientist at Yandex Data Factory, leading over 50 applied ML projects across industries. Emeli co-authored a Coursera machine learning and data analysis curriculum with over 100,000 students enrolled.</p>
+    </div>
 
-      <p>
-        We are publishing lecture slides, notebooks, and code on the
-        <a href="https://llmsforsocialscience.net" target="_blank" rel="noopener">materials page</a>
-        and
-        <a href="https://github.com/antndlcrx/oxford-llms-workshop" target="_blank" rel="noopener"
-          >GitHub repository</a
-        >.
-      </p>
+    <div id="bio-grigory-sapunov">
+      <p>Grigory Sapunov is CTO and co-founder of <a href="https://inten.to/" target="_blank" rel="noopener">Intento</a>. He has over 20 years of software engineering experience, including around 15 years in data analysis, AI, and machine learning. Since 2011 he has focused on deep learning.</p>
+      <p>Grigory is a Google Developer Expert in Machine Learning and holds a PhD in Artificial Intelligence. He is a frequent speaker at ML conferences and community events.</p>
+    </div>
 
-      <h2>Collaborative Research Project</h2>
-      <p>
-        Participants took part in a Kaggle-style prediction competition, building systems that use
-        LLMs to predict human survey responses across different countries and contexts. The
-        competition gave participants direct experience with a live, open-ended research problem
-        rather than a pre-packaged exercise.
-      </p>
+    <div id="bio-tatiana-shavrina">
+      <p>Tatiana Shavrina works on the Llama team at Meta and has previously worked at Snap and AIRI. She is passionate about open source and multilingualism in LLMs, especially for under-resourced languages.</p>
+      <p>She contributed to BLOOM as lead for interpretability, led development of the mGPT multilingual model, and worked on Russian SuperGLUE and low-resource NLP methods. See her <a href="https://scholar.google.com/citations?user=sdmdZh8AAAAJ" target="_blank" rel="noopener">Google Scholar profile</a> for publications.</p>
+    </div>
 
-      <p>
-        The collaboration did not end with the workshop. A team of participants and speakers
-        continued developing the project after September. They have now completed that work and
-        submitted it for review at a peer-reviewed conference.
-      </p>
+    <div id="bio-sergei-skvortsov">
+      <p>Sergei Skvortsov is Lead Machine Learning Engineer at <a href="https://nebius.com/" target="_blank" rel="noopener">Nebius</a>, focused on efficient training and inference for large language models. He regularly lectures on efficient inference at the Nebius Academy.</p>
+      <p>Previously, he led the inference team at Yandex Self Driving Group, where his team built the main inference engine powering neural models for autonomous cars and robots.</p>
+    </div>
 
-      <h2>Social Programme</h2>
-      <p>
-        The workshop ran a social programme alongside the academic sessions. Participants and
-        speakers gathered at a pub on the first evening, giving everyone a chance to meet informally
-        before the week began. On Thursday, the full group joined a guided tour of Oxford. Speakers
-        and participants walked side by side, and many of the most candid conversations of the week
-        happened along the way. Both events added an important dimension to the workshop&apos;s
-        collaborative spirit.
-      </p>
+    <div id="bio-raymond-duch">
+      <p>Ray Duch is the co-founder and Director of the <a href="https://cess-nuffield.nuff.ox.ac.uk/" target="_blank" rel="noopener">Centre for Experimental Social Sciences (CESS)</a> at Nuffield College. He has established CESS centres in Chile, China, and India, and serves as co-Director of the Candour Project and co-PI for the REAL Demand Centre.</p>
+      <p>His work uses experimental methods to study decision making in politics, finance, health, and economics, and has appeared in the <em>American Political Science Review</em>, <em>Journal of Politics</em>, and <em>Proceedings of the National Academy of Sciences</em>.</p>
+    </div>
 
-      <h2>Looking Ahead</h2>
-      <p>
-        Feedback from previous years identified the collaborative project as the workshop&apos;s
-        most valuable element. The 2025 edition built on that foundation. We are already planning
-        how to develop the format further for 2026.
-      </p>
-      <p>
-        If you are an early-career researcher eager to master LLM methods and work on real research
-        problems, watch this space for the 2026 application.
-      </p>
-      <h2>Organisers</h2>
+    <div id="bio-kosuke-imai">
+      <p>Kosuke Imai is Professor of Government and Statistics at Harvard University and an affiliate of the <a href="https://www.iq.harvard.edu/" target="_blank" rel="noopener">Institute for Quantitative Social Science</a>. He specialises in statistical methods and machine learning for social science, including causal inference, computational social science, and survey methodology.</p>
+      <p>He leads the <a href="https://alarm-redist.org/" target="_blank" rel="noopener">Algorithm-Assisted Redistricting Methodology (ALARM) Project</a> and is the author of <em><a href="https://press.princeton.edu/books/quantitative-social-science" target="_blank" rel="noopener">Quantitative Social Science: An Introduction</a></em>.</p>
+    </div>
 
-      <div class="speaker">
-        <span class="speaker-name">Rachel Bernhard (Co-Organiser)</span>
-        <span class="speaker-affil"><em>DPIR, Nuffield College, Oxford University</em></span>
-        <img
-          src="/img/speakers/rachel_bernhard.jpg"
-          alt="Portrait of Rachel Bernhard"
-          class="speaker-photo"
-        />
-        <div class="speaker-bio">
-          <p>
-            Rachel Bernhard is Associate Professor of Quantitative Political Science Research
-            Methods at Nuffield College and the University of Oxford. Before joining Nuffield, she
-            served as an Assistant Professor of Political Science at the University of California,
-            Davis. She holds a Ph.D. in political science from the University of California,
-            Berkeley, and previously was a Postdoctoral Prize Fellow in Politics at Nuffield. Her
-            current research focuses on appearance-based discrimination in politics. To learn more
-            about Rachel&apos;s research and teaching, visit her
-            <a href="https://rachelbernhard.com/" target="_blank" rel="noopener">website</a>.
-          </p>
-        </div>
-      </div>
+    <div id="bio-charles-rahal">
+      <p>Charles Rahal is Associate Professor in Computational Social Science at the University of Oxford, affiliated with the Demographic Science Unit and the <a href="https://www.demography.ox.ac.uk/" target="_blank" rel="noopener">Leverhulme Centre for Demographic Science</a>.</p>
+      <p>His research develops methods to uncover patterns in large-scale observational data with a focus on equality and equity. He contributed to the UK government's Covid-19 policy response and leads the <a href="https://metrics-and-models.github.io/" target="_blank" rel="noopener">Metrics and Models</a> lab.</p>
+    </div>
 
-      <div class="speaker">
-        <span class="speaker-name">Ilya Boytsov (Lecturer, Co-Organiser)</span>
-        <span class="speaker-affil"><em>NLP Lead, Wayfair</em></span>
-        <img
-          src="/img/speakers/ilya_boytsov.JPEG"
-          alt="Portrait of Ilya Boytsov"
-          class="speaker-photo"
-        />
-        <div class="speaker-bio">
-          <p>
-            Ilya is an applied Deep Learning Scientist with a focus on Natural Language Processing
-            (NLP). He currently works as the NLP lead at Wayfair in Berlin. His main professional
-            interests include information retrieval, aspect-based sentiment analysis, and
-            generative AI. In addition to his applied research work, Ilya has extensive experience
-            in teaching and public speaking, including conference talks at the
-            <a href="https://worlddatasummit.com/" target="_blank" rel="noopener"
-              >World Data Summit</a
-            >
-            and
-            <a href="https://datasciconference.com/" target="_blank" rel="noopener">DSC Europe</a>.
-            He is also a co-founder of the
-            <a
-              href="https://www.meetup.com/street-smart-ai-berlin-meetup/"
-              target="_blank"
-              rel="noopener"
-              >Street Smart AI community</a
-            >
-            in Berlin. You can read more about his work on his
-            <a
-              href="https://ieboytsov.github.io/about-me.html"
-              target="_blank"
-              rel="noopener"
-              >personal website</a
-            >.
-          </p>
-        </div>
-      </div>
+    <div id="bio-joan-timoneda">
+      <p>Joan Timoneda is Assistant Professor of Political Science at Purdue University. He received his PhD from the University of Maryland and previously held a postdoctoral position at Duke University.</p>
+      <p>His research focuses on authoritarian regimes, democratic backsliding, and how leaders use digital tools and social media. His methods work applies large language models to core questions in comparative politics. More details on his <a href="https://joantimoneda.netlify.app/" target="_blank" rel="noopener">personal website</a>.</p>
+    </div>
 
-      <div class="speaker">
-        <span class="speaker-name">Maksim Zubok (Co-Organiser)</span>
-        <span class="speaker-affil"><em>DPIR Oxford University</em></span>
-        <img
-          src="/img/speakers/maksim_zubok.png"
-          alt="Portrait of Maksim Zubok"
-          class="speaker-photo"
-        />
-        <div class="speaker-bio">
-          <p>
-            Maksim is a doctoral candidate in Politics at Oxford University,
-            <a
-              href="https://www.nuffield.ox.ac.uk/people/profiles/maksim-zubok/"
-              target="_blank"
-              rel="noopener"
-              >Nuffield College</a
-            >. His dissertation explores ways of harnessing LLMs for social science research, from
-            classic data labelling to using models as condensed snapshots of the internet to study
-            how people organise relationships between concepts and form beliefs about the world. He
-            has a longstanding interest in teaching and facilitating intellectual exchange and has
-            helped organise several academic events, including previous sessions of the Oxford LLM
-            workshop and
-            <a href="https://sicss.io/2022/oxford/" target="_blank" rel="noopener"
-              >the Oxford Summer Institute for Computational Social Science</a
-            >.
-          </p>
-        </div>
-      </div>
-
-      <h2>Lecturers</h2>
-
-      <div class="speaker">
-        <span class="speaker-name">Mikhail Burtsev (Lecturer)</span>
-        <span class="speaker-affil"
-          ><em>Arnold &amp; Landau AI Fellow at the London Institute for Mathematical Sciences</em></span
-        >
-        <img
-          src="/img/speakers/mikhail_burtsev.jpg"
-          alt="Portrait of Mikhail Burtsev"
-          class="speaker-photo"
-        />
-        <div class="speaker-bio">
-          <p>
-            Dr Mikhail Burtsev is a Landau AI Fellow at the London Institute. He studied
-            microelectronics at the Moscow Power Engineering Institute before completing his PhD in
-            computer science at the Keldysh Institute of Applied Mathematics. He has held senior
-            research positions at the Anokhin Institute of Normal Physiology and the Kurchatov
-            Institute, and visiting positions at Cambridge. As Scientific Director of the Artificial
-            Intelligence Research Institute in Moscow, he led development of the DeepPavlov
-            conversational AI framework. His research focuses on continual learning,
-            memory-augmented neural networks, and AI-assisted mathematics. More information is
-            available on his
-            <a href="https://lims.ac.uk/mikhail-burtsev/" target="_blank" rel="noopener">website</a>.
-          </p>
-        </div>
-      </div>
-
-      <div class="speaker">
-        <span class="speaker-name">Emeli Dral (Lecturer)</span>
-        <span class="speaker-affil"><em>Co-founder and CTO at Evidently AI</em></span>
-        <img
-          src="/img/speakers/emeli_dral.jpg"
-          alt="Portrait of Emeli Dral"
-          class="speaker-photo"
-        />
-        <div class="speaker-bio">
-          <p>
-            Emeli Dral is Co-founder and CTO at
-            <a href="https://www.evidentlyai.com/" target="_blank" rel="noopener">Evidently AI</a>, a
-            startup developing open-source tools to evaluate, test, and monitor machine learning
-            models. She previously co-founded an industrial AI startup and served as Chief Data
-            Scientist at Yandex Data Factory, leading over 50 applied ML projects across industries.
-            Emeli lectures on data science at Harbour.Space University and co-authored a Coursera
-            machine learning and data analysis curriculum with over 100,000 students.
-          </p>
-        </div>
-      </div>
-
-      <div class="speaker">
-        <span class="speaker-name">Grigory Sapunov (Lecturer)</span>
-        <span class="speaker-affil"><em>CTO and co-founder of Intento</em></span>
-        <img
-          src="/img/speakers/grigory_sapunov.jpeg"
-          alt="Portrait of Grigory Sapunov"
-          class="speaker-photo"
-        />
-        <div class="speaker-bio">
-          <p>
-            Grigory Sapunov is CTO and co-founder of Intento. He has over 20 years of software
-            engineering experience, including around 15 years in data analysis, AI, and machine
-            learning. Since 2011, he has focused on deep learning. Grigory is a Google Developer
-            Expert in Machine Learning and holds a Ph.D. in Artificial Intelligence. You can connect
-            with him on
-            <a
-              href="https://www.linkedin.com/in/grigorysapunov/"
-              target="_blank"
-              rel="noopener"
-              >LinkedIn</a
-            >.
-          </p>
-        </div>
-      </div>
-
-      <div class="speaker">
-        <span class="speaker-name">Tatiana Shavrina (Lecturer)</span>
-        <span class="speaker-affil"><em>Research Scientist Manager, Meta, Llama team</em></span>
-        <img
-          src="/img/speakers/tatiana_shavrina.jpg"
-          alt="Portrait of Tatiana Shavrina"
-          class="speaker-photo"
-        />
-        <div class="speaker-bio">
-          <p>
-            Tatiana Shavrina works on the Llama team at Meta and has previously worked at Snap and
-            AIRI. She is passionate about open source and multilingualism in LLMs, especially for
-            under-resourced languages. She has contributed to BLOOM as the lead for interpretability,
-            led development of the mGPT model, and worked on low-resource NLP methods. Her main
-            projects include mGPT, Russian SuperGLUE, and BLOOM. See her
-            <a
-              href="https://scholar.google.com/citations?user=sdmdZh8AAAAJ"
-              target="_blank"
-              rel="noopener"
-              >Google Scholar profile</a
-            >
-            for more details.
-          </p>
-        </div>
-      </div>
-
-      <div class="speaker">
-        <span class="speaker-name">Sergei Skvortsov (Lecturer)</span>
-        <span class="speaker-affil"><em>Lead MLE at Nebius</em></span>
-        <img
-          src="/img/speakers/sergei_skvortsov.jpg"
-          alt="Portrait of Sergei Skvortsov"
-          class="speaker-photo"
-        />
-        <div class="speaker-bio">
-          <p>
-            Sergei Skvortsov is a Lead Machine Learning Engineer at Nebius with a focus on efficient
-            training and inference for large language models. Previously, he led the inference team at
-            Yandex Self Driving Group, where his team built the main inference engine powering neural
-            models for autonomous cars and robots. He regularly lectures on efficient inference, for
-            example at the
-            <a href="https://academy.nebius.com/" target="_blank" rel="noopener">Nebius Academy</a>.
-          </p>
-        </div>
-      </div>
-
-      <h2>Social Science Researchers</h2>
-
-      <div class="speaker">
-        <span class="speaker-name">Raymond Duch</span>
-        <span class="speaker-affil"
-          ><em
-            >Director of the Centre for Experimental Social Sciences, Nuffield College, Oxford
-            University</em
-          ></span
-        >
-        <img
-          src="/img/speakers/ray_duch.png"
-          alt="Portrait of Raymond Duch"
-          class="speaker-photo"
-        />
-        <div class="speaker-bio">
-          <p>
-            Ray Duch is the co-founder and Director of the
-            <a
-              href="https://cess-nuffield.nuff.ox.ac.uk/"
-              target="_blank"
-              rel="noopener"
-              >Centre for Experimental Social Sciences (CESS)</a
-            >
-            at Nuffield College. He has established CESS centres in Chile, China, and India and serves
-            as co-Director of the Candour Project and co-PI for the REAL Demand Centre. His work uses
-            experimental methods to study decision making in politics, finance, health, and economics,
-            and has appeared in leading journals including the
-            <em>American Political Science Review</em> and
-            <em>Proceedings of the National Academy of Sciences</em>. More information is available on
-            his
-            <a href="https://www.raymondduch.com/" target="_blank" rel="noopener">website</a>.
-          </p>
-        </div>
-      </div>
-
-      <div class="speaker">
-        <span class="speaker-name">Kosuke Imai</span>
-        <span class="speaker-affil"
-          ><em
-            >Professor in the Department of Government and the Department of Statistics at Harvard
-            University</em
-          ></span
-        >
-        <img
-          src="/img/speakers/kosuke_imai.jpg"
-          alt="Portrait of Kosuke Imai"
-          class="speaker-photo"
-        />
-        <div class="speaker-bio">
-          <p>
-            Kosuke Imai is Professor of Government and Statistics at Harvard University and an
-            affiliate of the
-            <a href="https://www.iq.harvard.edu/" target="_blank" rel="noopener"
-              >Institute for Quantitative Social Science</a
-            >. He specializes in statistical methods and machine learning for social science,
-            including causal inference, computational social science, and survey methodology. He leads
-            the
-            <a href="https://alarm-redist.org/" target="_blank" rel="noopener"
-              >Algorithm-Assisted Redistricting Methodology Project (ALARM)</a
-            >
-            and is the author of
-            <em
-              ><a
-                href="https://press.princeton.edu/books/quantitative-social-science"
-                target="_blank"
-                rel="noopener"
-                >Quantitative Social Science: An Introduction</a
-              ></em
-            >.
-          </p>
-        </div>
-      </div>
-
-      <div class="speaker">
-        <span class="speaker-name">Charles Rahal</span>
-        <span class="speaker-affil"
-          ><em>Associate Professor in Computational Social Science at the University of Oxford</em></span
-        >
-        <img
-          src="/img/speakers/charles_rahal.jpg"
-          alt="Portrait of Charles Rahal"
-          class="speaker-photo"
-        />
-        <div class="speaker-bio">
-          <p>
-            Charles Rahal is an associate professor in computational social science at the University
-            of Oxford and is affiliated with the Demographic Science Unit and the
-            <a href="https://www.demography.ox.ac.uk/" target="_blank" rel="noopener"
-              >Leverhulme Centre for Demographic Science</a
-            >. His research develops methods to uncover patterns in large-scale observational data,
-            with a focus on equality and equity. He has contributed to the UK government&apos;s
-            Covid-19 policy response and leads the
-            <a href="https://metrics-and-models.github.io/" target="_blank" rel="noopener"
-              >Metrics and Models</a
-            >
-            lab.
-          </p>
-        </div>
-      </div>
-
-      <div class="speaker">
-        <span class="speaker-name">Joan Timoneda</span>
-        <span class="speaker-affil"
-          ><em>Assistant Professor of Political Science at Purdue University</em></span
-        >
-        <img
-          src="/img/speakers/joan_timoneda.jpg"
-          alt="Portrait of Joan Timoneda"
-          class="speaker-photo"
-        />
-        <div class="speaker-bio">
-          <p>
-            Joan Timoneda is an Assistant Professor of Political Science at Purdue University. He
-            received his Ph.D. from the University of Maryland and previously held a postdoctoral
-            position at Duke University. His research focuses on authoritarian regimes, democratic
-            backsliding, and how leaders use digital tools and social media. His methods work applies
-            large language models to core questions in comparative politics. More details are
-            available on his
-            <a href="https://joantimoneda.netlify.app/" target="_blank" rel="noopener"
-              >personal website</a
-            >.
-          </p>
-        </div>
-      </div>
+    <div id="bio-brandon-stewart">
+      <p>Brandon Stewart is Professor of Sociology at Princeton University. His research develops quantitative methods for the analysis of text as data, with a focus on making these tools accessible to social scientists.</p>
+      <p>He is the creator of the <a href="https://www.structuraltopicmodel.com/" target="_blank" rel="noopener">Structural Topic Model (STM)</a>, a widely-used method for analysing document collections that allows researchers to incorporate metadata into topic models. He joined the 2025 school as part of a joint session with the Metrics and Models seminar series.</p>
     </div>
 
   </div>
-</Base>
 
+  <SpeakerModal />
+
+</Base>

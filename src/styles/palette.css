@@ -1,0 +1,71 @@
+/* ================================================================
+   Oxford LLMs — palette
+   ----------------------------------------------------------------
+   Single fixed two-colour pair: Royal Blue × Spring Green.
+   A is the primary (chrome, buttons, identity).
+   B carries the "live / happening now" signal and secondary links.
+   The pair gradient fades A → white → B and is used for accent
+   bars, the hero rule, and gradient text moments.
+   ================================================================ */
+
+:root {
+  --c-a:      #1E45A0;
+  --c-a-deep: #11307A;
+  --c-b:      #4ADE80;
+  --c-b-deep: #2DA85A;
+  --c-mid:    #FCFCFC;
+
+  /* Signature gradients */
+  --grad-pair:       linear-gradient(in oklch 90deg, var(--c-a) 15%, var(--c-mid) 50%, var(--c-b) 85%);
+  --grad-pair-soft:  linear-gradient(in oklch 90deg, var(--c-a)  5%, var(--c-mid) 50%, var(--c-b) 95%);
+  --grad-a-tonal:    linear-gradient(in oklch 135deg, var(--c-a-deep), var(--c-a));
+  --grad-b-tonal:    linear-gradient(in oklch 135deg, var(--c-b-deep), var(--c-b));
+
+  /* Bridge: existing components that reference these tokens */
+  --grad-spectrum: var(--grad-pair);
+  --grad-primary:  var(--grad-a-tonal);
+  --accent:        var(--c-a);
+  --accent-hover:  var(--c-a-deep);
+}
+
+/* Aurora blobs */
+.hero-aurora .b1 { background: radial-gradient(circle, var(--c-a), transparent 65%); }
+.hero-aurora .b2 { background: radial-gradient(circle, var(--c-b), transparent 65%); }
+.hero-aurora .b3 { background: radial-gradient(circle, var(--c-mid), transparent 65%); }
+
+/* Hero title accent: tonal of colour A */
+.hero-title .word.accent,
+.hero-title .accent,
+.hero-manuscript .hero-title .accent {
+  background: var(--grad-a-tonal);
+  -webkit-background-clip: text;
+          background-clip: text;
+  color: transparent;
+}
+
+/* Accent bars (section markers, hero rule, footer, etc.) */
+.apply-feature::before,
+.apply-teaser::before,
+.section--marker::before,
+.stats::before,
+.footer-v3::before,
+.hero-rule-top { background: var(--grad-pair) !important; }
+
+/* Status dot — colour B carries the "live" signal */
+.status-dot {
+  background: var(--c-b) !important;
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--c-b) 50%, transparent) !important;
+  animation-name: status-pulse-b !important;
+}
+@keyframes status-pulse-b {
+  0%,100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--c-b) 50%, transparent); }
+  60%     { box-shadow: 0 0 0 8px color-mix(in srgb, var(--c-b) 0%,  transparent); }
+}
+
+/* Secondary action links — colour B-deep for legibility, brightens on hover */
+.btn-link-v3 {
+  color: var(--c-b-deep) !important;
+}
+.btn-link-v3:hover {
+  color: var(--c-b) !important;
+}

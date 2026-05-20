@@ -1,47 +1,313 @@
 ---
 import Base from '../../layouts/Base.astro';
+import SpeakerModal from '../../components/SpeakerModal.astro';
 ---
 
 <Base
-  title="Summer School 2026"
-  description="Oxford LLMs Summer School 2026 — preliminary dates 13–17 July 2026 at Nuffield College. Applications open soon."
+  title="Oxford LLMs 2026 — Programme"
+  description="Programme, support, and speakers for the Oxford LLMs Summer School 2026 — 13–17 July, Nuffield College, Oxford."
 >
-  <div class="container container--content">
 
-    <div class="page-header">
-      <p class="section-label">Summer School · 2026</p>
-      <h1 class="page-header__title">Oxford LLMs 2026</h1>
-      <p class="page-header__desc">
-        Preliminary dates: 13–17 July 2026 · Nuffield College, Oxford.<br />
-        Applications will open soon. Full programme and speakers to be announced.
-      </p>
+  <!-- ── Status strip ───────────────────────────────────────── -->
+  <aside class="status-strip" aria-label="Applications status">
+    <div class="status-strip-inner">
+      <span class="status-dot" aria-hidden="true"></span>
+      <span class="status-label">Applications open</span>
+      <span class="sep"></span>
+      <span>Deadline 1 June</span>
+      <span class="sep"></span>
+      <a href="/summer-school/" style="color:inherit; text-decoration:none;">Summer School</a>
+      <span class="sep"></span>
+      <span>2026 — Fourth edition</span>
+      <a class="status-cta" href="https://forms.gle/VQ5qrdQ5Pk1Rtogg7"
+         target="_blank" rel="noopener">
+        Apply now <span class="arrow">→</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- ── Manuscript hero with TOC rail ──────────────────────── -->
+  <section class="hero-manuscript">
+    <div class="hero-ms-inner">
+
+      <aside class="hero-ms-rail">
+        <span class="rail-label">2026</span>
+        <ol class="rail-toc">
+          <li>
+            <a href="#programme">
+              <span class="t-num">01</span>
+              <span class="t-name">Programme</span>
+            </a>
+          </li>
+          <li>
+            <a href="#support">
+              <span class="t-num">02</span>
+              <span class="t-name">Support</span>
+            </a>
+          </li>
+          <li>
+            <a href="#speakers">
+              <span class="t-num">03</span>
+              <span class="t-name">Speakers</span>
+            </a>
+          </li>
+          <li>
+            <a href="#apply">
+              <span class="t-num">04</span>
+              <span class="t-name">Eligibility</span>
+            </a>
+          </li>
+        </ol>
+        <div class="rail-foot">
+          <span>13–17 July</span>
+          <span>Oxford</span>
+        </div>
+      </aside>
+
+      <div class="hero-ms-content">
+        <p class="eyebrow-v3">Summer School 2026</p>
+        <h1 class="hero-title h-display" style="margin: 16px 0 24px;">
+          Fourth edition.<br>Nuffield College,<br>Oxford.
+        </h1>
+        <p class="lede-v3">
+          Programme details, confirmed topics, and funding information for the 2026 school.
+          The page will fill in as confirmations land; applications are open now.
+        </p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── § 01 Programme ─────────────────────────────────────── -->
+  <section class="section-v3 section-v3--marker" id="programme">
+    <span class="section-number">§ 01 · Programme</span>
+    <div class="shell">
+      <div class="section-head-v3 reveal">
+        <div>
+          <div class="eyebrow-v3" style="margin-bottom:14px">Scope &amp; priorities</div>
+          <h2 class="h-section">What the 2026 programme will cover.</h2>
+        </div>
+      </div>
+
+      <div class="reveal" style="max-width: 72ch;">
+        <p class="copy" style="margin: 0 0 18px;">
+          The 2026 school continues the programme's focus on large language models for social
+          science, combining technical depth with research application. The week will cover
+          foundations alongside new terrain: inference economics (cost, latency, and deployment
+          trade-offs at scale) and agents for science and research (LLM-driven workflows for
+          literature review, data extraction, and experiment design). Further topics will be
+          added as speakers confirm.
+        </p>
+        <p class="copy" style="margin: 0; color: var(--text-dim);">
+          The day-by-day schedule will be published here as it is finalised.
+          To get a sense of how the week is structured, see the
+          <a href="/summer-school/2025/#programme">2025 programme</a>.
+          Materials from past editions are on
+          <a href="https://github.com/antndlcrx/oxford-llms-workshop" target="_blank" rel="noopener">GitHub</a>.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── § 02 Support ───────────────────────────────────────── -->
+  <section class="section-v3 section-v3--marker section-tinted-v3" id="support">
+    <span class="section-number">§ 02 · Support</span>
+    <div class="shell">
+      <div class="section-head-v3 reveal">
+        <div>
+          <div class="eyebrow-v3" style="margin-bottom:14px">Costs &amp; funding</div>
+          <h2 class="h-section">Tuition is free.<br>We aim to remove every barrier we can.</h2>
+        </div>
+        <p class="lede-v3">
+          The school is designed so that cost is not a barrier. All tuition is free for admitted
+          participants.
+        </p>
+      </div>
+
+      <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 20px;"
+           class="reveal-stagger">
+
+        <article class="fb">
+          <span class="rule-soft"></span>
+          <h3 class="h-sub" style="margin-bottom:10px">Tuition</h3>
+          <p class="copy" style="margin:0; font-size:14px;">
+            The full programme (lectures, seminars, coding labs, and research project
+            supervision) is free of charge for all admitted participants.
+          </p>
+        </article>
+
+        <article class="fb">
+          <span class="rule-soft"></span>
+          <h3 class="h-sub" style="margin-bottom:10px">Accommodation &amp; meals</h3>
+          <p class="copy" style="margin:0 0 10px; font-size:14px;">
+            Accommodation is at participants' own expense. Admitted participants will receive
+            a list of recommended nearby hotels and affordable options in Oxford.
+          </p>
+          <p class="copy" style="margin:0; font-size:14px;">
+            We expect to cover meals during the school day; details will be confirmed
+            with admitted participants.
+          </p>
+        </article>
+
+        <article class="fb">
+          <span class="rule-soft"></span>
+          <h3 class="h-sub" style="margin-bottom:10px">Travel scholarships</h3>
+          <p class="copy" style="margin:0 0 12px; font-size:14px;">
+            We have offered travel support to participants in all three previous editions.
+            We are currently awaiting a funding decision for 2026 and will publish details
+            as soon as possible.
+          </p>
+          <p class="copy" style="margin:0; font-size:13px; color:var(--text-muted);">
+            If travel cost is a barrier, note it in your application; we consider financial
+            need alongside academic fit when making awards.
+          </p>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── § 03 Speakers ──────────────────────────────────────── -->
+  <section class="section-v3 section-v3--marker" id="speakers">
+    <span class="section-number">§ 03 · Speakers</span>
+    <div class="shell">
+      <div class="section-head-v3 reveal">
+        <div>
+          <div class="eyebrow-v3" style="margin-bottom:14px">Confirmed · more to follow</div>
+          <h2 class="h-section">Speakers.</h2>
+        </div>
+        <p class="lede-v3">
+          The programme brings together ML researchers, social scientists, and industry
+          practitioners. Further confirmations will be added here as they land.
+        </p>
+      </div>
+
+      <div class="speaker-grid speaker-grid--team reveal-stagger">
+
+        <button class="speaker-chip" data-speaker="tatiana-shavrina-26" data-name="Tatiana Shavrina" data-role="Research Scientist, Meta" data-tag="Lecturer" data-img="/img/speakers/tatiana_shavrina.jpg">
+          <div class="sc-portrait"><img src="/img/speakers/tatiana_shavrina.jpg" alt="" /></div>
+          <div class="sc-info"><span class="sc-tag">Lecturer</span><p class="sc-name">Tatiana Shavrina</p><p class="sc-role">Research Scientist, Meta</p></div>
+        </button>
+
+        <button class="speaker-chip" data-speaker="sergei-skvortsov-26" data-name="Sergei Skvortsov" data-role="Lead MLE, Nebius" data-tag="Lecturer" data-img="/img/speakers/sergei_skvortsov.jpg">
+          <div class="sc-portrait"><img src="/img/speakers/sergei_skvortsov.jpg" alt="" /></div>
+          <div class="sc-info"><span class="sc-tag">Lecturer</span><p class="sc-name">Sergei Skvortsov</p><p class="sc-role">Lead MLE, Nebius</p></div>
+        </button>
+
+        <button class="speaker-chip" data-speaker="piotr-mazurek" data-name="Piotr Mazurek" data-role="Member of Technical Staff, Liquid.AI" data-tag="Lecturer" data-img="/img/speakers/piotr_mazurek.jpg">
+          <div class="sc-portrait"><img src="/img/speakers/piotr_mazurek.jpg" alt="" /></div>
+          <div class="sc-info"><span class="sc-tag">Lecturer</span><p class="sc-name">Piotr Mazurek</p><p class="sc-role">Member of Technical Staff, Liquid.AI</p></div>
+        </button>
+
+        <button class="speaker-chip" data-speaker="ilya-boytsov-26" data-name="Ilya Boytsov" data-role="ML Performance Engineering, Nebius" data-tag="Lecturer" data-img="/img/speakers/ilya_boystov.jpg">
+          <div class="sc-portrait"><img src="/img/speakers/ilya_boystov.jpg" alt="" /></div>
+          <div class="sc-info"><span class="sc-tag">Lecturer</span><p class="sc-name">Ilya Boytsov</p><p class="sc-role">ML Performance Engineering, Nebius</p></div>
+        </button>
+
+      </div>
+
+      <div class="reveal" style="margin-top:32px;">
+        <p class="copy" style="font-size:13px; color:var(--text-dim); max-width:52ch; margin:0 0 12px;">
+          More speakers will be announced as confirmations land. If you are interested in
+          contributing as a speaker or social science presenter, reach out directly.
+        </p>
+        <a class="btn-link-v3" href="mailto:oxford@llmsforsocialscience.net">
+          Get in touch <span class="arrow">→</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── § 04 Apply ─────────────────────────────────────────── -->
+  <section class="section-v3 section-v3--marker section-tinted-v3" id="apply"
+           style="padding-bottom: clamp(56px, 7vw, 88px);">
+    <span class="section-number">§ 04 · Eligibility</span>
+    <div class="shell">
+      <div class="section-head-v3 reveal">
+        <div>
+          <div class="eyebrow-v3" style="margin-bottom:14px">Eligibility &amp; deadlines</div>
+          <h2 class="h-section">Applications are open.</h2>
+        </div>
+        <p class="lede-v3">Reviewed on a rolling basis. Deadline 1 June; all decisions out by 3 June.</p>
+      </div>
+
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap: clamp(40px, 6vw, 80px);"
+           class="reveal">
+        <div>
+          <h3 class="h-sub">Eligibility</h3>
+          <p class="copy" style="margin: 0 0 24px;">
+            Early-career researchers (PhD students, postdocs, or advanced master's students)
+            working at the intersection of social science and machine learning.
+            You do not need to be a heavy ML practitioner; we will teach you what you need.
+          </p>
+          <h3 class="h-sub">What to send</h3>
+          <ul class="a-list" style="margin-top: 12px;">
+            <li>A motivation statement on your research interests, expertise, and what you hope to gain — up to 1,000 words, PDF</li>
+            <li>A CV, no more than two pages, PDF</li>
+          </ul>
+          <p class="copy" style="margin: 16px 0 0; font-size: 13px; color: var(--text-dim);">
+            We are finalising scholarship details and will publish them here. We cannot offer accommodation but will send admitted participants a list of nearby hotels and other affordable accommodation options.
+          </p>
+        </div>
+
+        <div>
+          <h3 class="h-sub" style="margin-bottom: 16px;">Key dates</h3>
+          <div class="date-timeline">
+            <div class="dt-item dt-open">
+              <span class="dt-label">Applications open</span>
+              <span class="dt-value">Now</span>
+            </div>
+            <div class="dt-item">
+              <span class="dt-label">Deadline</span>
+              <span class="dt-value">Mon 1 June 2026</span>
+            </div>
+            <div class="dt-item">
+              <span class="dt-label">Decisions sent</span>
+              <span class="dt-value">Wed 3 June 2026</span>
+            </div>
+            <div class="dt-item">
+              <span class="dt-label">Summer school</span>
+              <span class="dt-value">13–17 July 2026</span>
+            </div>
+          </div>
+          <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center; margin-top: 28px;">
+            <a class="btn-primary" href="https://forms.gle/VQ5qrdQ5Pk1Rtogg7"
+               target="_blank" rel="noopener">
+              Start application <span class="arrow">→</span>
+            </a>
+            <a class="btn-link-v3" href="mailto:oxford@llmsforsocialscience.net">
+              Email us first <span class="arrow">→</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Bio data (used by speaker modal) ───────────────────── -->
+  <div hidden aria-hidden="true">
+
+    <div id="bio-tatiana-shavrina-26">
+      <p>Tatiana Shavrina is a Research Scientist at Meta and has previously worked at Snap and AIRI. She is passionate about open source and multilingualism in LLMs, especially for under-resourced languages.</p>
+      <p>She contributed to BLOOM as lead for interpretability, led development of the mGPT multilingual model, and worked on Russian SuperGLUE and low-resource NLP methods. See her <a href="https://scholar.google.com/citations?user=sdmdZh8AAAAJ" target="_blank" rel="noopener">Google Scholar profile</a> for publications.</p>
     </div>
 
-    <div class="prose">
-      <h2>Overview</h2>
-      <p>
-        The 2026 edition of the Oxford LLMs Summer School will continue the programme&apos;s focus on
-        large language models for social science, combining lectures, coding sessions, collaborative
-        research, and guest talks.
-      </p>
-      <p>
-        We are finalising the detailed programme, speaker list, and collaborative project structure.
-        These details will be published here as they are confirmed.
-      </p>
+    <div id="bio-sergei-skvortsov-26">
+      <p>Sergei Skvortsov is Lead Machine Learning Engineer at <a href="https://nebius.com/" target="_blank" rel="noopener">Nebius</a>, focused on efficient training and inference for large language models. He regularly lectures on efficient inference at the Nebius Academy.</p>
+      <p>Previously, he led the inference team at Yandex Self Driving Group, where his team built the main inference engine powering neural models for autonomous cars and robots.</p>
+    </div>
 
-      <h2>Dates & Venue</h2>
-      <p>
-        The summer school will run from <strong>July 13–17, 2026</strong> at
-        <a href="https://www.nuffield.ox.ac.uk" target="_blank" rel="noopener">Nuffield College</a>,
-        University of Oxford.
-      </p>
+    <div id="bio-ilya-boytsov-26">
+      <p>Ilya Boytsov is a member of the ML Performance Engineering team at Nebius, where he works on large-scale LLM inference systems and performance optimisation. His interests include efficient transformer architectures, distributed inference infrastructure, and scalable serving of foundation models, with a particular focus on Mixture-of-Experts architectures.</p>
+    </div>
 
-      <h2>Applications</h2>
-      <p>
-        Applications will open soon. Further information on eligibility and support will follow.
-      </p>
+    <div id="bio-piotr-mazurek">
+      <p>Piotr Mazurek is Member of Technical Staff at <a href="https://www.liquid.ai/" target="_blank" rel="noopener">Liquid.AI</a>. He writes <a href="https://www.tensoreconomics.com/" target="_blank" rel="noopener">Tensor Economics</a>, a newsletter on the economics and efficiency of large language model deployment.</p>
+      <p>He will lecture on the economics of LLM inference — how to reason about cost, latency, and deployment trade-offs when running models at scale.</p>
     </div>
 
   </div>
-</Base>
 
+  <SpeakerModal />
+
+</Base>
