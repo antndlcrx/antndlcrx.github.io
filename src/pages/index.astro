@@ -1,26 +1,12 @@
 ---
 import Base from '../layouts/Base.astro';
 import Partners from '../components/Partners.astro';
+import ApplicationsStatus from '../components/ApplicationsStatus.astro';
 ---
 
 <Base title="Oxford LLMs">
 
-  <aside class="status-strip" aria-label="Applications status">
-    <div class="status-strip-inner">
-      <span class="status-dot" aria-hidden="true"></span>
-      <span class="status-label">Applications open</span>
-      <span class="sep"></span>
-      <span>Deadline 3 June</span>
-      <span class="sep"></span>
-      <span>13–17 July 2026</span>
-      <span class="sep"></span>
-      <span>30 places</span>
-      <div style="margin-left:auto; display:flex; gap:10px; align-items:center;">
-        <a class="status-cta" style="margin-left:0" href="https://forms.gle/VQ5qrdQ5Pk1Rtogg7" target="_blank" rel="noopener">Apply now <span class="arrow">→</span></a>
-        <a class="status-cta" style="margin-left:0" href="/summer-school/2026/">Details <span class="arrow">→</span></a>
-      </div>
-    </div>
-  </aside>
+  <ApplicationsStatus />
 
   <!-- ═══════════════════════════════════════════════════════════
        HERO — aurora
@@ -75,7 +61,7 @@ import Partners from '../components/Partners.astro';
         <span class="sep"></span>
         <span>Nuffield College, Oxford</span>
         <span class="sep"></span>
-        <span>Applications open</span>
+        <span>Applications closed</span>
       </div>
     </div>
   </div>
@@ -168,14 +154,14 @@ import Partners from '../components/Partners.astro';
       <div class="apply-teaser reveal">
         <div>
           <div class="at-row">
-            <span class="status-dot"></span>
-            <span>Applications open</span>
+            <span class="status-dot status-dot--closed"></span>
+            <span>Applications closed</span>
+            <span class="sep"></span>
+            <span>Decisions Monday 8 June</span>
             <span class="sep"></span>
             <span>13–17 July 2026</span>
-            <span class="sep"></span>
-            <span>Nuffield College, Oxford</span>
           </div>
-          <p class="at-title">Apply for the 2026 cohort.</p>
+          <p class="at-title">2026 applications are now closed.</p>
         </div>
         <div class="at-cta">
           <a class="btn-primary" href="/summer-school/2026/">

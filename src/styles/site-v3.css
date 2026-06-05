@@ -647,8 +647,14 @@
 }
 .status-dot {
   display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--accent);
   box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 50%, transparent);
   animation: status-pulse 2.4s ease-in-out infinite; flex-shrink: 0;
+}
+.status-dot--closed {
+  background: var(--text-sec);
+  animation: none;
+  box-shadow: none;
 }
 @keyframes status-pulse {
   0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 50%, transparent); }
