@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import ApplicationsStatus from '../components/ApplicationsStatus.astro';
 ---
 
 <Base
@@ -7,22 +8,7 @@ import Base from '../layouts/Base.astro';
   description="Open-source course materials, summer school archives, research code, and models from Oxford LLMs."
 >
 
-  <aside class="status-strip" aria-label="Applications status">
-    <div class="status-strip-inner">
-      <span class="status-dot" aria-hidden="true"></span>
-      <span class="status-label">Applications open</span>
-      <span class="sep"></span>
-      <span>Deadline 3 June</span>
-      <span class="sep"></span>
-      <span>13–17 July 2026</span>
-      <span class="sep"></span>
-      <span>30 places</span>
-      <div style="margin-left:auto; display:flex; gap:10px; align-items:center;">
-        <a class="status-cta" style="margin-left:0" href="https://forms.gle/VQ5qrdQ5Pk1Rtogg7" target="_blank" rel="noopener">Apply now <span class="arrow">→</span></a>
-        <a class="status-cta" style="margin-left:0" href="/summer-school/2026/">Details <span class="arrow">→</span></a>
-      </div>
-    </div>
-  </aside>
+  <ApplicationsStatus />
 
   <section class="section-v3" style="padding-top: clamp(72px, 8vw, 112px);">
     <div class="shell">
