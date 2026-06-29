@@ -756,6 +756,7 @@
 }
 .prog-title { font-size: 13px; color: var(--text-sec); line-height: 1.45; }
 .prog-title a { color: inherit; }
+.prog-break .prog-title { color: var(--text-muted); font-style: italic; }
 @media (max-width: 560px) {
   .prog-slot { grid-template-columns: 40px 1fr; gap: 10px; }
 }
@@ -955,6 +956,7 @@
   display: flex; gap: 14px; align-items: flex-start; padding: 14px 16px;
   background: var(--card); border: 1px solid var(--border); border-radius: 12px;
   transition: border-color .22s, transform .22s;
+  scroll-margin-top: 84px;
 }
 .speaker-chip:hover { border-color: var(--border-lt); transform: translateY(-2px); }
 .sc-portrait {
