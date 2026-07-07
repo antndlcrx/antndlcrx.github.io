@@ -1,0 +1,60 @@
+{
+  "_comment": "Leaderboard data contract for the AI Respondents Challenge. Overwritten by the competition scoring script; committing a new version triggers an Astro rebuild. Rows are pre-sorted by each board's primary metric (first numeric column); the page adds rank numbers. board.state: 'live' renders the table, 'locked' renders a reveal notice, 'final' freezes it.",
+  "updated": "2026-07-07T12:00:00Z",
+  "phase": "pre-launch",
+  "note": "Preview standings — automated baselines only. Team rows appear once submissions open on Monday.",
+  "boards": [
+    {
+      "id": "pred-in-domain",
+      "title": "Prediction · In-domain",
+      "subtitle": "WVS · seen countries · held-out respondents",
+      "metric": "Normalized skill (accuracy above the majority-class baseline)",
+      "state": "live",
+      "columns": [
+        { "key": "team", "label": "Team", "align": "left" },
+        { "key": "skill", "label": "Skill", "fmt": "num3" },
+        { "key": "f1_macro", "label": "F1-macro", "fmt": "num3" },
+        { "key": "coverage", "label": "Coverage", "fmt": "pct" },
+        { "key": "n_sub", "label": "Subs", "fmt": "int" }
+      ],
+      "rows": [
+        { "team": "XGBoost oracle (baseline)", "skill": 0.421, "f1_macro": 0.508, "coverage": 1.0, "n_sub": 1, "kind": "baseline" },
+        { "team": "LLM zero-shot · DeepSeek-V3.2 (baseline)", "skill": 0.284, "f1_macro": 0.392, "coverage": 1.0, "n_sub": 1, "kind": "baseline" },
+        { "team": "Majority class (floor)", "skill": 0.0, "f1_macro": 0.221, "coverage": 1.0, "n_sub": 1, "kind": "baseline" }
+      ]
+    },
+    {
+      "id": "pred-ood",
+      "title": "Prediction · Out-of-domain",
+      "subtitle": "WVS · held-out countries (unseen populations)",
+      "metric": "Normalized skill (accuracy above the majority-class baseline)",
+      "state": "live",
+      "columns": [
+        { "key": "team", "label": "Team", "align": "left" },
+        { "key": "skill", "label": "Skill", "fmt": "num3" },
+        { "key": "f1_macro", "label": "F1-macro", "fmt": "num3" },
+        { "key": "coverage", "label": "Coverage", "fmt": "pct" },
+        { "key": "n_sub", "label": "Subs", "fmt": "int" }
+      ],
+      "rows": [
+        { "team": "XGBoost oracle (baseline)", "skill": 0.318, "f1_macro": 0.441, "coverage": 1.0, "n_sub": 1, "kind": "baseline" },
+        { "team": "LLM zero-shot · DeepSeek-V3.2 (baseline)", "skill": 0.241, "f1_macro": 0.357, "coverage": 1.0, "n_sub": 1, "kind": "baseline" },
+        { "team": "Majority class (floor)", "skill": 0.0, "f1_macro": 0.198, "coverage": 1.0, "n_sub": 1, "kind": "baseline" }
+      ]
+    },
+    {
+      "id": "selection",
+      "title": "Selection · captured importance",
+      "subtitle": "How much of the true predictive structure your declared features recover",
+      "metric": "Captured importance vs. the permutation-importance oracle",
+      "state": "locked",
+      "locked_message": "Revealed at the Friday wrap-up — kept hidden during the week so the prediction contest stays primary and no one overfits the selection scorer.",
+      "columns": [
+        { "key": "team", "label": "Team", "align": "left" },
+        { "key": "captured", "label": "Captured imp.", "fmt": "num3" },
+        { "key": "vs_random", "label": "Δ vs random", "fmt": "num3" }
+      ],
+      "rows": []
+    }
+  ]
+}
