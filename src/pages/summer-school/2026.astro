@@ -151,6 +151,7 @@ import SpeakerModal from '../../components/SpeakerModal.astro';
             <li class="prog-slot prog-break"><span class="prog-time">09:00</span><span class="prog-title">Morning Coffee</span></li>
             <li class="prog-slot"><span class="prog-time">09:15</span><span class="prog-title"><a href="#sp-sagi-shaier">Sagi Shaier</a> — Continual Learning: Why Models Forget, and What We Can Do About It</span></li>
             <li class="prog-slot prog-break"><span class="prog-time">10:45</span><span class="prog-title">Coffee Break</span></li>
+            <li class="prog-slot"><span class="prog-time">11:00</span><span class="prog-title">Group Research Project</span></li>
             <li class="prog-slot prog-break"><span class="prog-time">12:30</span><span class="prog-title">Lunch</span></li>
             <li class="prog-slot"><span class="prog-time">14:00</span><span class="prog-title">Group Research Project</span></li>
             <li class="prog-slot prog-break"><span class="prog-time">15:45</span><span class="prog-title">Coffee Break</span></li>
@@ -201,7 +202,7 @@ import SpeakerModal from '../../components/SpeakerModal.astro';
             <li class="prog-slot prog-break"><span class="prog-time">12:30</span><span class="prog-title">Lunch</span></li>
             <li class="prog-slot"><span class="prog-time">14:00</span><span class="prog-title">Group Research Project Presentations</span></li>
             <li class="prog-slot prog-break"><span class="prog-time">15:45</span><span class="prog-title">Coffee Break</span></li>
-            <li class="prog-slot"><span class="prog-time">16:00</span><span class="prog-title">Guest Talk <em>(to be confirmed)</em></span></li>
+            <li class="prog-slot"><span class="prog-time">16:00</span><span class="prog-title"><a href="#sp-elliott-ash">Elliott Ash</a> — Research Talk</span></li>
           </ol>
         </div>
 
@@ -209,8 +210,8 @@ import SpeakerModal from '../../components/SpeakerModal.astro';
 
       <div class="reveal" style="margin-top:28px;">
         <p class="copy" style="color:var(--text-dim); max-width:64ch; margin:0;">
-          The programme is close to final; a few sessions are still being confirmed
-          (marked <em>to be confirmed</em> above). For a sense of how the week runs, see the
+          The programme is close to final and may still see minor adjustments.
+          For a sense of how the week runs, see the
           <a href="/summer-school/2025/#programme">2025 programme</a>.
           Materials from past editions are on
           <a href="https://github.com/Oxford-LLMs-Research/oxford-llms-workshop" target="_blank" rel="noopener">GitHub</a>.
@@ -231,6 +232,11 @@ import SpeakerModal from '../../components/SpeakerModal.astro';
       </div>
 
       <div class="speaker-grid speaker-grid--team reveal-stagger">
+
+        <button id="sp-elliott-ash" class="speaker-chip" data-speaker="elliott-ash" data-name="Elliott Ash" data-role="Associate Professor of Law, Economics & Data Science, ETH Zurich" data-tag="Research Talk" data-img="/img/speakers/elliott_ash.jpg">
+          <div class="sc-portrait"><img src="/img/speakers/elliott_ash.jpg" alt="" /></div>
+          <div class="sc-info"><span class="sc-tag">Research Talk</span><p class="sc-name">Elliott Ash</p><p class="sc-role">Associate Professor of Law, Economics &amp; Data Science, ETH Zurich</p></div>
+        </button>
 
         <button id="sp-ibragim-badertdinov" class="speaker-chip" data-speaker="ibragim-badertdinov" data-name="Ibragim Badertdinov" data-role="Lead Engineer, Nebius" data-tag="Lecturer" data-img="/img/speakers/ibragim_badertdinov.jpeg">
           <div class="sc-portrait"><img src="/img/speakers/ibragim_badertdinov.jpeg" alt="" /></div>
@@ -404,6 +410,11 @@ import SpeakerModal from '../../components/SpeakerModal.astro';
 
   <!-- ── Bio data (used by speaker modal) ───────────────────── -->
   <div hidden aria-hidden="true">
+
+    <div id="bio-elliott-ash">
+      <p>Elliott Ash is Associate Professor of Law, Economics, and Data Science at <a href="https://ethz.ch/" target="_blank" rel="noopener">ETH Zurich</a>'s <a href="https://lawecon.ethz.ch/" target="_blank" rel="noopener">Center for Law &amp; Economics</a>. His research applies natural language processing and machine learning to large text corpora to study law, politics, and the economy.</p>
+      <p>His work uses text-as-data and large language models to analyse judicial decision-making, media, and political discourse, spanning computational social science, causal inference, and the economics of institutions. More information is available on his <a href="https://elliottash.com/" target="_blank" rel="noopener">personal website</a>.</p>
+    </div>
 
     <div id="bio-tatiana-shavrina-26">
       <p>Tatiana Shavrina is a Research Scientist Manager at Meta and has previously worked at Snap and AIRI. She is passionate about open source and multilingualism in LLMs, especially for under-resourced languages.</p>
