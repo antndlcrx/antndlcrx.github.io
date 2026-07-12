@@ -22,6 +22,12 @@ import Base from '../layouts/Base.astro';
               <span class="t-name">Open</span>
             </a>
           </li>
+          <li>
+            <a href="#challenge">
+              <span class="t-num">03</span>
+              <span class="t-name">Challenge</span>
+            </a>
+          </li>
         </ol>
         <div class="rail-foot">
           <span>Open source</span>
@@ -92,8 +98,7 @@ import Base from '../layouts/Base.astro';
   </section>
 
   <!-- ── § 02 Open ──────────────────────────────────────────── -->
-  <section class="section-v3 section-v3--marker" id="open"
-           style="padding-bottom: clamp(56px, 7vw, 88px);">
+  <section class="section-v3 section-v3--marker" id="open">
     <span class="section-number">§ 02 · Open</span>
     <div class="shell">
       <div class="section-head-v3 reveal">
@@ -137,6 +142,36 @@ import Base from '../layouts/Base.astro';
         </a>
 
       </div>
+    </div>
+  </section>
+
+  <!-- ── § 03 Challenge ─────────────────────────────────────── -->
+  <section class="section-v3 section-v3--marker section-tinted-v3" id="challenge"
+           style="padding-bottom: clamp(56px, 7vw, 88px);">
+    <span class="section-number">§ 03 · Challenge</span>
+    <div class="shell">
+      <div class="section-head-v3 reveal">
+        <div>
+          <div class="eyebrow-v3" style="margin-bottom:14px">Common task</div>
+          <h2 class="h-section">A live prediction challenge.</h2>
+        </div>
+        <p class="lede-v3">
+          Predicting real survey responses with language models, run as an open common-task
+          benchmark — with a live leaderboard during the summer school and beyond.
+        </p>
+      </div>
+
+      <a class="fb" href="/research/challenge/" style="display:block;">
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
+          <span style="width:8px;height:8px;border-radius:999px;background:var(--c-b);display:inline-block;flex:none;"></span>
+          <h3 class="h-sub" style="margin:0;">The AI Respondents Challenge</h3>
+        </div>
+        <p class="copy" style="margin:0 0 12px; font-size:14px;">
+          Predict individual survey answers, disclose what your method relied on, and see how
+          far the field can get. Live leaderboard and an open dataset.
+        </p>
+        <span class="btn-link-v3">View the challenge <span class="arrow">→</span></span>
+      </a>
     </div>
   </section>
 

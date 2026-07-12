@@ -1,0 +1,307 @@
+---
+import Base from '../../layouts/Base.astro';
+import lb from '../../data/leaderboard.json';
+
+// Leaderboard rows come from src/data/leaderboard.json (written by the competition
+// scoring script, ox_competition/score.py in the features_project repo).
+
+const { updated, phase, note, boards } = lb;
+
+const fmt = {
+  num3: (v) => (v === null || v === undefined) ? '—' : Number(v).toFixed(3),
+  pct:  (v) => (v === null || v === undefined) ? '—' : Math.round(v * 100) + '%',
+  int:  (v) => (v === null || v === undefined) ? '—' : String(v),
+};
+const cell = (row, col) => (col.fmt && fmt[col.fmt]) ? fmt[col.fmt](row[col.key]) : (row[col.key] ?? '—');
+
+// Stable per-team emoji (deterministic hash of the name -> curated set). NOT random:
+// a team's emoji is its identity, so it never changes between refreshes.
+const EMOJI = ['🦊','🦉','🐙','🦁','🐝','🦅','🐬','🦄','🐼','🦖','🚀','⚡','🔮','🧩','🌗','🛰️','🧠','📡','🎯','🧪'];
+const teamEmoji = (name) => {
+  let h = 0;
+  for (const ch of String(name)) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  return EMOJI[h % EMOJI.length];
+};
+const MEDALS = ['🥇', '🥈', '🥉'];
+
+const updatedStr = new Date(updated).toLocaleString('en-GB', {
+  day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'UTC',
+}) + ' UTC';
+const phaseLabel = ({ 'pre-launch': 'Preview', practice: 'Practice', live: 'Live', final: 'Final' })[phase] || phase;
+---
+
+<Base
+  title="AI Respondents Challenge"
+  description="A common-task challenge: predict individual survey responses with LLMs, and a live public benchmark of how well the field can do it.">
+
+  <!-- ── Hero ───────────────────────────────────────────────── -->
+  <section class="section-v3" style="padding-top: clamp(72px, 10vw, 132px);">
+    <div class="shell">
+      <p class="eyebrow-v3">Research · Common-task challenge</p>
+      <h1 class="h-display" style="margin: 14px 0 22px; max-width: 16ch;">
+        The AI Respondents Challenge.
+      </h1>
+      <p class="lede-v3" style="max-width: 60ch;">
+        Real people answered a survey; we hid some of their answers. Teams predict what each
+        person said — with any method — and disclose <em>what</em> their approach relied on.
+        A live public benchmark of how well, and by what means, language models can stand in
+        for human respondents.
+      </p>
+      <p class="lb-status">
+        <span class="status-dot"></span>
+        <span>{phaseLabel} · leaderboard updates through the school week</span>
+        <a class="btn-link-v3" href="#leaderboard">Jump to standings <span class="arrow">→</span></a>
+      </p>
+    </div>
+  </section>
+
+  <!-- ── § 01 The task ──────────────────────────────────────── -->
+  <section class="section-v3 section-v3--marker section-tinted-v3" id="task">
+    <span class="section-number">§ 01 · The task</span>
+    <div class="shell">
+      <div class="section-head-v3 reveal">
+        <div>
+          <div class="eyebrow-v3" style="margin-bottom:14px">What you build</div>
+          <h2 class="h-section">Predict the answer.<br>Show your reasoning.</h2>
+        </div>
+        <p class="lede-v3">
+          The classic prediction contest, with a twist that turns the competition into a
+          study of <em>how</em> models reason about people.
+        </p>
+      </div>
+
+      <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 20px;" class="reveal-stagger">
+        <article class="fb">
+          <span class="rule-soft"></span>
+          <h3 class="h-sub" style="margin-bottom:10px">Individual prediction</h3>
+          <p class="copy" style="margin:0; font-size:14px;">
+            Given a respondent's other answers, predict a held-out question — in-domain, then
+            unseen countries and a held-out survey. Any method: prompt an LLM directly, or have it
+            select the features for a classifier.
+          </p>
+        </article>
+        <article class="fb">
+          <span class="rule-soft"></span>
+          <h3 class="h-sub" style="margin-bottom:10px">Accurate and aligned</h3>
+          <p class="copy" style="margin:0; font-size:14px;">
+            Scored two ways: how often you get the individual right, and how closely your predicted
+            distribution matches the real one — standing in for a population takes both.
+          </p>
+        </article>
+        <article class="fb">
+          <span class="rule-soft"></span>
+          <h3 class="h-sub" style="margin-bottom:10px">Disclose your method</h3>
+          <p class="copy" style="margin:0; font-size:14px;">
+            Submit your predictions with the respondent characteristics you relied on and your
+            prompts. That disclosure is what the selection analysis — and the shared paper — are built on.
+          </p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── § 02 Leaderboard ───────────────────────────────────── -->
+  <section class="section-v3 section-v3--marker" id="leaderboard">
+    <span class="section-number">§ 02 · Leaderboard</span>
+    <div class="shell">
+      <div class="section-head-v3 reveal">
+        <div>
+          <div class="eyebrow-v3" style="margin-bottom:14px">Standings</div>
+          <h2 class="h-section">Live leaderboard.</h2>
+        </div>
+        <p class="lede-v3">
+          Separate boards for in-domain and out-of-domain prediction; the selection analysis is
+          previewed at the Friday wrap-up. Ranking uses a normalized skill score so questions with
+          different answer counts compare fairly, alongside how well each team's predicted
+          distribution matches the truth.
+          <span class="lb-updated"><span class="status-dot"></span> Updated {updatedStr}</span>
+        </p>
+      </div>
+
+      <div class="lb-grid reveal-stagger">
+        {boards.map((b) => (
+          <article class={`lb-card${b.state === 'locked' ? ' lb-card--locked' : ''}`}>
+            <header class="lb-card-head">
+              <div>
+                <h3 class="lb-title">{b.title}</h3>
+                <p class="lb-sub">{b.subtitle}</p>
+              </div>
+              <span class={`status-badge ${b.state === 'locked' ? 'status-badge--dev' : 'status-badge--confirmed'}`}>
+                {b.state === 'locked' ? 'Locked' : b.state === 'final' ? 'Final' : 'Live'}
+              </span>
+            </header>
+            <p class="lb-metric">{b.metric}</p>
+
+            {b.state === 'locked' ? (
+              <p class="lb-locked">{b.locked_message}</p>
+            ) : b.rows.length === 0 ? (
+              <p class="lb-locked">No submissions yet — the first will appear here automatically.</p>
+            ) : (
+              <div class="lb-scroll">
+                <table class="lb-table">
+                  <thead>
+                    <tr>
+                      <th class="lb-rank">#</th>
+                      {b.columns.map((c) => <th class={c.align === 'left' ? 'lb-l' : 'lb-r'}>{c.label}</th>)}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {b.rows.map((row, i) => (
+                      <tr class={row.kind === 'baseline' ? 'lb-baseline' : ''}>
+                        <td class="lb-rank">
+                          {i < 3 && row.kind !== 'baseline'
+                            ? <span class="lb-medal">{MEDALS[i]}</span>
+                            : i + 1}
+                        </td>
+                        {b.columns.map((c) => (
+                          <td class={c.align === 'left' ? 'lb-l' : 'lb-r'}>
+                            {c.key === 'team'
+                              ? <><span class="lb-emoji">{row.kind === 'baseline' ? '🤖' : teamEmoji(row.team)}</span>{row.team}</>
+                              : cell(row, c)}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </article>
+        ))}
+      </div>
+
+      <p class="lb-note copy">{note}</p>
+    </div>
+  </section>
+
+  <!-- ── § 03 Participate ───────────────────────────────────── -->
+  <section class="section-v3 section-v3--marker section-tinted-v3" id="participate"
+           style="padding-bottom: clamp(56px, 7vw, 88px);">
+    <span class="section-number">§ 03 · Participate</span>
+    <div class="shell">
+      <div class="section-head-v3 reveal">
+        <div>
+          <div class="eyebrow-v3" style="margin-bottom:14px">How it works</div>
+          <h2 class="h-section">Get the data.<br>Beat the baselines.</h2>
+        </div>
+        <p class="lede-v3">
+          A starter kit gets you to a first submission fast. Any method is welcome — provided
+          you disclose it.
+        </p>
+      </div>
+
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 20px;" class="reveal-stagger">
+        <a class="fb" href="https://huggingface.co/datasets/oxford-llms/ai-respondents-challenge" style="display:block;">
+          <h3 class="h-sub" style="margin:0 0 10px;">Data &amp; starter kit</h3>
+          <p class="copy" style="margin:0 0 12px; font-size:14px;">
+            Labeled training respondents, the allowed feature pool, the target questions with
+            their answer options, and the test respondents — plus a starter notebook that
+            produces a valid submission end-to-end. All on Hugging Face.
+          </p>
+          <span class="btn-link-v3">Open the dataset <span class="arrow">→</span></span>
+        </a>
+        <a class="fb" href="/research/challenge-rules/" style="display:block;">
+          <h3 class="h-sub" style="margin:0 0 10px;">Rules &amp; submission format</h3>
+          <p class="copy" style="margin:0 0 12px; font-size:14px;">
+            Three files per submission: your predictions, the features you used, and your prompts.
+            Any method is allowed — just disclose it.
+          </p>
+          <span class="btn-link-v3">Read the rules <span class="arrow">→</span></span>
+        </a>
+      </div>
+
+      <p class="copy" style="margin-top:22px; font-size:13.5px; color:var(--text-muted); max-width:70ch;">
+        The challenge runs live during the Oxford LLMs summer school and continues afterwards as
+        an open rolling benchmark. By submitting you agree your predictions, declared features,
+        and prompts may be used, with attribution, in research arising from the challenge.
+      </p>
+    </div>
+  </section>
+
+</Base>
+
+<style>
+  .lb-status {
+    display: flex; align-items: center; flex-wrap: wrap; gap: 14px;
+    margin-top: 26px; font-family: var(--font-mono); font-size: 12.5px;
+    letter-spacing: 0.02em; color: var(--text-muted);
+  }
+  .lb-updated {
+    display: inline-flex; align-items: center; gap: 8px;
+    margin-left: 12px; font-family: var(--font-mono); font-size: 11.5px;
+    letter-spacing: 0.03em; color: var(--text-muted); white-space: nowrap;
+  }
+  .status-dot {
+    width: 8px; height: 8px; border-radius: 50%; flex: none;
+    background: var(--c-b); border-radius: 999px;
+  }
+
+  .lb-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 20px; margin-top: 8px;
+  }
+  .lb-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; padding: 22px 22px 10px;
+    box-shadow: 0 14px 36px -28px rgba(15,17,23,0.16);
+  }
+  .lb-card--locked { background: color-mix(in srgb, var(--surface) 60%, var(--card)); }
+  .lb-card-head {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    gap: 14px; margin-bottom: 8px;
+  }
+  .lb-title {
+    font-family: var(--font-heading); font-weight: 700; font-size: 16px;
+    letter-spacing: -0.01em; margin: 0; color: var(--text);
+  }
+  .lb-sub { margin: 4px 0 0; font-size: 12.5px; color: var(--text-muted); line-height: 1.45; }
+  .lb-metric {
+    margin: 0 0 14px; font-family: var(--font-mono); font-size: 10.5px;
+    text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-dim);
+  }
+  .lb-locked {
+    margin: 6px 0 18px; font-size: 13.5px; line-height: 1.6; color: var(--text-sec);
+  }
+
+  .lb-scroll { overflow-x: auto; margin: 0 -4px; }
+  .lb-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  .lb-table thead th {
+    font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted);
+    padding: 0 12px 9px; border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  .lb-table tbody td {
+    padding: 11px 12px; border-bottom: 1px solid var(--border);
+    color: var(--text-sec); white-space: nowrap;
+  }
+  .lb-table tbody tr:last-child td { border-bottom: none; }
+  .lb-table tbody tr:hover td { background: color-mix(in srgb, var(--surface) 60%, transparent); }
+  .lb-l { text-align: left; }
+  .lb-r { text-align: right; font-variant-numeric: tabular-nums; font-family: var(--font-mono); }
+  th.lb-rank, td.lb-rank {
+    width: 34px; text-align: right; padding-left: 4px; color: var(--text-dim);
+    font-family: var(--font-mono); font-variant-numeric: tabular-nums;
+  }
+  /* first data column (team) reads as the row label */
+  .lb-table tbody td.lb-l { color: var(--text); font-weight: 500; }
+  .lb-baseline td { color: var(--text-muted); font-style: italic; }
+  .lb-baseline td.lb-l { color: var(--text-muted); font-weight: 400; }
+
+  .lb-emoji {
+    display: inline-block; width: 1.5em; margin-right: 6px;
+    text-align: center; font-style: normal;
+  }
+  .lb-medal { font-size: 15px; line-height: 1; }
+
+  .lb-note {
+    margin-top: 18px; font-size: 12.5px; color: var(--text-muted);
+    font-family: var(--font-mono); letter-spacing: 0.01em;
+  }
+
+  @media (max-width: 760px) {
+    #task .reveal-stagger,
+    #participate .reveal-stagger { grid-template-columns: 1fr !important; }
+    .lb-updated { margin-left: 0; }
+  }
+</style>
