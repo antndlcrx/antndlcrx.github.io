@@ -7,6 +7,9 @@ import lb from '../../data/leaderboard.json';
 
 const { updated, phase, note, boards } = lb;
 
+const boardColumns = (columns) =>
+  columns.filter((c) => c.key !== 'n_sub');
+
 const fmt = {
   num3: (v) => (v === null || v === undefined) ? '—' : Number(v).toFixed(3),
   pct:  (v) => (v === null || v === undefined) ? '—' : Math.round(v * 100) + '%',
@@ -32,7 +35,7 @@ const phaseLabel = ({ 'pre-launch': 'Preview', practice: 'Practice', live: 'Live
 
 <Base
   title="AI Respondents Challenge"
-  description="A common-task challenge: predict individual survey responses with LLMs, and a live public benchmark of how well the field can do it.">
+  description="Predict individual survey responses with LLMs: a live common-task benchmark at the Oxford LLMs summer school.">
 
   <!-- ── Hero ───────────────────────────────────────────────── -->
   <section class="section-v3" style="padding-top: clamp(72px, 10vw, 132px);">
@@ -41,68 +44,24 @@ const phaseLabel = ({ 'pre-launch': 'Preview', practice: 'Practice', live: 'Live
       <h1 class="h-display" style="margin: 14px 0 22px; max-width: 16ch;">
         The AI Respondents Challenge.
       </h1>
-      <p class="lede-v3" style="max-width: 60ch;">
-        Real people answered a survey; we hid some of their answers. Teams predict what each
-        person said — with any method — and disclose <em>what</em> their approach relied on.
-        A live public benchmark of how well, and by what means, language models can stand in
-        for human respondents.
+      <p class="lede-v3" style="max-width: 62ch;">
+        Real people answered the World Values Survey, and we hid some of their answers.
+        Your job: predict what each person said, with any method, and disclose the
+        features and prompts your approach relied on.
       </p>
       <p class="lb-status">
         <span class="status-dot"></span>
-        <span>{phaseLabel} · leaderboard updates through the school week</span>
-        <a class="btn-link-v3" href="#leaderboard">Jump to standings <span class="arrow">→</span></a>
+        <span>{phaseLabel} · updates through the school week</span>
+        <a class="btn-link-v3" href="#leaderboard">Leaderboard <span class="arrow">→</span></a>
+        <a class="btn-link-v3" href="#start">Get started <span class="arrow">→</span></a>
+        <a class="btn-link-v3" href="#rules">Rules <span class="arrow">→</span></a>
       </p>
     </div>
   </section>
 
-  <!-- ── § 01 The task ──────────────────────────────────────── -->
-  <section class="section-v3 section-v3--marker section-tinted-v3" id="task">
-    <span class="section-number">§ 01 · The task</span>
-    <div class="shell">
-      <div class="section-head-v3 reveal">
-        <div>
-          <div class="eyebrow-v3" style="margin-bottom:14px">What you build</div>
-          <h2 class="h-section">Predict the answer.<br>Show your reasoning.</h2>
-        </div>
-        <p class="lede-v3">
-          The classic prediction contest, with a twist that turns the competition into a
-          study of <em>how</em> models reason about people.
-        </p>
-      </div>
-
-      <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 20px;" class="reveal-stagger">
-        <article class="fb">
-          <span class="rule-soft"></span>
-          <h3 class="h-sub" style="margin-bottom:10px">Individual prediction</h3>
-          <p class="copy" style="margin:0; font-size:14px;">
-            Given a respondent's other answers, predict a held-out question — in-domain, then
-            unseen countries and a held-out survey. Any method: prompt an LLM directly, or have it
-            select the features for a classifier.
-          </p>
-        </article>
-        <article class="fb">
-          <span class="rule-soft"></span>
-          <h3 class="h-sub" style="margin-bottom:10px">Accurate and aligned</h3>
-          <p class="copy" style="margin:0; font-size:14px;">
-            Scored two ways: how often you get the individual right, and how closely your predicted
-            distribution matches the real one — standing in for a population takes both.
-          </p>
-        </article>
-        <article class="fb">
-          <span class="rule-soft"></span>
-          <h3 class="h-sub" style="margin-bottom:10px">Disclose your method</h3>
-          <p class="copy" style="margin:0; font-size:14px;">
-            Submit your predictions with the respondent characteristics you relied on and your
-            prompts. That disclosure is what the selection analysis — and the shared paper — are built on.
-          </p>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <!-- ── § 02 Leaderboard ───────────────────────────────────── -->
-  <section class="section-v3 section-v3--marker" id="leaderboard">
-    <span class="section-number">§ 02 · Leaderboard</span>
+  <!-- ── § 01 Leaderboard ───────────────────────────────────── -->
+  <section class="section-v3 section-v3--marker section-tinted-v3" id="leaderboard">
+    <span class="section-number">§ 01 · Leaderboard</span>
     <div class="shell">
       <div class="section-head-v3 reveal">
         <div>
@@ -110,39 +69,33 @@ const phaseLabel = ({ 'pre-launch': 'Preview', practice: 'Practice', live: 'Live
           <h2 class="h-section">Live leaderboard.</h2>
         </div>
         <p class="lede-v3">
-          Separate boards for in-domain and out-of-domain prediction; the selection analysis is
-          previewed at the Friday wrap-up. Ranking uses a normalized skill score so questions with
-          different answer counts compare fairly, alongside how well each team's predicted
-          distribution matches the truth.
-          <span class="lb-updated"><span class="status-dot"></span> Updated {updatedStr}</span>
+          Two boards: in-domain (countries your models can study) and out-of-domain
+          (countries they never saw). Teams are ranked by skill.
         </p>
       </div>
 
       <div class="lb-grid reveal-stagger">
         {boards.map((b) => (
-          <article class={`lb-card${b.state === 'locked' ? ' lb-card--locked' : ''}`}>
+          <article class="lb-card">
             <header class="lb-card-head">
               <div>
                 <h3 class="lb-title">{b.title}</h3>
                 <p class="lb-sub">{b.subtitle}</p>
               </div>
-              <span class={`status-badge ${b.state === 'locked' ? 'status-badge--dev' : 'status-badge--confirmed'}`}>
-                {b.state === 'locked' ? 'Locked' : b.state === 'final' ? 'Final' : 'Live'}
+              <span class="status-badge status-badge--confirmed">
+                {b.state === 'final' ? 'Final' : 'Live'}
               </span>
             </header>
-            <p class="lb-metric">{b.metric}</p>
 
-            {b.state === 'locked' ? (
-              <p class="lb-locked">{b.locked_message}</p>
-            ) : b.rows.length === 0 ? (
-              <p class="lb-locked">No submissions yet — the first will appear here automatically.</p>
+            {b.rows.length === 0 ? (
+              <p class="lb-locked">No submissions yet. The first will appear here automatically.</p>
             ) : (
               <div class="lb-scroll">
                 <table class="lb-table">
                   <thead>
                     <tr>
                       <th class="lb-rank">#</th>
-                      {b.columns.map((c) => <th class={c.align === 'left' ? 'lb-l' : 'lb-r'}>{c.label}</th>)}
+                      {boardColumns(b.columns).map((c) => <th class={c.align === 'left' ? 'lb-l' : 'lb-r'}>{c.label}</th>)}
                     </tr>
                   </thead>
                   <tbody>
@@ -153,7 +106,7 @@ const phaseLabel = ({ 'pre-launch': 'Preview', practice: 'Practice', live: 'Live
                             ? <span class="lb-medal">{MEDALS[i]}</span>
                             : i + 1}
                         </td>
-                        {b.columns.map((c) => (
+                        {boardColumns(b.columns).map((c) => (
                           <td class={c.align === 'left' ? 'lb-l' : 'lb-r'}>
                             {c.key === 'team'
                               ? <><span class="lb-emoji">{row.kind === 'baseline' ? '🤖' : teamEmoji(row.team)}</span>{row.team}</>
@@ -170,51 +123,198 @@ const phaseLabel = ({ 'pre-launch': 'Preview', practice: 'Practice', live: 'Live
         ))}
       </div>
 
-      <p class="lb-note copy">{note}</p>
+      <div class="lb-foot reveal">
+        <p class="lb-foot-meta">
+          <span class="status-dot"></span>
+          {note} · Updated {updatedStr}
+        </p>
+
+        <details class="lb-guide">
+          <summary>How to read the board</summary>
+          <div class="lb-guide-body">
+            <p>
+              <strong>Skill.</strong> Accuracy above always guessing the majority answer,
+              rescaled as <code>(accuracy − majority share) / (1 − majority share)</code> and
+              averaged over target questions. 0 = no better than majority; 1 = perfect. Teams
+              are ranked on this.
+            </p>
+            <p>
+              <strong>Alignment.</strong> How closely your predicted answer distribution matches
+              the real one (1 = identical). Order-aware: "Agree" is closer to "Agree strongly"
+              than "Disagree".
+            </p>
+            <p>
+              <strong>Coverage.</strong> Share of respondent–question pairs answered. Unanswered
+              pairs count as wrong — predict everyone.
+            </p>
+            <p>
+              <strong>Baselines.</strong> <em>Majority class</em> always picks each question's
+              most common training answer; <em>Random draw</em> samples from training shares.
+              Both score like teams. Doing well on skill and alignment together is the goal.
+            </p>
+          </div>
+        </details>
+      </div>
     </div>
   </section>
 
-  <!-- ── § 03 Participate ───────────────────────────────────── -->
-  <section class="section-v3 section-v3--marker section-tinted-v3" id="participate"
-           style="padding-bottom: clamp(56px, 7vw, 88px);">
-    <span class="section-number">§ 03 · Participate</span>
+  <!-- ── § 02 Get started ───────────────────────────────────── -->
+  <section class="section-v3 section-v3--marker" id="start">
+    <span class="section-number">§ 02 · Get started</span>
     <div class="shell">
       <div class="section-head-v3 reveal">
         <div>
-          <div class="eyebrow-v3" style="margin-bottom:14px">How it works</div>
-          <h2 class="h-section">Get the data.<br>Beat the baselines.</h2>
+          <div class="eyebrow-v3" style="margin-bottom:14px">Two links</div>
+          <h2 class="h-section">Data, then a working pipeline.</h2>
         </div>
         <p class="lede-v3">
-          A starter kit gets you to a first submission fast. Any method is welcome — provided
-          you disclose it.
+          The starter notebook runs end-to-end as-is and writes a valid submission.
+          It is a working example, not a recommended design.
         </p>
       </div>
 
-      <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 20px;" class="reveal-stagger">
+      <div class="start-grid reveal-stagger">
         <a class="fb" href="https://huggingface.co/datasets/oxford-llms/ai-respondents-challenge" style="display:block;">
-          <h3 class="h-sub" style="margin:0 0 10px;">Data &amp; starter kit</h3>
-          <p class="copy" style="margin:0 0 12px; font-size:14px;">
+          <span class="rule-soft"></span>
+          <h3 class="h-sub" style="margin:0 0 10px;">The data</h3>
+          <p class="copy" style="margin:0 0 14px;">
             Labeled training respondents, the allowed feature pool, the target questions with
-            their answer options, and the test respondents — plus a starter notebook that
-            produces a valid submission end-to-end. All on Hugging Face.
+            their answer options, and the test respondents: one dataset on Hugging Face.
           </p>
           <span class="btn-link-v3">Open the dataset <span class="arrow">→</span></span>
         </a>
-        <a class="fb" href="/research/challenge-rules/" style="display:block;">
-          <h3 class="h-sub" style="margin:0 0 10px;">Rules &amp; submission format</h3>
-          <p class="copy" style="margin:0 0 12px; font-size:14px;">
-            Three files per submission: your predictions, the features you used, and your prompts.
-            Any method is allowed — just disclose it.
+        <a class="fb" href="https://github.com/Oxford-LLMs-Research/ai-respondents-challenge" style="display:block;">
+          <span class="rule-soft"></span>
+          <h3 class="h-sub" style="margin:0 0 10px;">Starter notebook</h3>
+          <p class="copy" style="margin:0 0 14px;">
+            A minimal, Colab-ready pipeline: load the data, prompt an open LLM, parse replies
+            to valid answers, save the submission files.
           </p>
-          <span class="btn-link-v3">Read the rules <span class="arrow">→</span></span>
+          <span class="btn-link-v3">Open on GitHub <span class="arrow">→</span></span>
         </a>
       </div>
+    </div>
+  </section>
 
-      <p class="copy" style="margin-top:22px; font-size:13.5px; color:var(--text-muted); max-width:70ch;">
-        The challenge runs live during the Oxford LLMs summer school and continues afterwards as
-        an open rolling benchmark. By submitting you agree your predictions, declared features,
-        and prompts may be used, with attribution, in research arising from the challenge.
-      </p>
+  <!-- ── § 03 Rules ─────────────────────────────────────────── -->
+  <section class="section-v3 section-v3--marker section-tinted-v3" id="rules"
+           style="padding-bottom: clamp(56px, 7vw, 88px);">
+    <span class="section-number">§ 03 · Rules</span>
+    <div class="shell">
+      <div class="section-head-v3 reveal">
+        <div>
+          <div class="eyebrow-v3" style="margin-bottom:14px">Everything you need to submit</div>
+          <h2 class="h-section">The rules.</h2>
+        </div>
+        <p class="lede-v3">
+          Short version: any method, full disclosure, don't game the truth.
+        </p>
+      </div>
+
+      <div class="rules-stack reveal-stagger">
+        <article class="fb rules-block">
+          <span class="rule-soft"></span>
+          <h3 class="h-sub rules-block-title">The data: four parts</h3>
+          <dl class="rules-parts">
+            <div class="rules-part">
+              <dt><code>train</code></dt>
+              <dd>Labeled respondents (100 per seen country) with all their survey answers, for exploring the data and validating your pipeline.</dd>
+            </div>
+            <div class="rules-part">
+              <dt><code>test</code></dt>
+              <dd>The 1,050 respondents you predict for (30 per country: 20 seen countries plus 15 that never appear in train). Their answers to the target questions are hidden and never released.</dd>
+            </div>
+            <div class="rules-part">
+              <dt><code>targets</code></dt>
+              <dd>The 9 target questions with their answer options in scale order. The <code>label</code> column is the answer space: predictions must match one of a question's labels exactly. Anything else scores zero.</dd>
+            </div>
+            <div class="rules-part">
+              <dt><code>features</code></dt>
+              <dd>The allowed feature pool, with question text and the code→text map for turning coded answers into words.</dd>
+            </div>
+          </dl>
+        </article>
+
+        <article class="fb rules-block">
+          <span class="rule-soft"></span>
+          <h3 class="h-sub rules-block-title">What you submit: three parts</h3>
+          <div class="rules-files">
+            <div class="rules-file">
+              <p class="rules-file-name"><code>predictions.csv</code></p>
+              <p class="rules-file-schema">respondent_id · question_id · prediction</p>
+              <p class="copy rules-file-copy">One row per (test respondent, target question). <code>prediction</code> is a text label from <code>targets</code>.</p>
+            </div>
+            <div class="rules-file">
+              <p class="rules-file-name"><code>features.csv</code></p>
+              <p class="rules-file-schema">question_id · feature_variable_code</p>
+              <p class="copy rules-file-copy">The variables your method actually relied on, per question. If you prompted with age, religion, and income, those three go here.</p>
+            </div>
+            <div class="rules-file">
+              <p class="rules-file-name"><code>method/</code></p>
+              <p class="rules-file-schema">prompts.jsonl · method.md</p>
+              <p class="copy rules-file-copy">Your prompt template per question and a short note on your approach, kept for reproducibility.</p>
+            </div>
+          </div>
+          <p class="copy rules-footnote">
+            Zip the folder and upload it via the submission portal announced at the school.
+          </p>
+        </article>
+
+        <article class="fb rules-block">
+          <span class="rule-soft"></span>
+          <h3 class="h-sub rules-block-title">Fair play</h3>
+          <dl class="rules-parts">
+            <div class="rules-part">
+              <dt>Any method is allowed</dt>
+              <dd>Provided you disclose it via <code>features.csv</code> and <code>method/</code>.</dd>
+            </div>
+            <div class="rules-part">
+              <dt>Features only from the pool</dt>
+              <dd>Respondent information must come from the feature pool. Target questions are never usable as features.</dd>
+            </div>
+            <div class="rules-part">
+              <dt>No reverse-engineering test labels</dt>
+              <dd>Final scoring uses a private split.</dd>
+            </div>
+            <div class="rules-part">
+              <dt>Budget</dt>
+              <dd>Open models run on the shared Nebius allowance; a full pass over the test set costs a few dollars. Only <code>test</code> predictions are scored, so spend deliberately. Closed models require your own API key.</dd>
+            </div>
+            <div class="rules-part">
+              <dt>Research use</dt>
+              <dd>By submitting you agree that your predictions, declared features, prompts, and method notes may be used, with attribution, in research arising from the challenge.</dd>
+            </div>
+          </dl>
+        </article>
+
+        <article class="fb rules-block">
+          <span class="rule-soft"></span>
+          <h3 class="h-sub rules-block-title">The week</h3>
+          <div class="rules-timeline">
+            <div class="rules-timeline-item">
+              <span class="rules-day">Mon 13 Jul</span>
+              <p>Launch: data walkthrough, teams form, starter kit and infrastructure check</p>
+            </div>
+            <div class="rules-timeline-item">
+              <span class="rules-day">Tue–Wed</span>
+              <p>Team research work; the live leaderboard is open throughout</p>
+            </div>
+            <div class="rules-timeline-item">
+              <span class="rules-day">Thu 16 Jul</span>
+              <p>Out-of-domain evaluation sets released (hidden questions and held-out surveys): run your pipeline and submit</p>
+            </div>
+            <div class="rules-timeline-item">
+              <span class="rules-day">Fri 17 Jul</span>
+              <p>Results reveal and team presentations</p>
+            </div>
+          </div>
+          <p class="copy rules-footnote">
+            The challenge continues after the school as an open rolling benchmark. The disclosed
+            features and prompts feed the selection-vs-modeling analysis previewed at the Friday
+            wrap-up: the research finding the cohort co-produces.
+          </p>
+        </article>
+      </div>
     </div>
   </section>
 
@@ -226,18 +326,13 @@ const phaseLabel = ({ 'pre-launch': 'Preview', practice: 'Practice', live: 'Live
     margin-top: 26px; font-family: var(--font-mono); font-size: 12.5px;
     letter-spacing: 0.02em; color: var(--text-muted);
   }
-  .lb-updated {
-    display: inline-flex; align-items: center; gap: 8px;
-    margin-left: 12px; font-family: var(--font-mono); font-size: 11.5px;
-    letter-spacing: 0.03em; color: var(--text-muted); white-space: nowrap;
-  }
   .status-dot {
-    width: 8px; height: 8px; border-radius: 50%; flex: none;
+    width: 8px; height: 8px; flex: none;
     background: var(--c-b); border-radius: 999px;
   }
 
   .lb-grid {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    display: grid; grid-template-columns: 1fr;
     gap: 20px; margin-top: 8px;
   }
   .lb-card {
@@ -245,26 +340,24 @@ const phaseLabel = ({ 'pre-launch': 'Preview', practice: 'Practice', live: 'Live
     border-radius: 14px; padding: 22px 22px 10px;
     box-shadow: 0 14px 36px -28px rgba(15,17,23,0.16);
   }
-  .lb-card--locked { background: color-mix(in srgb, var(--surface) 60%, var(--card)); }
   .lb-card-head {
     display: flex; align-items: flex-start; justify-content: space-between;
-    gap: 14px; margin-bottom: 8px;
+    gap: 14px; margin-bottom: 14px;
   }
   .lb-title {
     font-family: var(--font-heading); font-weight: 700; font-size: 16px;
     letter-spacing: -0.01em; margin: 0; color: var(--text);
   }
   .lb-sub { margin: 4px 0 0; font-size: 12.5px; color: var(--text-muted); line-height: 1.45; }
-  .lb-metric {
-    margin: 0 0 14px; font-family: var(--font-mono); font-size: 10.5px;
-    text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-dim);
-  }
   .lb-locked {
     margin: 6px 0 18px; font-size: 13.5px; line-height: 1.6; color: var(--text-sec);
   }
 
-  .lb-scroll { overflow-x: auto; margin: 0 -4px; }
-  .lb-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  .lb-scroll { margin: 0; }
+  .lb-table {
+    width: 100%; border-collapse: collapse; font-size: 13.5px;
+    table-layout: fixed;
+  }
   .lb-table thead th {
     font-family: var(--font-mono); font-size: 10px; font-weight: 700;
     text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted);
@@ -273,16 +366,21 @@ const phaseLabel = ({ 'pre-launch': 'Preview', practice: 'Practice', live: 'Live
   }
   .lb-table tbody td {
     padding: 11px 12px; border-bottom: 1px solid var(--border);
-    color: var(--text-sec); white-space: nowrap;
+    color: var(--text-sec);
   }
   .lb-table tbody tr:last-child td { border-bottom: none; }
   .lb-table tbody tr:hover td { background: color-mix(in srgb, var(--surface) 60%, transparent); }
   .lb-l { text-align: left; }
   .lb-r { text-align: right; font-variant-numeric: tabular-nums; font-family: var(--font-mono); }
   th.lb-rank, td.lb-rank {
-    width: 34px; text-align: right; padding-left: 4px; color: var(--text-dim);
+    width: 40px; text-align: right; padding-left: 4px; color: var(--text-dim);
     font-family: var(--font-mono); font-variant-numeric: tabular-nums;
+    white-space: nowrap;
   }
+  .lb-table th.lb-l, .lb-table td.lb-l {
+    width: 42%; white-space: normal; word-break: break-word;
+  }
+  .lb-table th.lb-r, .lb-table td.lb-r { white-space: nowrap; }
   /* first data column (team) reads as the row label */
   .lb-table tbody td.lb-l { color: var(--text); font-weight: 500; }
   .lb-baseline td { color: var(--text-muted); font-style: italic; }
@@ -294,14 +392,106 @@ const phaseLabel = ({ 'pre-launch': 'Preview', practice: 'Practice', live: 'Live
   }
   .lb-medal { font-size: 15px; line-height: 1; }
 
-  .lb-note {
-    margin-top: 18px; font-size: 12.5px; color: var(--text-muted);
-    font-family: var(--font-mono); letter-spacing: 0.01em;
+  .lb-foot {
+    display: flex; flex-direction: column; align-items: flex-start;
+    gap: 6px; margin-top: 22px;
+  }
+  .lb-foot-meta {
+    display: inline-flex; align-items: center; gap: 8px;
+    margin: 0; font-family: var(--font-mono); font-size: 12px;
+    letter-spacing: 0.02em; color: var(--text-muted);
   }
 
-  @media (max-width: 760px) {
-    #task .reveal-stagger,
-    #participate .reveal-stagger { grid-template-columns: 1fr !important; }
-    .lb-updated { margin-left: 0; }
+  .lb-guide { width: 100%; }
+  .lb-guide summary {
+    list-style: none; cursor: pointer; user-select: none;
+    font-family: var(--font-heading); font-weight: 600; font-size: 13px;
+    color: var(--accent); padding: 2px 0;
+  }
+  .lb-guide summary::-webkit-details-marker { display: none; }
+  .lb-guide summary::before {
+    content: '▸'; display: inline-block; margin-right: 7px;
+    font-size: 11px; transition: transform .2s ease;
+  }
+  .lb-guide[open] summary::before { transform: rotate(90deg); }
+  .lb-guide summary:hover { color: var(--c-a-deep); }
+
+  .lb-guide-body {
+    margin-top: 10px; padding-left: 18px;
+    border-left: 2px solid var(--border);
+  }
+  .lb-guide-body p {
+    margin: 0 0 12px; font-size: 14px; line-height: 1.65;
+    color: var(--text-sec);
+  }
+  .lb-guide-body p:last-child { margin-bottom: 0; }
+  .lb-guide-body strong { color: var(--text); font-weight: 600; }
+  .lb-guide-body code {
+    font-family: var(--font-mono); font-size: 12px;
+    background: color-mix(in srgb, var(--surface) 70%, var(--card));
+    border: 1px solid var(--border); border-radius: 4px; padding: 1px 5px;
+  }
+
+  .start-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+  /* rules: stacked sections, scannable blocks */
+  .rules-stack { display: grid; grid-template-columns: 1fr; gap: 20px; }
+  .rules-block-title { margin: 0 0 18px; }
+
+  .rules-parts { margin: 0; display: grid; gap: 16px; }
+  .rules-part { margin: 0; }
+  .rules-part dt {
+    margin: 0 0 4px; font-family: var(--font-heading); font-weight: 600;
+    font-size: 14px; color: var(--text);
+  }
+  .rules-part dd {
+    margin: 0; font-size: 14px; line-height: 1.65; color: var(--text-sec);
+  }
+  .rules-part dt code, .rules-part dd code, .rules-file-copy code, .rules-file-name code {
+    font-family: var(--font-mono); font-size: 12.5px;
+    background: color-mix(in srgb, var(--surface) 70%, var(--card));
+    border: 1px solid var(--border); border-radius: 5px; padding: 1px 5px;
+  }
+
+  .rules-files {
+    display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px;
+  }
+  .rules-file {
+    padding: 14px 16px; border: 1px solid var(--border); border-radius: 10px;
+    background: color-mix(in srgb, var(--surface) 55%, var(--card));
+  }
+  .rules-file-name { margin: 0 0 6px; }
+  .rules-file-name code { font-size: 13px; }
+  .rules-file-schema {
+    margin: 0 0 10px; font-family: var(--font-mono); font-size: 11.5px;
+    line-height: 1.5; color: var(--text-muted); letter-spacing: 0.01em;
+  }
+  .rules-file-copy { margin: 0; font-size: 13.5px; line-height: 1.6; }
+
+  .rules-footnote {
+    margin: 16px 0 0; font-size: 14px; line-height: 1.65; color: var(--text-sec);
+  }
+
+  .rules-timeline { display: grid; gap: 0; }
+  .rules-timeline-item {
+    display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 16px;
+    padding: 14px 0; border-bottom: 1px solid var(--border);
+  }
+  .rules-timeline-item:first-child { padding-top: 0; }
+  .rules-timeline-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .rules-timeline-item p {
+    margin: 0; font-size: 14px; line-height: 1.65; color: var(--text-sec);
+  }
+  .rules-day {
+    font-family: var(--font-mono); font-size: 12px; line-height: 1.65;
+    color: var(--text); padding-top: 2px;
+  }
+
+  @media (max-width: 900px) {
+    .start-grid { grid-template-columns: 1fr; }
+    .rules-files { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 640px) {
+    .rules-timeline-item { grid-template-columns: 1fr; gap: 4px; }
   }
 </style>
