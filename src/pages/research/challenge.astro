@@ -45,9 +45,17 @@ const phaseLabel = ({ 'pre-launch': 'Preview', practice: 'Practice', live: 'Live
         The AI Respondents Challenge.
       </h1>
       <p class="lede-v3" style="max-width: 62ch;">
-        Real people answered the World Values Survey, and we hid some of their answers.
-        Your job: predict what each person said, with any method, and disclose the
-        features and prompts your approach relied on.
+        Real people answered the World Values Survey. We hid some of their answers.
+        Your task: predict what each person said, using any method you like, and
+        disclose the features and prompts behind your predictions.
+      </p>
+      <p class="copy" style="max-width: 66ch; margin-top: 18px; color: var(--text-sec);">
+        The challenge is a live measurement of what language models actually know about
+        people: their opinions, values, and behaviours. Every score comes from answers the
+        models never saw, in an expanding circle of difficulty: held-out respondents, then
+        held-out countries, and at the end of the week held-out questions and entire held-out
+        surveys. Each step outward tests whether a pipeline learned something about people or
+        just memorised a dataset.
       </p>
       <p class="lb-status">
         <span class="status-dot"></span>
@@ -135,22 +143,40 @@ const phaseLabel = ({ 'pre-launch': 'Preview', practice: 'Practice', live: 'Live
             <p>
               <strong>Skill.</strong> Accuracy above always guessing the majority answer,
               rescaled as <code>(accuracy − majority share) / (1 − majority share)</code> and
-              averaged over target questions. 0 = no better than majority; 1 = perfect. Teams
-              are ranked on this.
+              averaged over target questions. 1 = every answer right; 0 = no better than
+              majority guessing; negative = worse than majority guessing. The ceiling is 1 but
+              the floor is not −1: on questions where one answer dominates, skill can fall well
+              below −1, because there is more room under the majority guess than above it.
+              Teams are ranked on this.
             </p>
             <p>
-              <strong>Alignment.</strong> How closely your predicted answer distribution matches
-              the real one (1 = identical). Order-aware: "Agree" is closer to "Agree strongly"
-              than "Disagree".
+              <strong>Alignment.</strong> One minus the distance between your predicted answer
+              distribution and the true one, per question, averaged. The distance is an
+              order-aware earth-mover distance: answer options sit at equal steps in scale
+              order, and we sum the absolute gaps between the two cumulative distributions,
+              divided by the number of steps. Range 0 to 1: 1 = identical distributions, 0 =
+              all your mass at one end of the scale while the truth sits entirely at the other.
+              Only valid labels enter this measure; invalid ones are already punished in skill.
             </p>
             <p>
-              <strong>Coverage.</strong> Share of respondent–question pairs answered. Unanswered
-              pairs count as wrong — predict everyone.
+              <strong>F1-macro.</strong> Computed in two steps. Per question: all answered
+              pairs are pooled across countries, an F1 score (the harmonic mean of precision
+              and recall) is computed for each answer option, and these are averaged with
+              equal weight to give the question's macro-F1. The board then shows the plain
+              average of the per-question values. Range 0 to 1. Because every answer option
+              counts equally, rare answers matter as much as common ones, which is exactly
+              what accuracy misses.
+            </p>
+            <p>
+              <strong>Coverage.</strong> Share of respondent–question pairs answered, from 0
+              to 100%. Unanswered pairs count as wrong in skill, so predict everyone.
             </p>
             <p>
               <strong>Baselines.</strong> <em>Majority class</em> always picks each question's
-              most common training answer; <em>Random draw</em> samples from training shares.
-              Both score like teams. Doing well on skill and alignment together is the goal.
+              most common training answer; <em>Random draw</em> samples from training shares;
+              <em>Starter notebook</em> is the unmodified default pipeline from the starter kit
+              (an open LLM shown six generic demographics). All three score like teams. Doing
+              well on skill and alignment together is the goal.
             </p>
           </div>
         </details>
