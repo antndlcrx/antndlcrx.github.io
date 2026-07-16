@@ -77,8 +77,11 @@ const phaseLabel = ({ 'pre-launch': 'Preview', practice: 'Practice', live: 'Live
           <h2 class="h-section">Live leaderboard.</h2>
         </div>
         <p class="lede-v3">
-          Two boards: in-domain (countries your models can study) and out-of-domain
-          (countries they never saw). Teams are ranked by skill.
+          Two tiers, each with an in-domain board (countries your models can study) and an
+          out-of-domain board (countries they never saw). The original nine target questions
+          form the first tier; the four hidden questions released mid-week form the second.
+          A team appears on the hidden boards once it submits predictions for those questions.
+          Teams are ranked by skill.
         </p>
       </div>
 
@@ -170,6 +173,14 @@ const phaseLabel = ({ 'pre-launch': 'Preview', practice: 'Practice', live: 'Live
             <p>
               <strong>Coverage.</strong> Share of respondent–question pairs answered, from 0
               to 100%. Unanswered pairs count as wrong in skill, so predict everyone.
+            </p>
+            <p>
+              <strong>Hidden-question boards.</strong> The two lower boards cover the four
+              questions that were never announced as targets until their mid-week release.
+              Same metrics, same truth data, but scored only over the hidden questions and
+              only for teams that submitted them. The main boards always score the original
+              nine questions, so submitting the hidden tier never changes your main-board
+              standing by itself.
             </p>
             <p>
               <strong>Baselines.</strong> <em>Majority class</em> always picks each question's
