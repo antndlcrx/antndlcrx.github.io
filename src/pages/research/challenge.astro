@@ -7,6 +7,12 @@ import lb from '../../data/leaderboard.json';
 
 const { updated, phase, note, boards } = lb;
 
+// The board list carries two tiers: the original nine questions and the
+// hidden four (board ids ending in "-hidden"). They render as tabs so the
+// page shows one tier at a time.
+const mainBoards = boards.filter((b) => !b.id.endsWith('-hidden'));
+const hiddenBoards = boards.filter((b) => b.id.endsWith('-hidden'));
+
 const boardColumns = (columns) =>
   columns.filter((c) => c.key !== 'n_sub');
 
@@ -85,8 +91,20 @@ const phaseLabel = ({ 'pre-launch': 'Preview', practice: 'Practice', live: 'Live
         </p>
       </div>
 
-      <div class="lb-grid reveal-stagger">
-        {boards.map((b) => (
+      {hiddenBoards.length > 0 && (
+        <>
+          <input type="radio" name="lb-tier" id="lbt-main" class="lb-tier-radio" checked />
+          <input type="radio" name="lb-tier" id="lbt-hidden" class="lb-tier-radio" />
+          <div class="lb-tier-tabs reveal" aria-label="Leaderboard tier">
+            <label for="lbt-main">Original questions</label>
+            <label for="lbt-hidden">Hidden questions</label>
+          </div>
+        </>
+      )}
+
+      {[['lb-grid--main', mainBoards], ['lb-grid--hidden', hiddenBoards]].map(([cls, tier]) => tier.length > 0 && (
+        <div class={`lb-grid reveal-stagger ${cls}`}>
+          {tier.map((b) => (
           <article class="lb-card">
             <header class="lb-card-head">
               <div>
@@ -131,8 +149,9 @@ const phaseLabel = ({ 'pre-launch': 'Preview', practice: 'Practice', live: 'Live
               </div>
             )}
           </article>
-        ))}
-      </div>
+          ))}
+        </div>
+      ))}
 
       <div class="lb-foot reveal">
         <p class="lb-foot-meta">
@@ -374,6 +393,27 @@ const phaseLabel = ({ 'pre-launch': 'Preview', practice: 'Practice', live: 'Live
   .lb-grid {
     display: grid; grid-template-columns: 1fr;
     gap: 20px; margin-top: 8px;
+  }
+  /* Tier tabs: pure CSS toggle, the two radios control which tier's grid shows. */
+  .lb-tier-radio { position: absolute; opacity: 0; pointer-events: none; }
+  .lb-tier-tabs {
+    display: inline-flex; gap: 4px; padding: 4px; margin-bottom: 14px;
+    background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+  }
+  .lb-tier-tabs label {
+    padding: 7px 16px; border-radius: 7px; cursor: pointer;
+    font-size: 13.5px; font-weight: 600; color: var(--text-sec);
+    transition: color .15s ease, background .15s ease;
+  }
+  .lb-tier-tabs label:hover { color: var(--text); }
+  #lbt-main:checked ~ .lb-tier-tabs label[for='lbt-main'],
+  #lbt-hidden:checked ~ .lb-tier-tabs label[for='lbt-hidden'] {
+    background: var(--text); color: var(--card);
+  }
+  #lbt-main:checked ~ .lb-grid--hidden { display: none; }
+  #lbt-hidden:checked ~ .lb-grid--main { display: none; }
+  .lb-tier-radio:focus-visible ~ .lb-tier-tabs {
+    outline: 2px solid var(--text-sec); outline-offset: 2px;
   }
   .lb-card {
     background: var(--card); border: 1px solid var(--border);
