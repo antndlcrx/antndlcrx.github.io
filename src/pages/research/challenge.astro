@@ -7,11 +7,13 @@ import lb from '../../data/leaderboard.json';
 
 const { updated, phase, note, boards } = lb;
 
-// The board list carries two tiers: the original nine questions and the
-// hidden four (board ids ending in "-hidden"). They render as tabs so the
-// page shows one tier at a time.
-const mainBoards = boards.filter((b) => !b.id.endsWith('-hidden'));
+// The board list carries up to three tiers: the original nine questions, the
+// hidden four (board ids ending in "-hidden"), and the held-out surveys
+// (board ids starting with "pred-tier4", revealed Friday). They render as
+// tabs so the page shows one tier at a time.
+const surveyBoards = boards.filter((b) => b.id.startsWith('pred-tier4'));
 const hiddenBoards = boards.filter((b) => b.id.endsWith('-hidden'));
+const mainBoards = boards.filter((b) => !b.id.endsWith('-hidden') && !b.id.startsWith('pred-tier4'));
 
 const boardColumns = (columns) =>
   columns.filter((c) => c.key !== 'n_sub');
@@ -83,26 +85,28 @@ const phaseLabel = ({ 'pre-launch': 'Preview', practice: 'Practice', live: 'Live
           <h2 class="h-section">Live leaderboard.</h2>
         </div>
         <p class="lede-v3">
-          Two tiers, each with an in-domain board (countries your models can study) and an
+          Each tier pairs an in-domain board (countries your models can study) with an
           out-of-domain board (countries they never saw). The original nine target questions
-          form the first tier; the four hidden questions released mid-week form the second.
-          A team appears on the hidden boards once it submits predictions for those questions.
+          form the first tier; the four hidden questions released mid-week form the second{surveyBoards.length > 0 ? '; the two held-out surveys, scored zero-shot with no training data, form the third' : ''}.
+          A team appears on a tier's boards once it submits predictions for those questions.
           Teams are ranked by skill.
         </p>
       </div>
 
-      {hiddenBoards.length > 0 && (
+      {(hiddenBoards.length > 0 || surveyBoards.length > 0) && (
         <>
           <input type="radio" name="lb-tier" id="lbt-main" class="lb-tier-radio" checked />
           <input type="radio" name="lb-tier" id="lbt-hidden" class="lb-tier-radio" />
+          <input type="radio" name="lb-tier" id="lbt-surveys" class="lb-tier-radio" />
           <div class="lb-tier-tabs reveal" aria-label="Leaderboard tier">
             <label for="lbt-main">Original questions</label>
-            <label for="lbt-hidden">Hidden questions</label>
+            {hiddenBoards.length > 0 && <label for="lbt-hidden">Hidden questions</label>}
+            {surveyBoards.length > 0 && <label for="lbt-surveys">Held-out surveys</label>}
           </div>
         </>
       )}
 
-      {[['lb-grid--main', mainBoards], ['lb-grid--hidden', hiddenBoards]].map(([cls, tier]) => tier.length > 0 && (
+      {[['lb-grid--main', mainBoards], ['lb-grid--hidden', hiddenBoards], ['lb-grid--surveys', surveyBoards]].map(([cls, tier]) => tier.length > 0 && (
         <div class={`lb-grid reveal-stagger ${cls}`}>
           {tier.map((b) => (
           <article class="lb-card">
@@ -407,11 +411,16 @@ const phaseLabel = ({ 'pre-launch': 'Preview', practice: 'Practice', live: 'Live
   }
   .lb-tier-tabs label:hover { color: var(--text); }
   #lbt-main:checked ~ .lb-tier-tabs label[for='lbt-main'],
-  #lbt-hidden:checked ~ .lb-tier-tabs label[for='lbt-hidden'] {
+  #lbt-hidden:checked ~ .lb-tier-tabs label[for='lbt-hidden'],
+  #lbt-surveys:checked ~ .lb-tier-tabs label[for='lbt-surveys'] {
     background: var(--text); color: var(--card);
   }
-  #lbt-main:checked ~ .lb-grid--hidden { display: none; }
-  #lbt-hidden:checked ~ .lb-grid--main { display: none; }
+  #lbt-main:checked ~ .lb-grid--hidden,
+  #lbt-main:checked ~ .lb-grid--surveys { display: none; }
+  #lbt-hidden:checked ~ .lb-grid--main,
+  #lbt-hidden:checked ~ .lb-grid--surveys { display: none; }
+  #lbt-surveys:checked ~ .lb-grid--main,
+  #lbt-surveys:checked ~ .lb-grid--hidden { display: none; }
   .lb-tier-radio:focus-visible ~ .lb-tier-tabs {
     outline: 2px solid var(--text-sec); outline-offset: 2px;
   }
