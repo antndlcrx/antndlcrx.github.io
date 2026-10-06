@@ -1,0 +1,279 @@
+---
+track: frontier
+order: 1
+id: F1
+title: LLM Agents and Evaluation
+description: "What does a benchmark score actually tell you? Learn to separate preference, capability, and risk, then design evaluations you can defend in your own research."
+objectives:
+  - Distinguish human preference, task capability, and safety as different evaluation targets.
+  - Explain how a judge, task distribution, and agent scaffold can change an evaluation result.
+  - Recognise contamination, saturation, and run-to-run variation as different problems.
+  - Draft an evaluation protocol for a research workflow.
+estimatedMinutes: 20
+status: draft
+layer: appendix
+widgets: [evaluation-mix]
+speaker: Tatiana Shavrina
+speakerRole: Research Scientist Manager, Meta
+speakerImage: /img/speakers/tatiana_shavrina.jpg
+edition: 2026
+slides: /materials/lectures/2026/shavrina-llm-agents-and-evaluation.pdf
+# Add video: https://www.youtube.com/watch?v=VIDEO_ID once the upload is ready.
+# Add thumbnail: /img/lectures/2026/shavrina-evaluation.jpg when the artwork is ready.
+---
+
+import EvaluationMix from '../../../components/widgets/EvaluationMix.astro';
+
+## Start here
+
+Imagine choosing an LLM to code open-ended survey responses. It tops a public leaderboard,
+writes persuasive explanations, and performs well on a few examples. But your study contains
+irony, mixed opinions, and responses in several languages. **Which of those observations
+establishes that it measures what your study needs?**
+
+Tatiana Shavrina's lecture takes that question from human preference comparisons to scientific
+research agents. Its organising idea is that evaluation needs several distinct lenses. A useful
+answer, a correct solution, and acceptable behaviour are related, but they are not interchangeable.
+
+These notes are an Oxford LLMs teaching companion to the supplied lecture slides, with additional
+examples and an interactive illustration. They are not a transcript. The slide references use the PDF's page numbers;
+benchmark figures are a snapshot from the lecture, rather than a live leaderboard.
+
+<div class="key-takeaway">
+  <p class="key-takeaway__label">After this lecture, you should be able to</p>
+  <ol>
+    <li>Separate preference, capability, and safety as evaluation targets.</li>
+    <li>Identify what changes when you change the judge, task mix, or agent scaffold.</li>
+    <li>Distinguish contamination, saturation, and variation between runs.</li>
+    <li>Write an evaluation protocol for your own research workflow.</li>
+  </ol>
+</div>
+
+**Where this fits.** Start with [Evaluating & Choosing Models](/course/day-2/#evaluating)
+for task-specific metrics, and [Agentic Workflows](/course/day-5/#agents) for the agent loop.
+This lecture extends both. No code is needed to follow the notes. The evaluation protocol
+near the end provides a practical reference for your own research.
+
+## Three lenses on evaluation
+
+<p class="visual-diagram__caption">Lecture guide: slides 7–30, 31–54, and 68.</p>
+
+Before choosing a metric, state the claim you want the evaluation to support. “Users choose
+this answer” is a different claim from “this answer is correct,” and both differ from “this
+system handles a dangerous or misleading request appropriately.”
+
+<div class="lecture-table" role="region" aria-label="Three evaluation lenses compared; scroll horizontally on small screens" tabIndex={0}>
+
+| Lens | Question it answers | Evidence to collect | What it cannot establish alone |
+| --- | --- | --- | --- |
+| Human preference | Which answer do people prefer? | Blinded comparisons and reasons for the choice | Factual accuracy or faithfulness to a source |
+| Task capability | Can the system complete a defined task? | Reference labels, tests, or expert-scored outputs | Reliability on a different population or workflow |
+| Safety and societal impact | How does the system fail, and who is affected? | Targeted failure cases, subgroup analysis, and review of consequences | Absence of failures outside the tested conditions |
+
+</div>
+
+For survey coding, apply all three. Researchers might find an explanation clear; a gold-standard
+label set might reveal classification errors; subgroup analysis might show that those errors
+concentrate in one language. Combining these observations gives a much stronger account of
+the tool than any single overall score.
+
+<div class="key-takeaway">
+  <p class="key-takeaway__label">Key takeaway</p>
+  <p>Write the intended claim before selecting the benchmark. A metric is evidence about a defined property under defined conditions.</p>
+</div>
+
+## Preference and the judge
+
+<p class="visual-diagram__caption">Lecture guide: slides 7–13.</p>
+
+In a pairwise comparison, a person sees two responses to the same prompt and chooses one.
+Repeated comparisons can produce a ranking. This is useful when the target is the experience
+of reading or using an answer, especially when there is no single reference response.
+
+The difficulty is that presentation contributes to the choice. A confident, well-formatted
+answer can be appealing even when its evidence is weak. Tatiana's lecture asks us to keep
+likeability separate from the property we actually need to measure.
+
+An **LLM-as-a-judge** replaces or supplements the human rater with a model prompted to apply
+a rubric. This can make large evaluations practical, but it adds another measurement instrument
+that needs validation. Research on [MT-Bench and Chatbot Arena](https://arxiv.org/abs/2306.05685)
+documents position and verbosity biases, among other limitations of model judges.
+
+### Make the rubric observable
+
+For a research summary, replace a vague “How good is this?” with distinct questions:
+
+- Does each factual claim have support in the supplied source?
+- Does the summary preserve qualifications and disagreement?
+- Are the cited passages real and relevant?
+- Is the explanation understandable to its intended reader?
+
+Keep these scores separate initially. Validate the judge on examples independently scored by
+people with relevant expertise. In pairwise comparisons, swap the response order; when testing
+factuality, check whether a stylistic rewrite changes the verdict despite unchanged evidence.
+These are teaching suggestions for operationalising the lecture's warning about preference.
+
+<div class="stop-and-think">
+  <div class="stop-and-think__header"><span class="stop-and-think__label">Stop and think</span></div>
+  <p>A judge consistently agrees with your research team. Is that enough to trust it on multilingual survey responses?</p>
+  <details><summary>Reveal the reasoning</summary><div><p>Agreement on one sample is useful evidence, but it does not show that the sample covers every relevant language or response type. Your team and the judge can also share a bias. Inspect disagreement and subgroup performance, and validate on the population where the instrument will be used.</p></div></details>
+</div>
+
+## Capability belongs to a setup
+
+<p class="visual-diagram__caption">Lecture guide: slides 31–54.</p>
+
+A multiple-choice knowledge test, a repository-level coding task, and an autonomous research
+experiment ask different things of a system. The lecture moves from subject knowledge and
+coding to agents that formulate and run experiments. As tasks become longer, there are more
+places for the environment, tools, and execution policy to affect the result.
+
+<div class="definition-box">
+  <p class="definition-box__label">Definition</p>
+  <p class="definition-box__term">Agent scaffold</p>
+  <p>The software around the language model that controls its workflow: which tools it can use, what state it retains, how it chooses the next action, and whether it retries or explores alternative solutions.</p>
+</div>
+
+[MLE-bench](https://arxiv.org/abs/2410.07095), discussed in slides 39–42, evaluates ML engineering
+using 75 Kaggle-derived competitions. [AIRS-Bench](https://arxiv.org/abs/2602.06855), discussed
+in slides 45–51, uses 20 research tasks drawn from machine-learning papers across several
+domains. The latter evaluates an agent's research process, including developing and refining
+a solution. Its [task definitions and evaluation code](https://github.com/facebookresearch/airs-bench)
+are available to inspect.
+
+Two distinctions matter when reading these results:
+
+1. **Did the run produce a valid submission?** A broken file or unfinished experiment may never reach scoring.
+2. **How good was the submitted solution?** A valid submission can still perform poorly on the task.
+
+<figure class="visual-diagram">
+  <a href="/materials/lectures/2026/shavrina-llm-agents-and-evaluation.pdf#page=47" aria-label="Open slide 47 in the lecture PDF">
+    <img src="/img/lectures/2026/shavrina-valid-submissions.png" alt="Slide 47 compares valid submission rates for model and scaffold combinations. The lecture reports an overall rate of 65.8%, with large differences across combinations." width="1600" height="900" loading="lazy" />
+  </a>
+  <figcaption class="visual-diagram__caption">Tatiana Shavrina, slide 47. Valid submission rate is one part of the evaluation; it does not measure the quality of those submissions. The figure compares combinations of models and scaffolds, so it does not isolate either factor's causal effect. <a href="/materials/lectures/2026/shavrina-llm-agents-and-evaluation.pdf#page=48">Slide 48</a> turns to normalised task scores.</figcaption>
+</figure>
+
+### Hold the right things constant
+
+To ask whether one model improves a fixed workflow, keep the task set, tools, scaffold, budget,
+and scoring procedure constant. To compare complete systems, allow their designs to differ,
+but state the resource constraints and the claim you are making. Those are different experiments.
+
+The test population matters too. Try the following example before reading the conclusion.
+
+<EvaluationMix />
+
+An aggregate score weights different cases by their frequency. If your research corpus has
+more difficult cases than the benchmark, the ranking can change without either system changing.
+Report performance on meaningful subgroups, alongside an overall score weighted to the intended
+population. This connects directly to the course's [validation material](/course/day-3/).
+
+<div class="key-takeaway">
+  <p class="key-takeaway__label">Key takeaway · slide 52</p>
+  <p>Record the full evaluation setup: model version, prompts, tools, scaffold, task distribution, resource limits, scoring rules, and repeated runs. The score describes their joint behaviour.</p>
+</div>
+
+## Safety and societal impact
+
+<p class="visual-diagram__caption">Lecture guide: slides 14–30; additional alignment discussion in slides 90–99.</p>
+
+The lecture broadens evaluation beyond successful task completion to bias, factual errors,
+misinformation, harmful outputs, misuse, and wider societal effects. For a social scientist,
+the practical move is to ask what a failure would do to the research process and the people
+represented in the data.
+
+Consider a system extracting political positions from interviews. An invented quotation is
+a different failure from a missed relevant passage. A model that consistently misreads one
+group's dialect creates a different concern again. An average accuracy score may obscure all three.
+
+Define critical failures separately, inspect relevant subgroups, and include difficult or unusual
+inputs on purpose. A fluent answer should not compensate for a fabricated source in the same
+aggregate “quality” score. The acceptable threshold depends on the use and consequences; write
+it into the evaluation protocol before inspecting the final results.
+
+<div class="stop-and-think">
+  <div class="stop-and-think__header"><span class="stop-and-think__label">Stop and think</span></div>
+  <p>Your agent invents no citations in 100 test runs. What can you report?</p>
+  <details><summary>Reveal the reasoning</summary><div><p>You observed zero fabricated citations in those 100 runs, under that task distribution and configuration. You have not established that the failure rate is zero. Preserve the denominator and test conditions, examine coverage, and express uncertainty rather than claiming that the system cannot invent citations.</p></div></details>
+</div>
+
+## When benchmark evidence breaks
+
+<p class="visual-diagram__caption">Lecture guide: slides 52–67.</p>
+
+Three problems deserve separate names because they require different responses.
+
+<div class="lecture-table" role="region" aria-label="Benchmark problems and responses; scroll horizontally on small screens" tabIndex={0}>
+
+| Problem | Why it matters | A useful response |
+| --- | --- | --- |
+| Contamination | Test content may have appeared in training, weakening evidence of generalisation | Track data provenance and exposure; use genuinely held-out or refreshed tasks where possible |
+| Saturation | Many systems score near the ceiling, leaving little separation | Add harder or different tasks that still represent the intended use |
+| Variation between runs | A result changes with random seed, execution, or environment | Repeat runs, retain failures, and report variation with the resource budget |
+
+</div>
+
+Contamination is especially difficult to assess when the training corpus is unavailable.
+The [black-box contamination study](https://arxiv.org/abs/2310.17623) cited in slide 61 tests
+whether models assign unusually high likelihood to a benchmark's original example ordering
+relative to shuffled orderings. Such tests can provide evidence under specific assumptions;
+failing to detect exposure is not proof that a test set is clean.
+
+Refreshed tasks can reduce some exposure risks, but a new publication date alone cannot certify
+an uncontaminated benchmark. Record when the data were created and released, what is known about
+the evaluated model, and what remains uncertain.
+
+For an agent, also distinguish one attempt from several attempts with the best result selected.
+More attempts consume more resources and change the meaning of success. Keep the selection rule
+fixed, count unsuccessful runs, and reserve a final test set that is not repeatedly used to tune
+the workflow.
+
+<div class="key-takeaway">
+  <p class="key-takeaway__label">Key takeaway</p>
+  <p>A stronger benchmark result needs an explanation of what was measured, what could have leaked, and how stable the result is. A bigger number by itself leaves those questions open.</p>
+</div>
+
+## Design your own evaluation
+
+The lecture ends by asking whether you would create a benchmark yourself. Domain expertise is
+what makes that possible: you know which distinctions matter, which cases are difficult, and
+which errors would invalidate the research.
+
+Use this protocol as a starting point for your own work. It is a teaching companion to the
+lecture, with practical suggestions added by Oxford LLMs.
+
+1. **State the claim.** For example: “This workflow identifies policy commitments in the sampled speeches and returns supporting passages.”
+2. **Define the population and sampling unit.** Cover relevant time periods, sources, languages, and difficult cases. Keep related documents together when splitting the data.
+3. **Build a reference standard.** Write the coding rules, obtain independent annotations, and adjudicate disagreements. Preserve genuine ambiguity.
+4. **Freeze the system and its budget.** Save model identifiers, prompts, tool access, scaffold settings, stopping rules, and runtime or cost limits.
+5. **Choose several measurements.** Score task success, evidence quality, and critical failures separately. Inspect subgroup performance.
+6. **Separate development from final evaluation.** Use development cases to improve the workflow. Keep final cases untouched until the protocol is fixed.
+7. **Repeat, inspect, and report.** Keep run logs, describe uncertainty, and examine failure cases alongside summary scores.
+
+<details class="appendix-box">
+  <summary>A compact evaluation record to copy</summary>
+  <div class="appendix-box__body">
+    <pre><code>{`Claim and intended use:
+Population, sampling unit, and exclusions:
+Task set version and train/development/test split:
+Reference labels, rubric, and adjudication:
+Model version, prompt, tools, and scaffold:
+Budget, attempts, and stopping rule:
+Metrics, subgroup breakdowns, and critical failures:
+Run seeds, execution dates, and uncertainty:
+Data exposure checks and remaining limitations:
+Decision rule and location of run logs:`}</code></pre>
+  </div>
+</details>
+
+## Materials and next steps
+
+- **Original lecture:** [Tatiana Shavrina's slides, 99 pages](/materials/lectures/2026/shavrina-llm-agents-and-evaluation.pdf). Main lecture: pages 1–71; appendix: pages 72–99.
+- **Judging responses:** [Zheng et al., Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena](https://arxiv.org/abs/2306.05685). Read for the limitations of automated preference judgements.
+- **ML engineering agents:** [Chan et al., MLE-bench](https://arxiv.org/abs/2410.07095). Connects to slides 39–42.
+- **Research agents:** [Lupidi et al., AIRS-Bench](https://arxiv.org/abs/2602.06855) and the [benchmark repository](https://github.com/facebookresearch/airs-bench). Connects to slides 45–51.
+- **Contamination:** [Oren et al., Proving Test Set Contamination in Black Box Language Models](https://arxiv.org/abs/2310.17623). Connects to slide 61.
+
+Continue with [Evaluating & Choosing Models](/course/day-2/#evaluating) to build a task-specific
+evaluation, or [Evaluating Agents](/course/day-5/#evaluating-agents) to examine outcomes and
+execution traces together. Return to [Advanced lectures](/course/lectures/) for the lecture collection.

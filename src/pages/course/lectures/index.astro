@@ -1,0 +1,44 @@
+---
+import Base from '../../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+const lectures = (await getCollection('modules', ({ data }) => data.track === 'frontier' && data.status !== 'planned'))
+  .sort((a, b) => a.data.order - b.data.order);
+---
+<Base title="Advanced lectures" description="Explore lectures from the Oxford LLMs intensive with guided notes and original slides that extend the core course.">
+  <aside class="status-strip" aria-label="Page breadcrumb"><div class="status-strip-inner"><a href="/course/">Course</a><span class="sep"></span><span>Advanced lectures</span></div></aside>
+  <section class="section-v3">
+    <div class="shell">
+      <div class="section-head-v3">
+        <div><p class="eyebrow-v3">From the Oxford LLMs intensive</p><h1 class="h-section">Beyond the fundamentals.</h1></div>
+        <p class="lede-v3">Go deeper with researchers working on language models. Each lecture brings together guided notes and original materials, with links back to the core course.</p>
+      </div>
+      <div class="lecture-list">
+        {lectures.map(({ id, data }) => (
+          <article class="lecture-card">
+            {data.speakerImage && <img src={data.speakerImage} alt={data.speaker} width="160" height="160" />}
+            <div>
+              <p class="eyebrow-v3">{data.edition} intensive · {data.video ? 'Video + lecture notes' : 'Lecture notes + slides'}</p>
+              <h2 class="h-sub"><a href={`/course/${id}/`}>{data.title}</a></h2>
+              <p class="lecture-byline">{data.speaker}</p>
+              <p class="copy">{data.description}</p>
+              <a class="btn-link-v3" href={`/course/${id}/`}>Explore the lecture <span aria-hidden="true">→</span></a>
+            </div>
+          </article>
+        ))}
+      </div>
+      <p class="copy lecture-return">Build the foundations with the <a href="/course/">five-module course</a>, or browse <a href="/resources/summer-school/">materials from every summer school</a>.</p>
+    </div>
+  </section>
+</Base>
+<style>
+  .lecture-list { margin-top: 40px; }
+  .lecture-card { display: grid; grid-template-columns: 160px minmax(0, 1fr); gap: 32px; padding: 32px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .lecture-card > img { border-radius: 12px; object-fit: cover; }
+  .lecture-card h2 { margin: 12px 0 8px; }
+  .lecture-card h2 a { color: inherit; text-decoration: none; }
+  .lecture-card h2 a:hover { color: var(--c-a); }
+  .lecture-card .copy { max-width: 65ch; margin: 16px 0 20px; }
+  .lecture-byline { font-size: 13px; color: var(--text-sec); }
+  .lecture-return { margin-top: 32px; }
+  @media (max-width: 600px) { .lecture-card { grid-template-columns: 1fr; gap: 20px; } .lecture-card > img { width: 88px; height: 88px; } }
+</style>

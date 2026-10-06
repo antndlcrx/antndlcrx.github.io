@@ -888,7 +888,8 @@
 .footer-v3-icons a:hover { opacity: 1; }
 .footer-v3-icons img { width: 20px; height: 20px; }
 @media (max-width: 760px) {
-  .footer-v3-inner { grid-template-columns: 1fr 1fr; gap: 32px 24px; }
+  .footer-v3-inner { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px 24px; }
+  .footer-v3-inner > div { min-width: 0; overflow-wrap: anywhere; }
   .footer-v3-inner > div:first-child { grid-column: 1 / -1; }
   .footer-v3-bottom { flex-direction: column; gap: 14px; align-items: flex-start; }
 }

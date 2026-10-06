@@ -60,6 +60,7 @@ export const WIDGET_REGISTRY = new Set([
   'weat-calculator',
   'contextual-vs-static',
   'scaling-law-plotter',
+  'evaluation-mix',
 ]);
 
 /**

@@ -1,5 +1,6 @@
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
+import { getYouTubeId } from './lib/video';
 
 /**
  * Module pages for the six curriculum tracks. Entry id = `{track}/{slug}`
@@ -27,9 +28,13 @@ const modules = defineCollection({
     layer: z.enum(['spine', 'appendix']).default('spine'),
     updated: z.string().optional(), // modules carrying dated figures
     // frontier extension
-    speaker: z.string().optional(), // key into speakers.json
+    speaker: z.string().optional(), // lecture speaker's display name
     edition: z.number().optional(),
-    video: z.string().url().optional(),
+    video: z.string().url().refine((url) => Boolean(getYouTubeId(url)), 'Use a YouTube video URL').optional(),
+    thumbnail: z.string().startsWith('/').optional(),
+    speakerRole: z.string().optional(),
+    speakerImage: z.string().startsWith('/').optional(),
+    slides: z.string().startsWith('/').optional(),
     segments: z
       .array(
         z.object({
@@ -40,6 +45,11 @@ const modules = defineCollection({
         })
       )
       .default([]),
+  }).superRefine((data, context) => {
+    if (data.track !== 'frontier') return;
+    for (const field of ['speaker', 'edition', 'slides'] as const) {
+      if (!data[field]) context.addIssue({ code: z.ZodIssueCode.custom, path: [field], message: `Lecture requires ${field}` });
+    }
   }),
 });
 

@@ -1,0 +1,27 @@
+TITLE
+LLM Agents and Evaluation | Tatiana Shavrina | Oxford LLMs 2026
+
+DESCRIPTION
+What does a benchmark score tell us about a language model or an AI agent?
+
+In this lecture from the 2026 Oxford LLMs intensive, Tatiana Shavrina explores human preference, LLMs as judges, safety and societal impact, domain capabilities, and the evaluation of scientific research agents. She also examines benchmark contamination and the challenge of interpreting results that depend on the full evaluation setup.
+
+Lecture notes, slides, and interactive example:
+https://llmsforsocialscience.net/course/frontier/shavrina-evaluation/
+
+Explore the core LLMs for Social Science course:
+https://llmsforsocialscience.net/course/
+
+Topics covered:
+- Human preference and automated judges
+- Safety and societal impact
+- Domain capabilities and scientific research agents
+- MLE-bench and AIRS-Bench
+- Metrics, variation, and evaluation design
+- Benchmark contamination and saturation
+
+Speaker: Tatiana Shavrina
+Event: Oxford LLMs intensive, 2026
+
+Oxford LLMs is a research lab and education hub for social scientists working with language models.
+https://llmsforsocialscience.net/

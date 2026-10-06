@@ -1,0 +1,5 @@
+title: Advanced lectures
+blurb: Lectures from the Oxford LLMs intensive, with guided notes, original slides, and exercises that extend the core course.
+theme: default
+order: 6
+prerequisiteTracks: [llms]

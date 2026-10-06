@@ -1,0 +1,61 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { getYouTubeId } from '../lib/video';
+interface Props { entry: CollectionEntry<'modules'> }
+const { entry } = Astro.props;
+const { title, speaker, speakerRole, speakerImage, edition, video, thumbnail, slides } = entry.data;
+const videoId = video ? getYouTubeId(video) : null;
+const watchUrl = videoId ? `https://www.youtube.com/watch?v=${videoId}` : null;
+---
+
+<div class="lecture-media" id="recording">
+  <div class="lecture-speaker">
+    {speakerImage && <img src={speakerImage} alt="" width="48" height="48" />}
+    <div><strong>{speaker}</strong>{speakerRole && <span>{speakerRole} · at the time of the lecture</span>}</div>
+    <a href={`/summer-school/${edition}/`}>{edition} intensive ↗</a>
+  </div>
+  {watchUrl ? (
+    <a class="lecture-video" href={watchUrl} target="_blank" rel="noopener noreferrer" aria-label={`Watch ${title} by ${speaker} on YouTube (opens in a new tab)`}>
+      <img src={thumbnail ?? `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`} alt={`${title} — ${speaker}`} width="1280" height="720" />
+      <span class="lecture-video__play" aria-hidden="true">▶</span>
+      <span class="lecture-video__caption">Watch the lecture on YouTube ↗</span>
+    </a>
+  ) : (
+    <div class="lecture-pending">
+      <span class="lecture-pending__label">Oxford LLMs · {edition} intensive</span>
+      <strong>{title}</strong>
+      <span>{speaker}</span>
+      <p>Recording forthcoming</p>
+    </div>
+  )}
+  <div class="lecture-media__links">
+    {slides && <a class="btn-primary" href={slides}>Open lecture slides <span aria-hidden="true">↗</span></a>}
+    <a class="btn-link-v3" href="#start-here">Read the lecture notes <span aria-hidden="true">↓</span></a>
+    {watchUrl && <a class="btn-link-v3" href={watchUrl} target="_blank" rel="noopener noreferrer">YouTube ↗</a>}
+  </div>
+</div>
+
+<style>
+  .lecture-media { margin: -12px 0 40px; scroll-margin-top: 90px; }
+  .lecture-speaker { display: flex; align-items: center; gap: 12px; margin-bottom: 22px; flex-wrap: wrap; }
+  .lecture-speaker img { border-radius: 50%; object-fit: cover; flex: none; }
+  .lecture-speaker strong { font-size: 15px; display: block; }
+  .lecture-speaker > div { flex: 1; min-width: 0; }
+  .lecture-speaker span { font-size: 11px; color: var(--text-sec); display: block; margin-top: 3px; }
+  .lecture-speaker > a { margin-left: auto; font-family: var(--font-mono); font-size: 10px; color: var(--text-sec); }
+  .lecture-video, .lecture-pending { aspect-ratio: 16 / 9; border-radius: 12px; overflow: hidden; position: relative; }
+  .lecture-video { display: block; background: #152638; color: white; }
+  .lecture-video > img { width: 100%; height: 100%; object-fit: cover; }
+  .lecture-video__play { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: grid; place-items: center; width: 68px; height: 68px; background: #102438e8; border: 1px solid #ffffff88; border-radius: 50%; font-size: 25px; }
+  .lecture-video__caption { position: absolute; bottom: 0; left: 0; right: 0; padding: 28px 20px 16px; background: linear-gradient(transparent, #000c); font-size: 14px; }
+  .lecture-video:focus-visible { outline: 3px solid var(--c-a); outline-offset: 5px; }
+  .lecture-video:hover .lecture-video__play { background: #102438; }
+  .lecture-pending { display: flex; flex-direction: column; justify-content: center; align-items: flex-start; padding: clamp(24px, 5vw, 52px); border: 1px solid var(--border); background: linear-gradient(125deg, #e5f1f7, #f5f5fa 60%, #eee8f5); }
+  .lecture-pending__label { font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: .13em; color: #405b70; }
+  .lecture-pending strong { max-width: 15ch; font-family: var(--font-heading); font-size: clamp(24px, 3vw, 38px); line-height: 1.1; letter-spacing: -.03em; margin: 18px 0 12px; color: #152638; }
+  .lecture-pending > span:not(:first-child) { font-size: 14px; color: #405b70; }
+  .lecture-pending p { margin: 24px 0 0; font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: .08em; color: #405b70; border-top: 1px solid #b5c9d5; padding-top: 12px; }
+  .lecture-media__links { display: flex; flex-wrap: wrap; gap: 16px 24px; align-items: center; margin-top: 20px; }
+  @media (max-width: 600px) { .lecture-speaker > a { margin-left: 60px; flex-basis: calc(100% - 60px); } }
+  @media (max-width: 480px) { .lecture-pending { aspect-ratio: auto; min-height: 250px; } }
+</style>
