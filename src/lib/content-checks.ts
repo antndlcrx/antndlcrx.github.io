@@ -61,6 +61,8 @@ export const WIDGET_REGISTRY = new Set([
   'contextual-vs-static',
   'scaling-law-plotter',
   'evaluation-mix',
+  'healthbench-slices',
+  'rubric-explorer',
 ]);
 
 /**

@@ -1,0 +1,32 @@
+---
+interface Props { page: 6 | 37 | 38 | 47 | 48 | 50 | 52 | 68; title?: string; caption?: string }
+const { page, title, caption } = Astro.props;
+const assets: Record<number, { file: string; title: string }> = {
+  6: { file: 'shavrina-slide-6.png', title: 'The lecture’s four axes of evaluation' },
+  37: { file: 'shavrina-healthbench-37.png', title: 'HealthBench, Hard and Consensus results' },
+  38: { file: 'shavrina-healthbench-38.png', title: 'HealthBench failure slices' },
+  47: { file: 'shavrina-valid-submissions.png', title: 'AIRS-Bench valid submission rates' },
+  48: { file: 'shavrina-normalised-scores.png', title: 'AIRS-Bench average normalised scores' },
+  50: { file: 'shavrina-slide-50.png', title: 'Selected AIRS-Bench task results and methods' },
+  52: { file: 'shavrina-slide-52.png', title: 'Metrics and Variance' },
+  68: { file: 'shavrina-slide-68.png', title: 'What we learnt' },
+};
+const asset = assets[page];
+const pdf = '/materials/lectures/2026/shavrina-llm-agents-and-evaluation.pdf';
+---
+<details class="lecture-slide">
+  <summary><span>Original slide {page}</span> {title ?? asset.title}</summary>
+  <figure>
+    <a href={`/img/lectures/2026/${asset.file}`} target="_blank" rel="noopener noreferrer" aria-label={`Open lecture slide ${page} at full size`}><img src={`/img/lectures/2026/${asset.file}`} alt={title ?? asset.title} width="1800" height="1013" loading="lazy" /></a>
+    <figcaption>{caption ?? 'Original presentation by Tatiana Shavrina; displayed here as source material.'} <a href={`${pdf}#page=${page}`}>Open PDF at slide {page} ↗</a>. Select the image to view it at full size.</figcaption>
+  </figure>
+</details>
+<style>
+  .lecture-slide { margin: 22px 0; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  summary { cursor: pointer; padding: 16px 20px; font-size: 13px; font-weight: 600; }
+  summary span { color: var(--text-sec); font: 10px var(--font-mono); margin-right: 10px; }
+  summary:focus-visible { outline: 2px solid var(--c-a); outline-offset: -3px; }
+  figure { margin: 0; padding: 0 16px 16px; }
+  img { display: block; width: 100%; height: auto; background: white; }
+  figcaption { font-size: 11px; color: var(--text-sec); margin-top: 12px; line-height: 1.6; }
+</style>

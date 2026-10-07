@@ -7,8 +7,10 @@ The collection at `/course/lectures/` extends the core course. Lecture pages use
 - Page: `/course/frontier/shavrina-evaluation/`
 - Source: `src/content/modules/frontier/shavrina-evaluation.mdx`
 - Original deck: `public/materials/lectures/2026/shavrina-llm-agents-and-evaluation.pdf`
-- Illustrated excerpt: PDF page 47, rendered without alteration to `public/img/lectures/2026/shavrina-valid-submissions.png`.
-- Notes are an editorial companion based on the slides, not a recording transcript. The interactive survey example and practical evaluation protocol are additions by Oxford LLMs. This lecture has no problem set.
+- Original slide expanders: PDF pages 6, 37, 38, 47, 48 and 50, rendered without alteration under `public/img/lectures/2026/`.
+- Notes are an editorial companion based on the slides, not a recording transcript. The rubric responses, interactive task-mix example and practical evaluation record are Oxford LLMs additions. The HealthBench interactive chart transcribes historical slide 38 results. This lecture has no problem set.
+- Current benchmark views load on request: official SWE-bench and LiveCodeBench pages in sandboxed frames; AIRS-Bench's public README leaderboard fetched into an accessible table. Source links remain visible when external services fail. Fetch time and author-supplied result dates are distinct. The current AIRS source can cover different systems from the lecture's historical comparison.
+- The three writer/critic rounds and technical verification are recorded in `shavrina-editorial-review.md`.
 - Recording and final thumbnail are still needed. No video duration, captions, or chapter timestamps have been inferred from slide numbers.
 
 ## Connect the recording

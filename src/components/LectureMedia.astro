@@ -11,9 +11,10 @@ const watchUrl = videoId ? `https://www.youtube.com/watch?v=${videoId}` : null;
 <div class="lecture-media" id="recording">
   <div class="lecture-speaker">
     {speakerImage && <img src={speakerImage} alt="" width="48" height="48" />}
-    <div><strong>{speaker}</strong>{speakerRole && <span>{speakerRole} · at the time of the lecture</span>}</div>
+    <div><strong>Lecture by {speaker}</strong>{speakerRole && <span>{speakerRole} · at the time of the lecture</span>}</div>
     <a href={`/summer-school/${edition}/`}>{edition} intensive ↗</a>
   </div>
+  <p class="lecture-editorial">Page written and assembled by the Oxford LLMs team. The presentation and recording are {speaker}’s; these notes and teaching illustrations are our companion to them.</p>
   {watchUrl ? (
     <a class="lecture-video" href={watchUrl} target="_blank" rel="noopener noreferrer" aria-label={`Watch ${title} by ${speaker} on YouTube (opens in a new tab)`}>
       <img src={thumbnail ?? `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`} alt={`${title} — ${speaker}`} width="1280" height="720" />
@@ -43,6 +44,7 @@ const watchUrl = videoId ? `https://www.youtube.com/watch?v=${videoId}` : null;
   .lecture-speaker > div { flex: 1; min-width: 0; }
   .lecture-speaker span { font-size: 11px; color: var(--text-sec); display: block; margin-top: 3px; }
   .lecture-speaker > a { margin-left: auto; font-family: var(--font-mono); font-size: 10px; color: var(--text-sec); }
+  .lecture-editorial { font-size: 12px; color: var(--text-sec); line-height: 1.7; margin: 0 0 24px; }
   .lecture-video, .lecture-pending { aspect-ratio: 16 / 9; border-radius: 12px; overflow: hidden; position: relative; }
   .lecture-video { display: block; background: #152638; color: white; }
   .lecture-video > img { width: 100%; height: 100%; object-fit: cover; }
