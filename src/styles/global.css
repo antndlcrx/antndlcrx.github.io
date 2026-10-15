@@ -75,119 +75,14 @@
 
 
 /* ============================================================
-   THEME VARIANTS (data-theme on <html>)
-   Uses same structure as base, but remaps the blue ramp,
-   background, surface, card, border and text tokens.
-   Base (no data-theme) = Blue Lagoon.
+   Theme ramps (data-theme) and brand pairs (data-palette) live
+   in themes.css — the design-system file — loaded after this
+   one by Base.astro. Bridge below: themes.css §4 styles
+   .btn-link, but site markup uses .btn-link-v3.
    ============================================================ */
 
-:root[data-theme="purple"] {
-  /* Blue spectrum remapped to Fusion ramp */
-  --blue-0: #2D1B4E;
-  --blue-1: #4A2272;
-  --blue-2: #6B2FA0;
-  --blue-3: #8B3CBF;
-  --blue-4: #A94ED4;
-  --blue-5: #C46AE6;
-  --blue-6: #D88AF0;
-  --blue-7: #E6A8F5;
-  --blue-8: #F0C8F9;
-  --blue-9: #F8E4FD;
-
-  --bg:        #FDFAFF;
-  --surface:   #F6F0FA;
-  --card:      #FFFFFF;
-  --elevated:  #FFFFFF;
-
-  --border:    #EAE0F0;
-  --border-lt: #DDCFE8;
-
-  --text:       #12091A;
-  --text-sec:   #3D2E4A;
-  --text-muted: #6E5F7A;
-  --text-dim:   #A094AA;
-}
-
-:root[data-theme="red"] {
-  /* Blue spectrum remapped to Ember ramp */
-  --blue-0: #5C1A1A;
-  --blue-1: #7A2424;
-  --blue-2: #9A3030;
-  --blue-3: #B84040;
-  --blue-4: #D45A3B;
-  --blue-5: #E67840;
-  --blue-6: #F09555;
-  --blue-7: #F5B478;
-  --blue-8: #FAD4A8;
-  --blue-9: #FDF0E0;
-
-  --bg:        #FDFBFA;
-  --surface:   #FAF4F0;
-  --card:      #FFFFFF;
-  --elevated:  #FFFFFF;
-
-  --border:    #F0E4DA;
-  --border-lt: #E6D6C8;
-
-  --text:       #1A0F0A;
-  --text-sec:   #4A3828;
-  --text-muted: #7A6858;
-  --text-dim:   #A89888;
-}
-
-:root[data-theme="green"] {
-  /* Blue spectrum remapped to Canopy ramp */
-  --blue-0: #1A3A2A;
-  --blue-1: #225540;
-  --blue-2: #2A7055;
-  --blue-3: #358A68;
-  --blue-4: #42A47E;
-  --blue-5: #58BC96;
-  --blue-6: #78D4B0;
-  --blue-7: #9CE6C8;
-  --blue-8: #B3ECD4;
-  --blue-9: #D4F6E8;
-
-  --bg:        #FAFDFB;
-  --surface:   #F0F8F4;
-  --card:      #FFFFFF;
-  --elevated:  #FFFFFF;
-
-  --border:    #DCF0E4;
-  --border-lt: #CEE5D8;
-
-  --text:       #0A1510;
-  --text-sec:   #2E453A;
-  --text-muted: #5A7568;
-  --text-dim:   #90A89A;
-}
-
-:root[data-theme="mono"] {
-  /* Blue spectrum remapped to Graphite ramp */
-  --blue-0: #1A1A1E;
-  --blue-1: #2A2A30;
-  --blue-2: #3A3A42;
-  --blue-3: #505058;
-  --blue-4: #686870;
-  --blue-5: #848490;
-  --blue-6: #A0A0AA;
-  --blue-7: #B8B8C0;
-  --blue-8: #C8C8D0;
-  --blue-9: #E2E2E8;
-
-  --bg:        #FAFAFB;
-  --surface:   #F0F0F2;
-  --card:      #FFFFFF;
-  --elevated:  #FFFFFF;
-
-  --border:    #E0E0E4;
-  --border-lt: #D2D2D8;
-
-  --text:       #0F0F12;
-  --text-sec:   #3A3A42;
-  --text-muted: #6A6A74;
-  --text-dim:   #9A9AA4;
-}
+.btn-link-v3 { color: var(--c-b-deep) !important; }
+.btn-link-v3:hover { color: var(--c-b) !important; }
 
 
 /* --- RESET --- */
@@ -2527,3 +2422,362 @@ code {
   vertical-align: middle;
 }
 
+
+/* ── Widget chrome (shared across course modules) ─────────────────── */
+.widget-wrap {
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background: var(--surface, #FFFFFF);
+  border: 1px solid var(--border, #E2E6EE);
+  border-radius: 12px;
+}
+.widget-eyebrow {
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent, #2D8ABF);
+  margin-bottom: 0.5rem;
+}
+.widget-title {
+  font-family: var(--font-display, 'Source Serif 4', Georgia, serif);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text, #1A1D27);
+  line-height: 1.25;
+  margin-bottom: 0.75rem;
+}
+.widget-intro {
+  font-size: 0.92rem;
+  color: var(--text-sec, #3D4455);
+  line-height: 1.65;
+  max-width: 620px;
+  margin-bottom: 1.5rem;
+}
+
+/* ===================================================================
+   Module-page chrome (collection-driven course pages)
+   =================================================================== */
+
+.course-sidebar__part {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--text-muted);
+  margin: 18px 0 8px;
+  list-style: none;
+}
+
+.course-sidebar__module-link--planned {
+  color: var(--text-dim, #9CA3AF);
+  cursor: default;
+}
+
+.planned-tag {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-dim, #9CA3AF);
+  border: 1px dashed var(--border);
+  border-radius: 3px;
+  padding: 1px 5px;
+  vertical-align: middle;
+}
+
+.prereq-chips {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+
+.prereq-chips__label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--text-muted);
+}
+
+.prereq-chip {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-sec, #3D4455);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 3px 10px;
+  text-decoration: none;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+a.prereq-chip:hover {
+  border-color: var(--accent, #2D8ABF);
+  color: var(--accent, #2D8ABF);
+}
+
+.prereq-chip--planned {
+  color: var(--text-dim, #9CA3AF);
+  border-style: dashed;
+}
+
+/* Appendix disclosures — the math track's second layer (spine + appendix).
+   Same material at full rigour, honestly labelled, collapsed by default. */
+.appendix-box {
+  margin: 28px 0;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--text-dim, #9CA3AF);
+  border-radius: 6px;
+  background: var(--surface);
+}
+.appendix-box > summary {
+  cursor: pointer;
+  padding: 12px 18px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+  list-style: none;
+}
+.appendix-box > summary::-webkit-details-marker { display: none; }
+.appendix-box > summary::before {
+  content: '+';
+  display: inline-block;
+  width: 14px;
+  color: var(--text-dim, #9CA3AF);
+}
+.appendix-box[open] > summary::before { content: '−'; }
+.appendix-box__body {
+  padding: 4px 22px 18px;
+  border-top: 1px solid var(--border);
+}
+.appendix-box__body p { font-size: 0.95em; }
+
+/* Problem sets — primary assessment for the math track (conventions §4).
+   Collapsed card; opens into a one-problem-at-a-time browser. */
+.problem-set {
+  margin: 28px 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--card, #fff);
+  overflow: hidden;
+}
+.problem-set > summary {
+  cursor: pointer;
+  padding: 18px 22px;
+  list-style: none;
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  flex-wrap: wrap;
+  background: var(--surface);
+  transition: background 0.15s ease;
+}
+.problem-set > summary:hover { background: var(--elevated, #fff); }
+.problem-set > summary::-webkit-details-marker { display: none; }
+.problem-set__eyebrow {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--accent, #2D8ABF);
+}
+.problem-set__title {
+  font-weight: 700;
+  font-size: 1.05em;
+  color: var(--text, #0F1117);
+}
+.problem-set__title::after {
+  content: ' ▾';
+  font-size: 0.8em;
+  color: var(--text-dim, #9CA3AF);
+}
+.problem-set[open] .problem-set__title::after { content: ' ▴'; }
+.problem-set__meta {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+}
+.problem-set__body {
+  border-top: 1px solid var(--border);
+  padding: 18px 22px 0;
+}
+
+/* Numbered jump pills, tinted by problem type; a filled corner dot marks
+   problems whose solution has been seen. */
+.problem-set__pills {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+.problem-set__pill {
+  position: relative;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+}
+.problem-set__pill[data-tag="mechanical"] { border-bottom-color: var(--c-a, #1E45A0); }
+.problem-set__pill[data-tag="conceptual"] { border-bottom-color: var(--accent, #2D8ABF); }
+.problem-set__pill[data-tag="extension"]  { border-bottom-color: var(--c-b-deep, #2DA85A); }
+.problem-set__pill:hover { color: var(--text, #0F1117); }
+.problem-set__pill.is-active {
+  background: var(--accent, #2D8ABF);
+  border-color: var(--accent, #2D8ABF);
+  color: #fff;
+}
+.problem-set__pill.is-seen::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--c-b-deep, #2DA85A);
+  border: 2px solid var(--card, #fff);
+}
+
+/* The problem card */
+.problem-card {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--card, #fff);
+  padding: 22px 26px 20px;
+  box-shadow: 0 1px 6px rgba(15, 17, 23, 0.04);
+}
+.problem-card[data-tag="mechanical"] { border-left: 3px solid var(--c-a, #1E45A0); }
+.problem-card[data-tag="conceptual"] { border-left: 3px solid var(--accent, #2D8ABF); }
+.problem-card[data-tag="extension"]  { border-left: 3px solid var(--c-b-deep, #2DA85A); }
+.problem-card__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.problem-card__num {
+  font-family: var(--font-heading, inherit);
+  font-weight: 700;
+  font-size: 1.05em;
+  color: var(--text, #0F1117);
+}
+.problem-card__of {
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: 0.7em;
+  color: var(--text-dim, #9CA3AF);
+}
+.problem-tag {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  border-radius: 3px;
+  padding: 2px 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+.problem-tag[data-tag="mechanical"] { color: var(--c-a, #1E45A0); background: color-mix(in srgb, var(--c-a, #1E45A0) 9%, transparent); }
+.problem-tag[data-tag="conceptual"] { color: var(--accent, #2D8ABF); background: color-mix(in srgb, var(--accent, #2D8ABF) 10%, transparent); }
+.problem-tag[data-tag="extension"]  { color: var(--c-b-deep, #2DA85A); background: color-mix(in srgb, var(--c-b-deep, #2DA85A) 10%, transparent); }
+.problem-card__statement { line-height: 1.65; }
+.problem-card__statement p { margin-bottom: 0.6em; }
+.problem-card__actions { margin-top: 16px; }
+.problem-card__reveal {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  padding: 8px 18px;
+  border: 1px solid var(--accent, #2D8ABF);
+  border-radius: 5px;
+  background: transparent;
+  color: var(--accent, #2D8ABF);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.problem-card__reveal:hover {
+  background: var(--accent, #2D8ABF);
+  color: #fff;
+}
+.problem-card__solution {
+  margin-top: 16px;
+  padding: 14px 18px;
+  background: var(--surface);
+  border-left: 3px solid var(--c-b-deep, #2DA85A);
+  border-radius: 0 6px 6px 0;
+  font-size: 0.95em;
+}
+.problem-card__solution-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--c-b-deep, #2DA85A);
+  margin-bottom: 8px;
+}
+
+/* Footer nav */
+.problem-set__nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 14px 2px 18px;
+}
+.problem-set__nav-btn {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 6px 14px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--surface);
+  color: var(--text-sec, #3D4455);
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+.problem-set__nav-btn:hover:not(:disabled) {
+  border-color: var(--accent, #2D8ABF);
+  color: var(--accent, #2D8ABF);
+}
+.problem-set__nav-btn:disabled { opacity: 0.35; cursor: default; }
+.problem-set__legend {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.problem-set__legend-item {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.problem-set__legend-item::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+}
+.problem-set__legend-item[data-tag="mechanical"]::before { background: var(--c-a, #1E45A0); }
+.problem-set__legend-item[data-tag="conceptual"]::before { background: var(--accent, #2D8ABF); }
+.problem-set__legend-item[data-tag="extension"]::before  { background: var(--c-b-deep, #2DA85A); }

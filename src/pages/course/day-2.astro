@@ -1,5 +1,6 @@
 ﻿---
 import CourseLayout from '../../layouts/CourseLayout.astro';
+import modelPrices from '../../data/model-prices.json';
 
 const sections = [
   { id: 'post-training', label: 'Post-Training' },
@@ -399,7 +400,7 @@ const math = {
         first-hand how subjective &ldquo;better&rdquo; can be, especially
         on contested topics like immigration policy or causal
         inference methodology.
-      </p>
+       <a href="https://colab.research.google.com/github/Oxford-LLMs-Research/Intro-to-LLMs-for-Social-Science/blob/main/course_notebooks/day_2_models_to_tools/day2_from_models_to_tools.ipynb" target="_blank" rel="noopener">Open in Colab&nbsp;&rarr;</a></p>
     </div>
 
     <div class="key-takeaway">
@@ -657,7 +658,7 @@ const math = {
         political tweets. Exercise 6 demonstrates construct validity: the
         difference between classifying <em>sentiment</em> and classifying
         <em>stance</em>.
-      </p>
+       <a href="https://colab.research.google.com/github/Oxford-LLMs-Research/Intro-to-LLMs-for-Social-Science/blob/main/course_notebooks/day_2_models_to_tools/day2_from_models_to_tools.ipynb" target="_blank" rel="noopener">Open in Colab&nbsp;&rarr;</a></p>
     </div>
 
     <div class="course-note course-note--research">
@@ -930,7 +931,7 @@ const math = {
         prompting on the tweets that the model misclassified with direct
         prompting. You will see exactly which cases benefit from reasoning
         and which do not.
-      </p>
+       <a href="https://colab.research.google.com/github/Oxford-LLMs-Research/Intro-to-LLMs-for-Social-Science/blob/main/course_notebooks/day_2_models_to_tools/day2_from_models_to_tools.ipynb" target="_blank" rel="noopener">Open in Colab&nbsp;&rarr;</a></p>
     </div>
 
     <div class="key-takeaway">
@@ -1125,10 +1126,11 @@ const math = {
       <svg id="model-landscape-svg" viewBox="0 0 520 380" style="width: 100%; max-width: 520px; display: block; margin: 0 auto;"></svg>
       <p class="attention-explorer__insight" id="model-landscape-insight">
         Illustrative chart based on approximate positions from public
-        benchmarks and API pricing (early 2026). Model names, positions,
-        and costs change frequently. This chart shows the <em>structure</em>
-        of the landscape (frontier, open/closed clustering), not precise
-        coordinates. Always verify current data before choosing a model.
+        benchmarks and API pricing, as of <strong>{modelPrices.asOf}</strong>.
+        Model names, positions, and costs change frequently. This chart shows
+        the <em>structure</em> of the landscape (frontier, open/closed
+        clustering), not precise coordinates. Always verify current data
+        before choosing a model.
       </p>
     </div>
 
@@ -1274,7 +1276,7 @@ const math = {
         classification results and manually label 10 tweets. Module 3 walks
         you through computing inter-annotator agreement between you and
         the model: the start of a proper validation pipeline.
-      </p>
+       <a href="https://colab.research.google.com/github/Oxford-LLMs-Research/Intro-to-LLMs-for-Social-Science/blob/main/course_notebooks/day_2_models_to_tools/day2_from_models_to_tools.ipynb" target="_blank" rel="noopener">Open in Colab&nbsp;&rarr;</a></p>
     </div>
 
     <div class="course-note">
@@ -1316,6 +1318,10 @@ const math = {
        MODULE SUMMARY
        =================================================================== -->
   <section id="summary" class="opening-narrative">
+    <div class="key-takeaway">
+      <p class="key-takeaway__label">Go deeper · Advanced lecture</p>
+      <p><a href="/course/frontier/shavrina-evaluation/">Tatiana Shavrina: LLM Agents and Evaluation</a> extends this module with model judges, research-agent benchmarks, contamination, and a practical evaluation protocol.</p>
+    </div>
     <h2>Module Summary</h2>
     <p>
       This module traced the path from a raw language model to a usable
@@ -1373,37 +1379,7 @@ const math = {
 <!-- =================================================================== -->
 <style is:inline>
 /* â”€â”€ Shared component tokens â”€â”€ */
-.widget-eyebrow {
-  font-family: var(--font-mono, 'JetBrains Mono', monospace);
-  font-size: 0.7rem;
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--accent, #2D8ABF);
-  margin-bottom: 0.5rem;
-}
-.widget-title {
-  font-family: var(--font-display, 'Source Serif 4', Georgia, serif);
-  font-size: 1.35rem;
-  font-weight: 700;
-  color: var(--text, #1A1D27);
-  line-height: 1.25;
-  margin-bottom: 0.75rem;
-}
-.widget-intro {
-  font-size: 0.92rem;
-  color: var(--text-sec, #3D4455);
-  line-height: 1.65;
-  max-width: 620px;
-  margin-bottom: 1.5rem;
-}
-.widget-wrap {
-  margin: 2rem 0;
-  padding: 1.5rem;
-  background: var(--surface, #FFFFFF);
-  border: 1px solid var(--border, #E2E6EE);
-  border-radius: 12px;
-}
+/* .widget-wrap / -eyebrow / -title / -intro live in global.css */
 @keyframes widgetFadeUp {
   from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: translateY(0); }
@@ -2131,27 +2107,14 @@ const math = {
 </script>
 
 <!-- 6. MODEL LANDSCAPE CHART -->
-<script is:inline>
+<script is:inline define:vars={{ MODEL_DATA: modelPrices.capabilityCost }}>
 (function() {
   var svg = document.getElementById("model-landscape-svg");
   var insight = document.getElementById("model-landscape-insight");
   var explorer = document.getElementById("model-explorer");
   if (!svg || !explorer) return;
 
-  var models = [
-    { name: "Claude Opus 4.6", cap: 0.95, cost: 0.55, type: "closed" },
-    { name: "Claude Sonnet 4.6", cap: 0.89, cost: 0.32, type: "closed" },
-    { name: "GPT-5.4", cap: 0.94, cost: 0.38, type: "closed" },
-    { name: "GPT-5.2", cap: 0.90, cost: 0.28, type: "closed" },
-    { name: "Gemini 3.1 Pro", cap: 0.96, cost: 0.42, type: "closed" },
-    { name: "Gemini 2.5 Flash", cap: 0.78, cost: 0.05, type: "closed" },
-    { name: "DeepSeek V3.2", cap: 0.85, cost: 0.03, type: "open" },
-    { name: "DeepSeek R1", cap: 0.88, cost: 0.16, type: "open" },
-    { name: "Qwen 3.5", cap: 0.84, cost: 0.12, type: "open" },
-    { name: "Llama 4 Maverick", cap: 0.80, cost: 0.06, type: "open" },
-    { name: "Mistral Large", cap: 0.82, cost: 0.20, type: "open" },
-    { name: "GLM-5", cap: 0.86, cost: 0.14, type: "open" }
-  ];
+  var models = MODEL_DATA;
 
   var filter = "all";
 

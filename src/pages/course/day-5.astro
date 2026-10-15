@@ -5,6 +5,7 @@ const sections = [
   { id: 'agents', label: 'What Is an Agent?' },
   { id: 'react', label: 'The ReAct Pattern' },
   { id: 'failure-modes', label: 'Failure Modes' },
+  { id: 'evaluating-agents', label: 'Evaluating Agents' },
   { id: 'production', label: 'From Notebooks to Production' },
   { id: 'summary', label: 'Module Summary' },
 ];
@@ -50,7 +51,8 @@ const sections = [
         <li>Explain how an LLM agent works: tools, system prompt, parser, and execution loop.</li>
         <li>Build a ReAct agent that alternates between reasoning and tool use, and trace its decision-making step by step.</li>
         <li>Identify the four failure modes specific to agents (hallucination on missing data, format drift, redundant loops, cascading errors) and implement safeguards for each.</li>
-        <li>Evaluate agent output using provenance verification, connecting back to the faithfulness checks from <a href="/course/day-4">Module 4</a>.</li>
+        <li>Evaluate agent runs by outcome <em>and</em> by trajectory, connecting back to the faithfulness checks from <a href="/course/day-4">Module 4</a>.</li>
+        <li>Decide when an agent is the wrong design &mdash; and where the autonomy line sits in a research workflow.</li>
         <li>Use production tools (Codespaces, Claude Code, MCP) to move from notebook prototypes to real research workflows.</li>
       </ol>
     </div>
@@ -167,7 +169,7 @@ const sections = [
         to answer a research question, writing out the Thought / Action /
         Observation sequence by hand. Exercise 1b has you test each tool
         individually before putting them in the loop.
-      </p>
+       <a href="https://colab.research.google.com/github/Oxford-LLMs-Research/Intro-to-LLMs-for-Social-Science/blob/main/course_notebooks/day_5_agents/day5_agentic_workflows.ipynb" target="_blank" rel="noopener">Open in Colab&nbsp;&rarr;</a></p>
     </div>
   </section>
 
@@ -197,6 +199,51 @@ const sections = [
       for the wrong thing? Did it misinterpret a tool result? Did it
       synthesize correctly but from incomplete evidence?
     </p>
+
+    <div class="visual-diagram">
+      <svg viewBox="0 0 460 340" width="460" height="340" xmlns="http://www.w3.org/2000/svg" style="max-width: 100%; height: auto; font-family: var(--font-body, Inter, system-ui, sans-serif); font-size: 11px;">
+        <!-- Thought -->
+        <rect x="150" y="30" width="140" height="40" rx="6" style="fill: var(--blue-9, #D5F5FD); stroke: var(--blue-2, #2272A8);" stroke-width="1.5"/>
+        <text x="220" y="47" text-anchor="middle" style="fill: var(--blue-0, #1E3A5F);" font-weight="600">Thought</text>
+        <text x="220" y="62" text-anchor="middle" style="fill: var(--text-muted, #6B7280);" font-size="9">what do I need next?</text>
+        <line x1="220" y1="70" x2="220" y2="140" style="stroke: var(--text-dim, #9CA3AF);" stroke-width="1.5" marker-end="url(#d5reactArr)"/>
+        <!-- Action -->
+        <rect x="150" y="140" width="140" height="40" rx="6" style="fill: var(--blue-8, #B0ECF9); stroke: var(--blue-1, #1E5A8A);" stroke-width="1.5"/>
+        <text x="220" y="157" text-anchor="middle" style="fill: var(--blue-0, #1E3A5F);" font-weight="600">Action</text>
+        <text x="220" y="172" text-anchor="middle" style="fill: var(--text-muted, #6B7280);" font-size="9">a tool call</text>
+        <!-- Tools -->
+        <rect x="360" y="140" width="80" height="40" rx="6" style="fill: var(--surface, #F2F4F8); stroke: var(--border, #E2E6EE);" stroke-width="1.5"/>
+        <text x="400" y="164" text-anchor="middle" style="fill: var(--text-muted, #6B7280);" font-weight="600">Tools</text>
+        <line x1="290" y1="152" x2="360" y2="152" style="stroke: var(--text-dim, #9CA3AF);" stroke-width="1.5" marker-end="url(#d5reactArr)"/>
+        <text x="325" y="144" text-anchor="middle" style="fill: var(--text-muted, #6B7280);" font-size="9">call</text>
+        <path d="M 400,180 L 400,268 L 292,268" fill="none" style="stroke: var(--text-dim, #9CA3AF);" stroke-width="1.5" marker-end="url(#d5reactArr)"/>
+        <text x="352" y="260" text-anchor="middle" style="fill: var(--text-muted, #6B7280);" font-size="9">result</text>
+        <!-- Observation -->
+        <rect x="150" y="248" width="140" height="40" rx="6" style="fill: var(--blue-9, #D5F5FD); stroke: var(--blue-2, #2272A8);" stroke-width="1.5"/>
+        <text x="220" y="265" text-anchor="middle" style="fill: var(--blue-0, #1E3A5F);" font-weight="600">Observation</text>
+        <text x="220" y="280" text-anchor="middle" style="fill: var(--text-muted, #6B7280);" font-size="9">what came back</text>
+        <!-- Loop back -->
+        <path d="M 150,268 C 60,268 60,50 150,50" fill="none" style="stroke: var(--accent-hover, #3BA3D4);" stroke-width="1.5" marker-end="url(#d5reactArrB)"/>
+        <text x="48" y="160" text-anchor="middle" style="fill: var(--accent-hover, #3BA3D4);" font-size="9" transform="rotate(-90, 48, 160)">repeat until done</text>
+        <!-- Final answer -->
+        <path d="M 290,44 L 340,44" fill="none" style="stroke: var(--accent, #2D8ABF);" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#d5reactArrC)"/>
+        <text x="315" y="34" text-anchor="middle" style="fill: var(--accent, #2D8ABF);" font-size="9">enough info?</text>
+        <rect x="340" y="26" width="104" height="36" rx="6" style="fill: var(--accent-bg, #EBF7FD); stroke: var(--accent, #2D8ABF);" stroke-width="1.5"/>
+        <text x="392" y="48" text-anchor="middle" style="fill: var(--blue-0, #1E3A5F);" font-weight="600">Final answer</text>
+        <text x="150" y="322" style="fill: var(--text-dim, #9CA3AF);" font-size="10">The loop runs until the model can answer &#8212; or hits a step limit.</text>
+        <defs>
+          <marker id="d5reactArr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" style="fill: var(--text-dim, #9CA3AF)"/></marker>
+          <marker id="d5reactArrB" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" style="fill: var(--accent-hover, #3BA3D4)"/></marker>
+          <marker id="d5reactArrC" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" style="fill: var(--accent, #2D8ABF)"/></marker>
+        </defs>
+      </svg>
+      <p class="visual-diagram__caption">
+        The ReAct loop. Each cycle produces a thought, an action against a
+        tool, and an observation of the result, which feeds the next thought.
+        The dashed exit runs whenever the model judges it has enough &#8212;
+        and the step limit is the safeguard for when it never does.
+      </p>
+    </div>
 
     <h3>The Three Components</h3>
     <p>
@@ -322,7 +369,7 @@ const sections = [
         system prompt. Exercise 2b has you build the agent loop. Exercise
         2c runs the agent on real research questions so you can watch it
         reason, act, and synthesize in real time.
-      </p>
+       <a href="https://colab.research.google.com/github/Oxford-LLMs-Research/Intro-to-LLMs-for-Social-Science/blob/main/course_notebooks/day_5_agents/day5_agentic_workflows.ipynb" target="_blank" rel="noopener">Open in Colab&nbsp;&rarr;</a></p>
     </div>
   </section>
 
@@ -478,7 +525,7 @@ const sections = [
         designed to trigger failure modes. Exercise 2e has you pick one
         safeguard and implement it: minimum evidence rules, step budget
         awareness, or post-hoc source verification.
-      </p>
+       <a href="https://colab.research.google.com/github/Oxford-LLMs-Research/Intro-to-LLMs-for-Social-Science/blob/main/course_notebooks/day_5_agents/day5_agentic_workflows.ipynb" target="_blank" rel="noopener">Open in Colab&nbsp;&rarr;</a></p>
     </div>
 
     <div class="key-takeaway">
@@ -502,7 +549,164 @@ const sections = [
   </section>
 
   <!-- ===================================================================
-       SECTION 4: FROM NOTEBOOKS TO PRODUCTION
+       SECTION 4: EVALUATING AGENTS
+       =================================================================== -->
+  <section id="evaluating-agents">
+    <div class="key-takeaway">
+      <p class="key-takeaway__label">Go deeper · Advanced lecture</p>
+      <p><a href="/course/frontier/shavrina-evaluation/">Tatiana Shavrina: LLM Agents and Evaluation</a> explores how scaffolds, task distributions, and repeated runs shape evidence about agent capabilities.</p>
+    </div>
+    <h2>Evaluating Agents</h2>
+    <p>
+      Every method in this course arrived with an evaluation protocol:
+      classification got Cohen&rsquo;s &kappa; and a validation sample
+      (<a href="/course/day-3">Module 3</a>), extraction got faithfulness
+      checks, RAG got separate retrieval and generation metrics
+      (<a href="/course/day-4">Module 4</a>). Agents are the hardest case,
+      because the thing you built does not just produce an answer &mdash;
+      it chooses its own path to the answer. Evaluating only the answer
+      leaves the path unexamined, and the path is where agents fail.
+    </p>
+
+    <h3>Trajectories, Not Just Outcomes</h3>
+    <p>
+      An agent can reach the right answer for the wrong reasons. It can
+      skip the literature search, hallucinate a plausible summary, and
+      happen to be correct; it can retrieve the wrong documents and be
+      rescued by the model&rsquo;s background knowledge. On a ten-question
+      demo, this looks like success. At scale, on questions where you
+      cannot check by eye, the same behaviour is silent fabrication.
+      Outcome accuracy alone cannot tell these cases apart.
+    </p>
+    <p>
+      The fix is <strong>trajectory review</strong>: reading the full
+      Thought&thinsp;/&thinsp;Action&thinsp;/&thinsp;Observation trace
+      against a short rubric, the same way you read a coder&rsquo;s
+      reasoning in qualitative work. Three questions cover most of it.
+      Did the agent take a defensible path &mdash; the tools a competent
+      research assistant would have chosen, in a sensible order? Is every
+      claim in the final answer grounded in an observation actually
+      returned by a tool, rather than imported from the model&rsquo;s
+      prior knowledge? And did it stop for the right reason &mdash;
+      because it had enough evidence, not because it hit the step limit?
+    </p>
+    <p>
+      Two practices make this manageable at research scale. First, keep a
+      <strong>fixed task battery</strong>: a set of questions with known
+      answers and known-good trajectories, re-run after <em>any</em>
+      change to the prompt, the model, or the tools. An agent is a
+      pipeline, and pipelines regress; the battery is your regression
+      test. Second, track <strong>cost per episode</strong> alongside
+      accuracy. Two agents with equal accuracy are not equal if one takes
+      three tool calls and the other takes nineteen &mdash; and a rising
+      average step count is often the first visible symptom of a prompt
+      change that broke something subtle.
+    </p>
+
+    <div class="stop-and-think">
+      <div class="stop-and-think__header">
+        <svg class="stop-and-think__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+        <span class="stop-and-think__label">Stop and Think</span>
+      </div>
+      <p>
+        Your agent answers a question correctly, but its trace shows it
+        never ran the search tool &mdash; the answer came entirely from
+        the model&rsquo;s parametric knowledge. Does this count as a
+        success? What would you need to believe about the next hundred
+        questions for that answer to be trustworthy?
+      </p>
+      <details>
+        <summary>Reveal</summary>
+        <div>
+          <p>
+            It is a failure dressed as a success. The workflow you designed
+            &mdash; search, then ground the answer in what was found &mdash;
+            did not run; you got a lucky draw from the model&rsquo;s
+            training data instead. Trusting the next hundred questions
+            means believing the model&rsquo;s background knowledge is
+            complete and current for your entire domain, which is exactly
+            the assumption RAG and tool use exist to avoid. Grounding
+            failures with correct answers are the most dangerous kind,
+            because outcome metrics will never surface them.
+          </p>
+        </div>
+      </details>
+    </div>
+
+    <h3>Orchestration: When Not to Use an Agent</h3>
+    <p>
+      There is a spectrum between the fixed pipelines of
+      <a href="/course/day-3">Module 3</a> and the free agent of this
+      module, and most research work belongs somewhere on it. Three
+      patterns cover the practical range. A <strong>fixed pipeline</strong>
+      calls the model at predetermined steps &mdash; classify, then
+      extract, then verify &mdash; with control flow you wrote and can
+      audit. A <strong>generator&ndash;judge</strong> design adds a second
+      model call that checks the first&rsquo;s output against the source
+      before it is accepted: a quality gate, not an autonomous loop. A
+      full <strong>agent</strong> lets the model write the control flow
+      itself at runtime.
+    </p>
+    <p>
+      The useful heuristic: <strong>an agent is a pipeline that writes
+      itself &mdash; so if you can write the pipeline in advance, write
+      it.</strong> A fixed pipeline is cheaper (no reasoning tokens spent
+      deciding what to do), reproducible (the same input takes the same
+      path every run), and auditable (a reviewer can read your control
+      flow as code). Reserve genuine autonomy for tasks where the path
+      honestly varies item by item &mdash; a literature search whose next
+      query depends on what the last one found &mdash; and even then,
+      constrain it: a small tool set, a tight step limit, and a judge at
+      the end. Autonomy is a cost you pay for flexibility, not a feature
+      to maximise.
+    </p>
+
+    <h3>The Autonomy Line</h3>
+    <p>
+      Every agentic research workflow needs an explicit answer to one
+      question: <strong>what may run unattended, and what may not?</strong>
+      On the safe side of the line sit tasks whose failures are cheap and
+      checkable &mdash; reformatting, deduplication, retrieval, first-pass
+      screening that a human will review anyway. On the far side sits
+      anything that enters the paper: reported quantities, sampled cases,
+      substantive interpretations. The rule from
+      <a href="/course/day-3">Module 3</a> does not soften because the
+      pipeline became autonomous &mdash; the agent is another coder, and
+      no coder&rsquo;s output enters your results unvalidated.
+    </p>
+    <p>
+      Treat the line as a design decision you write down, like a codebook
+      rule: which steps run unattended, which require review, and what
+      the validation plan is for anything the agent touched. A reviewer
+      who asks &ldquo;how do you know the agent did this correctly?&rdquo;
+      should get the same quality of answer as one asking about a human
+      research assistant &mdash; a protocol, a sample, an agreement
+      statistic, not reassurance.
+    </p>
+
+    <div class="key-takeaway">
+      <p class="key-takeaway__label">Key Takeaway</p>
+      <p>
+        Evaluate the path, not just the answer: trajectory review, a fixed
+        regression battery, and per-episode cost tracking are the agent
+        equivalents of the validation protocol you built in Module 3.
+        Prefer the least autonomy that does the job &mdash; and wherever
+        the agent&rsquo;s output enters your findings, it is another
+        coder, subject to the same validation as any other.
+      </p>
+    </div>
+
+    <h3>Resources</h3>
+    <ul class="resource-list">
+      <li><a href="https://arxiv.org/abs/2407.01502" target="_blank" rel="noopener">Kapoor et al. (2024), <em>AI Agents That Matter</em></a>: argues that agent benchmarks overstate capability by ignoring cost and reproducibility &mdash; the evaluation stance this section takes.</li>
+      <li><a href="https://arxiv.org/abs/2308.03688" target="_blank" rel="noopener">Liu et al. (2023), <em>AgentBench: Evaluating LLMs as Agents</em></a>: systematic multi-environment agent evaluation, and a template for building task batteries.</li>
+    </ul>
+  </section>
+
+  <!-- ===================================================================
+       SECTION 5: FROM NOTEBOOKS TO PRODUCTION
        =================================================================== -->
   <section id="production">
     <h2>From Notebooks to Production</h2>
@@ -748,11 +952,7 @@ claude</pre>
 <!-- COMPONENT STYLES                                                    -->
 <!-- =================================================================== -->
 <style is:inline>
-/* â”€â”€ Shared widget tokens â”€â”€ */
-.widget-wrap { margin: 2rem 0; padding: 1.5rem; background: var(--surface, #FFFFFF); border: 1px solid var(--border, #E2E6EE); border-radius: 12px; }
-.widget-eyebrow { font-family: var(--font-mono, 'JetBrains Mono', monospace); font-size: 0.7rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent, #2D8ABF); margin-bottom: 0.5rem; }
-.widget-title { font-family: var(--font-display, 'Source Serif 4', Georgia, serif); font-size: 1.35rem; font-weight: 700; color: var(--text, #1A1D27); line-height: 1.25; margin-bottom: 0.75rem; }
-.widget-intro { font-size: 0.92rem; color: var(--text-sec, #3D4455); line-height: 1.65; max-width: 620px; margin-bottom: 1.5rem; }
+/* .widget-wrap / -eyebrow / -title / -intro live in global.css */
 
 /* â”€â”€ ReAct loop â”€â”€ */
 .rl__question { background: var(--surface-alt, #F5F5F0); border: 1px solid var(--border, #E2E6EE); border-radius: 8px; padding: 0.85rem 1.15rem; margin-bottom: 1.5rem; }

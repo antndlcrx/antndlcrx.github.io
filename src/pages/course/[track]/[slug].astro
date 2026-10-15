@@ -1,0 +1,24 @@
+---
+import { getCollection, render } from 'astro:content';
+import CourseLayout from '../../../layouts/CourseLayout.astro';
+import { assertContentIntegrity } from '../../../lib/content-checks';
+
+export async function getStaticPaths() {
+  const modules = await getCollection('modules');
+  assertContentIntegrity(modules);
+  // Planned modules have records (for sidebars and prerequisite chips) but no pages.
+  return modules
+    .filter((entry) => entry.data.status !== 'planned')
+    .map((entry) => {
+      const [track, ...rest] = entry.id.split('/');
+      return { params: { track, slug: rest.join('/') }, props: { entry } };
+    });
+}
+
+const { entry } = Astro.props;
+const { Content, headings } = await render(entry);
+---
+
+<CourseLayout entry={entry} headings={headings}>
+  <Content />
+</CourseLayout>

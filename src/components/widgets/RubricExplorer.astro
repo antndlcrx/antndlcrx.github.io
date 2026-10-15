@@ -1,0 +1,78 @@
+---
+const criteria = [
+  { points: 4, text: 'Recognises that the information supplied is insufficient for a confident conclusion.' },
+  { points: 3, text: 'Asks for the missing information that would change the answer.' },
+  { points: 3, text: 'Explains uncertainty in plain language.' },
+  { points: -6, text: 'Invents a supporting fact or reference.' },
+];
+---
+<div class="widget-wrap" id="rubric-explorer">
+  <p class="widget-eyebrow">When evidence is missing</p>
+  <p class="widget-title">How a rubric accounts for useful and unsupported claims</p>
+  <p class="widget-intro">The three responses below answer the same title-only article question with different combinations of useful and unsupported claims. Selecting a response shows how its behaviours contribute to the score; the checkboxes allow you to explore other combinations. Oxford LLMs invented the example, criteria, and weights to explain rubric scoring, rather than reproduce a HealthBench case or clinical assessment.</p>
+  <div class="rubric-presets" role="group" aria-label="Illustrative response behaviours">
+    <button type="button" data-preset="0">Confident but unsupported</button>
+    <button type="button" data-preset="1">Careful and useful</button>
+    <button type="button" data-preset="2">Careful, with an invented fact</button>
+  </div>
+  <div class="rubric-vignette">
+    <p><strong>Invented question:</strong> “This health article supports my conclusion, doesn’t it?” Only the article’s title has been supplied.</p>
+    <p><strong>Example response:</strong> <span id="rubric-response">“Yes, your conclusion is confirmed. A 2024 review of 12 trials supports it.”</span></p>
+    <p class="rubric-vignette__note" id="rubric-response-note">The example invents a review and claims confirmation without seeing the article. Its confident style earns no rubric points.</p>
+  </div>
+  <fieldset><legend>Behaviours present in the answer</legend>
+    {criteria.map((criterion, i) => <label><input type="checkbox" data-points={criterion.points} checked={i === 3} /><span>{criterion.text}</span><strong>{criterion.points > 0 ? '+' : ''}{criterion.points}</strong></label>)}
+  </fieldset>
+  <div class="rubric-result" aria-live="polite" aria-atomic="true"><strong id="rubric-score">−60%</strong><p id="rubric-equation">−6 ÷ 10 positive points = −60%</p></div>
+  <p class="visual-diagram__caption">The raw rubric score adds the weights of all met criteria, including any negative penalties, and divides by the total available positive weight (+10 here), allowing a score below zero. The <a href="https://github.com/openai/simple-evals/blob/main/healthbench_eval.py">HealthBench evaluator</a> uses this signed calculation per response and clips the aggregated mean to [0, 1]. This illustration shows the raw weighted score, whose percentage does not represent a share of correct medical answers.</p>
+  <noscript><p>The unsupported example incurs −6 out of 10 possible positive points. Meeting all positive criteria without that penalty gives 100%.</p></noscript>
+</div>
+<script>
+  const root = document.getElementById('rubric-explorer');
+  if (root) {
+    const boxes = [...root.querySelectorAll<HTMLInputElement>('input')];
+    const presets = [[false, false, false, true], [true, true, true, false], [true, true, true, true]];
+    const responses = [
+      '“Yes, your conclusion is confirmed. A 2024 review of 12 trials supports it.”',
+      '“I cannot tell from the title alone. Could you share the article’s findings and methods? Whether it supports your conclusion depends on what was measured and how.”',
+      '“I cannot tell from the title alone. Could you share the findings and methods? Whether they support your conclusion depends on the evidence. A 2024 review of 12 trials agrees with you.”',
+    ];
+    const notes = [
+      'The example invents a review and claims confirmation without seeing the article. Its confident style earns no rubric points.',
+      'The response acknowledges missing evidence, requests relevant information and explains uncertainty without inventing support.',
+      'The response meets all three positive criteria, but still invents a review. The penalty remains even in an otherwise careful answer.',
+    ];
+    const update = () => {
+      const points = boxes.reduce((sum, box) => sum + (box.checked ? Number(box.dataset.points) : 0), 0);
+      root.querySelector('#rubric-score')!.textContent = `${points * 10}%`;
+      root.querySelector('#rubric-equation')!.textContent = `${points} ÷ 10 positive points = ${points * 10}%`;
+      root.querySelectorAll<HTMLButtonElement>('button').forEach(button => button.setAttribute('aria-pressed', String(presets[Number(button.dataset.preset)].every((value, i) => value === boxes[i].checked))));
+    };
+    boxes.forEach(box => box.addEventListener('change', () => { update(); root.querySelector('#rubric-response-note')!.textContent = 'You are now exploring a custom set of behaviours; the example wording above has not changed.'; }));
+    root.querySelectorAll<HTMLButtonElement>('button').forEach(button => button.addEventListener('click', () => {
+      const index = Number(button.dataset.preset);
+      presets[index].forEach((value, i) => boxes[i].checked = value);
+      root.querySelector('#rubric-response')!.textContent = responses[index];
+      root.querySelector('#rubric-response-note')!.textContent = notes[index];
+      update();
+    }));
+    update();
+  }
+</script>
+<style>
+  .rubric-presets { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0; }
+  button { background: transparent; color: var(--text); border: 1px solid var(--border); padding: 9px 12px; border-radius: 6px; font: inherit; font-size: 12px; cursor: pointer; }
+  button[aria-pressed="true"] { border-color: var(--c-a); background: var(--border-lt); }
+  button:focus-visible, input:focus-visible { outline: 2px solid var(--c-a); outline-offset: 3px; }
+  fieldset { border: 0; padding: 0; margin: 22px 0; min-width: 0; }
+  .rubric-vignette { border-left: 3px solid var(--c-a); padding: 2px 0 2px 16px; margin: 20px 0; }
+  .rubric-vignette p { font-size: 13px; margin: 8px 0; }
+  .rubric-vignette .rubric-vignette__note { font-size: 11px; color: var(--text-sec); }
+  legend { font-size: 12px; font-weight: 600; margin-bottom: 12px; }
+  label { display: grid; grid-template-columns: 18px minmax(0, 1fr) 30px; gap: 12px; align-items: start; font-size: 13px; padding: 12px 0; border-top: 1px solid var(--border-lt); cursor: pointer; }
+  input { accent-color: var(--c-a); margin-top: 4px; }
+  label strong { font-family: var(--font-mono); text-align: right; }
+  .rubric-result { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: center; margin: 24px 0; }
+  .rubric-result > strong { font: 600 32px var(--font-mono); color: var(--c-a); }
+  .rubric-result p { font: 11px var(--font-mono); }
+</style>
