@@ -7,9 +7,9 @@ const criteria = [
 ];
 ---
 <div class="widget-wrap" id="rubric-explorer">
-  <p class="widget-eyebrow">Interactive · Oxford LLMs illustration</p>
-  <p class="widget-title">Fluent does not mean well scored.</p>
-  <p class="widget-intro">Imagine a health-information answer written with incomplete evidence. Mark which behaviours appear in it. The weights and criteria here are invented to explain rubric scoring; this is not a HealthBench case or a clinical assessment.</p>
+  <p class="widget-eyebrow">When evidence is missing</p>
+  <p class="widget-title">How a rubric accounts for useful and unsupported claims</p>
+  <p class="widget-intro">The three responses below answer the same title-only article question with different combinations of useful and unsupported claims. Selecting a response shows how its behaviours contribute to the score; the checkboxes allow you to explore other combinations. Oxford LLMs invented the example, criteria, and weights to explain rubric scoring, rather than reproduce a HealthBench case or clinical assessment.</p>
   <div class="rubric-presets" role="group" aria-label="Illustrative response behaviours">
     <button type="button" data-preset="0">Confident but unsupported</button>
     <button type="button" data-preset="1">Careful and useful</button>
@@ -24,7 +24,7 @@ const criteria = [
     {criteria.map((criterion, i) => <label><input type="checkbox" data-points={criterion.points} checked={i === 3} /><span>{criterion.text}</span><strong>{criterion.points > 0 ? '+' : ''}{criterion.points}</strong></label>)}
   </fieldset>
   <div class="rubric-result" aria-live="polite" aria-atomic="true"><strong id="rubric-score">−60%</strong><p id="rubric-equation">−6 ÷ 10 positive points = −60%</p></div>
-  <p class="visual-diagram__caption">A met negative criterion is a penalty. The raw rubric score sums all met criteria, then divides by the total available positive weight (+10 here). It can be negative. The <a href="https://github.com/openai/simple-evals/blob/main/healthbench_eval.py">HealthBench evaluator</a> uses this signed calculation per response and clips the aggregated mean to [0, 1]; our display deliberately shows the raw illustration. A percentage here is a weighted score, not the share of medical answers that are correct.</p>
+  <p class="visual-diagram__caption">The raw rubric score adds the weights of all met criteria, including any negative penalties, and divides by the total available positive weight (+10 here), allowing a score below zero. The <a href="https://github.com/openai/simple-evals/blob/main/healthbench_eval.py">HealthBench evaluator</a> uses this signed calculation per response and clips the aggregated mean to [0, 1]. This illustration shows the raw weighted score, whose percentage does not represent a share of correct medical answers.</p>
   <noscript><p>The unsupported example incurs −6 out of 10 possible positive points. Meeting all positive criteria without that penalty gives 100%.</p></noscript>
 </div>
 <script>

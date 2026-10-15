@@ -7,9 +7,9 @@ const slices = [
 ];
 ---
 <div class="widget-wrap" id="healthbench-slices" data-slices={JSON.stringify(slices)}>
-  <p class="widget-eyebrow">Explore the evidence · lecture snapshot</p>
-  <p class="widget-title">One domain. Three different failure modes.</p>
-  <p class="widget-intro">Choose a slice to compare the reported error rates. Every view uses the same 0–25% scale; lower is better.</p>
+  <p class="widget-eyebrow">HealthBench · 2025 results</p>
+  <p class="widget-title">Comparing three kinds of health-conversation error</p>
+  <p class="widget-intro">Each slice examines a different kind of error in health conversations. Selecting one shows the reported rates for that slice on a shared 0–25% scale, with lower values indicating better performance.</p>
   <div class="slice-controls" role="group" aria-label="HealthBench failure slice">
     {slices.map((slice, i) => <button type="button" data-slice={i} aria-pressed={i === 0}>{slice.name}</button>)}
   </div>

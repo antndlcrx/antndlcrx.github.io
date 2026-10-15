@@ -2,9 +2,9 @@
 /** Synthetic teaching example: each system's within-group accuracy stays fixed. */
 ---
 <div class="widget-wrap" id="evaluation-mix">
-  <p class="widget-eyebrow">Interactive · illustrative data</p>
-  <p class="widget-title">Change the test set. Change the winner.</p>
-  <p class="widget-intro">Two systems classify survey answers. System A gets 90% of explicit answers right but only 50% of ambiguous answers. System B gets 80% of each right. Predict when their overall ranking will reverse.</p>
+  <p class="widget-eyebrow">Survey-response classification</p>
+  <p class="widget-title">How the task mix changes the ranking</p>
+  <p class="widget-intro">Two systems classify survey answers with different strengths: A gets 90% of explicit answers right and 50% of ambiguous answers, while B gets 80% of each right. Adjusting the proportion of explicit answers changes their overall scores while keeping these within-group accuracies fixed.</p>
   <label for="eval-mix">Explicit answers in the test set <output id="eval-mix-value" for="eval-mix">80%</output></label>
   <input id="eval-mix" type="range" min="0" max="100" step="5" value="80" />
   <div class="mix-scale"><span>All ambiguous</span><span>All explicit</span></div>
@@ -14,7 +14,7 @@
     <p id="eval-verdict">System A leads by 2 percentage points.</p>
     <p id="eval-calculation">A: 0.80 × 90% + 0.20 × 50% = 82%. B: 80% in either group.</p>
   </div>
-  <p class="visual-diagram__caption">The systems never change. Only the population being measured changes. The scores tie when 75% of answers are explicit; below that, B leads. These are invented rates to explain task mix, with no sampling uncertainty modelled.</p>
+  <p class="visual-diagram__caption">Because the systems' within-group performance stays fixed, the change in ranking comes entirely from the mix of answers being measured. The scores tie at 75% explicit answers, with B leading below that point. These rates are invented to illustrate task mix, without modelling sampling uncertainty.</p>
   <noscript><p>At 20% explicit answers, A scores 58% and B scores 80%. At 80% explicit answers, A scores 82% and B scores 80%.</p></noscript>
 </div>
 <script>

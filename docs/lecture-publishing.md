@@ -11,7 +11,7 @@ The collection at `/course/lectures/` extends the core course. Lecture pages use
 - Notes are an editorial companion based on the slides, not a recording transcript. The rubric responses, interactive task-mix example and practical evaluation record are Oxford LLMs additions. The HealthBench interactive chart transcribes historical slide 38 results. This lecture has no problem set.
 - Current benchmark views load on request: official SWE-bench and LiveCodeBench pages in sandboxed frames; AIRS-Bench's public README leaderboard fetched into an accessible table. Source links remain visible when external services fail. Fetch time and author-supplied result dates are distinct. The current AIRS source can cover different systems from the lecture's historical comparison.
 - The three writer/critic rounds and technical verification are recorded in `shavrina-editorial-review.md`.
-- Recording and final thumbnail are still needed. No video duration, captions, or chapter timestamps have been inferred from slide numbers.
+- Recording connected: https://youtu.be/D4S0LhgKgb8 (currently unlisted, as supplied by the team). The uploaded YouTube thumbnail was saved at 1280 × 720 to `public/img/lectures/2026/shavrina-evaluation.jpg` on 15 October 2026. Update that asset if the YouTube artwork changes. No video duration, captions, or chapter timestamps have been inferred from slide numbers.
 
 ## Connect the recording
 

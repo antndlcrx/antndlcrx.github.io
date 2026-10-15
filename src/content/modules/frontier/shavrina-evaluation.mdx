@@ -18,8 +18,8 @@ speakerRole: Research Scientist Manager, Meta
 speakerImage: /img/speakers/tatiana_shavrina.jpg
 edition: 2026
 slides: /materials/lectures/2026/shavrina-llm-agents-and-evaluation.pdf
-# Add video: https://www.youtube.com/watch?v=VIDEO_ID once the upload is ready.
-# Add thumbnail: /img/lectures/2026/shavrina-evaluation.jpg when the artwork is ready.
+video: https://youtu.be/D4S0LhgKgb8
+thumbnail: /img/lectures/2026/shavrina-evaluation.jpg
 ---
 
 import EvaluationMix from '../../../components/widgets/EvaluationMix.astro';
@@ -30,86 +30,84 @@ import LectureSlide from '../../../components/LectureSlide.astro';
 
 ## Start here
 
-An LLM gives a warm, confident answer to a health question. A reader prefers it to a more cautious
-response. Yet it invents supporting evidence, accepts a mistaken premise, or assumes access to
-care the reader does not have. The preference is real. **What claim about the system does that
-preference actually support?**
+In the invented example used below, a reader sends an assistant the title of a health article
+and asks whether it supports a conclusion they have already reached. One response confidently
+agrees and cites a review of twelve trials that does not exist; another asks to see the article's
+findings and methods before drawing a conclusion. The first may feel more helpful because it
+offers a clear answer, but its reassurance rests on evidence the assistant does not have.
+Understanding why a reader might prefer it is a useful part of evaluation, alongside examining
+whether the response can support what it claims.
 
-The same question applies to human judgements, medical benchmarks, and agents that conduct
-machine-learning experiments. As the work becomes more consequential and more autonomous, “Which model is
-best?” becomes a question about the task, the evidence, and the conditions under which it was collected.
+This distinction matters throughout LLM evaluation, from rating an assistant's responses to testing
+an agent that runs machine-learning experiments. **A score is evidence for a particular claim under
+a particular evaluation setup.** Understanding that setup means knowing what the system was asked
+to do, how its work was judged, and which failures the test could reveal.
 
-**An Oxford LLMs teaching companion to Tatiana Shavrina's lecture.** The explanations and added
-illustrations are ours; the [original presentation](/materials/lectures/2026/shavrina-llm-agents-and-evaluation.pdf)
-is Tatiana's. Reproduced figures retain their historical results, while current source views are
-labelled separately. PDF references use page numbers.
-
-The central idea is that **a score is evidence for a particular claim under a particular evaluation
-setup**. Evaluation has four distinct axes: human likeability, safety, broad base capabilities,
-and professional or complex-task capabilities. Their differences become clear across three
-increasingly demanding settings: an answer someone likes, a health conversation that meets
-professional standards, and an agent that produces a usable research result.
+A useful framework separates human likeability, safety, broad base capabilities, and professional
+or complex-task capabilities. These dimensions overlap, but each needs its own evidence. Comparing
+preferred answers, evaluating health conversations, and testing research agents shows how the
+requirements change as systems take on more demanding work.
 
 <LectureSlide page={6} caption="Four axes of evaluation, from Tatiana Shavrina's original presentation." />
 
-For background, the core course introduces [Evaluating & Choosing Models](/course/day-2/#evaluating)
-and [Agentic Workflows](/course/day-5/#agents). This page extends both; no code is needed.
+The core course introduces the background in [Evaluating & Choosing Models](/course/day-2/#evaluating)
+and [Agentic Workflows](/course/day-5/#agents). The examples here develop those ideas further and
+can be followed without code.
 
 ## Preference: a useful signal with a limited claim
 
-In a pairwise evaluation, a person sees two responses to the same prompt and chooses one.
-Many such comparisons estimate relative preference across sampled prompts and participating raters.
-Chatbot Arena uses this approach: the result captures what people
-choose in that setting, which can be valuable when evaluating an assistant's overall experience.
+Pairwise evaluation gives preference a concrete form: a person sees two responses to the same
+prompt and chooses one. Combining many such comparisons produces an estimate of relative
+preference across the sampled prompts and participating raters. Chatbot Arena uses this approach
+to compare assistants, capturing aspects of the experience that a narrowly defined task metric
+might miss.
 
-The limitation appears when we quietly replace “preferred” with “correct” or “reliable.”
-Formatting, fluency, length, and confidence can affect a choice. A reader may also lack the
-expertise or source material needed to detect an error. Likeability and
-task performance need separate evidence, even when they often move together.
+Interpreting the result requires care because several qualities influence a choice. Formatting,
+fluency, length, and confidence may all matter, while a reader without the relevant expertise or
+source material may struggle to detect an error. Preference can therefore help explain why an
+assistant is appealing without establishing how accurately it performs a particular task.
 
 ### When the judge is another model
 
-An **LLM-as-a-judge** is a model prompted to rate another model's response.
-This makes evaluation scalable, but introduces a second system whose judgements need validation.
-The [MT-Bench and Chatbot Arena paper](https://arxiv.org/abs/2306.05685) documents limitations
-including position and verbosity bias. A judge's score depends on its model, prompt, rubric,
-and the material it can inspect.
+Human judgement is costly to collect at scale, so evaluations also use an LLM-as-a-judge: a model
+prompted to rate another model's response. This introduces a second system whose judgements need
+validation. The [MT-Bench and Chatbot Arena paper](https://arxiv.org/abs/2306.05685) documents
+limitations including position and verbosity bias, showing why the judge's model, prompt, rubric,
+and access to evidence all matter.
 
-For a literature summary, “How helpful is this?” bundles several properties together. A more
-informative rubric distinguishes whether claims have support in the supplied paper, whether
-qualifications survive the summary, whether citations resolve to relevant evidence, and whether
-the explanation suits the intended reader. These are Oxford LLMs examples of turning an
-evaluation goal into observable criteria.
+For example, judging a literature summary simply by asking how helpful it is combines several
+properties that may deserve separate attention. A rubric could assess whether the supplied paper
+supports the summary's claims, whether important qualifications survive, whether citations lead
+to relevant evidence, and whether the explanation suits its audience. These Oxford LLMs examples
+make the evaluation goal specific enough to inspect.
 
-Agreement with expert raters on representative examples gives evidence that the judge is useful
-for those examples. Swapping answer order or rewriting an answer's style while preserving its
-claims can expose sensitivity to irrelevant features. Neither check makes the judge universally
-reliable; it helps establish the conditions under which its scores are interpretable.
+The next step is to check how well the judge applies those criteria. Agreement with expert raters
+on representative examples supports its use on similar material. Swapping answer order or changing
+the style of an answer while preserving its claims can also reveal sensitivity to features that
+should not determine the score. Together, these checks help define where the judge's results are
+interpretable and where further scrutiny is needed.
 
 ## Risk: the answer can be appealing and still fail
 
-What happens when a system optimises for being liked in a situation where agreement is the
-wrong response? Sycophancy, possible harms in vulnerable conversations, bias, fabricated
-information, misinformation, and misuse all belong in evaluation because a pleasant interaction can
-conceal a consequential failure.
+Preference becomes particularly consequential when a system is rewarded for agreement in
+situations that call for correction or restraint. Sycophancy describes excessive agreement with
+the user's beliefs or preferences at the expense of an accurate or appropriate response.
+Research on [sycophancy in language models](https://arxiv.org/abs/2310.13548) finds that human
+preference feedback can favour agreement over truthfulness. An evaluation concerned with this
+failure needs to examine how the model handles mistaken premises, uncertainty, and disagreement.
 
-**Sycophancy** is excessive agreement with the user's beliefs or preferences at the expense of
-an accurate or appropriate response. Research on [sycophancy in language models](https://arxiv.org/abs/2310.13548)
-finds that human preference feedback can favour agreement over truthfulness. The relevant
-evaluation asks whether the model handles a mistaken premise, uncertainty, or disagreement
-well. It does not treat agreement itself as success.
+In vulnerable conversations, these behaviours may have consequences beyond the quality of an
+individual answer. A [study of potentially harmful chatbot conversations](https://arxiv.org/abs/2603.16567)
+examines a small observational sample and motivates closer scrutiny of possible mental-health
+harms. Its findings need to be read within that study design: they do not establish causation or
+the prevalence of harm among chatbot users.
 
-The [study of potentially harmful chatbot conversations](https://arxiv.org/abs/2603.16567) examines a small
-observational sample. It motivates scrutiny of possible mental-health harms; it does not establish
-causation or the prevalence of harm among chatbot users. That distinction is itself an example
-of the central question: what does the evidence support?
-
-Ordinary failures, high-consequence failures, and wider societal risks require different evidence.
-A fabricated citation, a systematic error affecting one group, and assistance with dangerous
-misuse require different test cases and decision rules. Labour-market exposure estimates,
-such as those in [GPTs are GPTs](https://arxiv.org/abs/2303.10130), ask another question
-again: which work tasks might change as capabilities advance? They do not measure an individual
-model's correctness or establish realised job losses.
+Other risks require their own evidence. A fabricated citation, a systematic error affecting one
+group, and assistance with dangerous misuse involve different failures, so they need different
+test cases and decision rules. Wider societal questions may require a different unit of analysis
+altogether. Labour-market exposure estimates, such as those in [GPTs are GPTs](https://arxiv.org/abs/2303.10130),
+concern which work tasks might change as capabilities advance; they neither measure an individual
+model's correctness nor establish realised job losses.
 
 <div class="lecture-table" role="region" aria-label="Evaluation claims and their limits; scroll horizontally on small screens" tabIndex={0}>
 
@@ -121,56 +119,59 @@ model's correctness or establish realised job losses.
 
 </div>
 
-A requirement of zero critical failures expresses a target, not a statistical guarantee.
-Observing no failures in a finite test set means none were observed under those conditions.
-The denominator, coverage, and uncertainty still matter. Medical evaluation makes this concrete:
-it must recognise the kind of error as well as its frequency.
+Even when the requirement is zero critical failures, a finite test can only establish what was
+observed under its particular conditions. The number of cases, their coverage, and the uncertainty
+around the result remain relevant. Medical evaluation brings these concerns together because both
+the nature of an error and its frequency affect how a result should be interpreted.
 
 ## HealthBench: expertise becomes a rubric
 
-Exam benchmarks test whether a model can select the correct answer to a defined question.
-A health conversation is harder to reduce to one answer key. A response may contain several
-correct facts while omitting a crucial qualification, giving unsupported reassurance, or failing
-to adapt to the user's circumstances. **HealthBench evaluates a model's next response in the
-context of a conversation, using criteria defined by physicians.**
+An exam question can often be scored against a defined answer key, whereas a health conversation
+may require several judgements at once. A response can contain correct facts while omitting a
+crucial qualification, offering unsupported reassurance, or overlooking the user's circumstances.
+HealthBench addresses this problem by evaluating a model's next response in the context of a
+conversation, using criteria defined by physicians.
 
 The [HealthBench paper](https://arxiv.org/abs/2505.08775) describes 5,000 multi-turn conversations
 with 48,562 unique rubric criteria, developed with 262 physicians. Each conversation has its own
 weighted rubric for the model's next response. Rather than demanding one canonical wording,
 the rubric specifies behaviours that should occur and behaviours that should not.
 
-The [official introduction](https://openai.com/index/healthbench/) describes a GPT-4.1-based
-grader that checks a response against those criteria. This separates two roles: domain experts
-decide what matters; the grader applies those criteria at scale. Physician-authored or validated
-rubrics do not mean every output was independently graded by a physician. Judge validation
-and inspection of failures remain part of understanding the measurement.
+According to the [official introduction](https://openai.com/index/healthbench/), a GPT-4.1-based
+grader checks responses against these criteria. Domain experts define what matters, while the
+model grader applies their criteria at scale; physician-authored or validated rubrics therefore
+do not imply that physicians independently graded every output. As with other model judges,
+understanding the results requires attention to grader validation and inspection of its errors.
 
 ### How a conversational rubric changes the measurement
 
-Consider the opening example again. A preference comparison may reward warmth and confidence.
-A domain rubric can ask additional questions: does the response avoid inventing evidence,
-acknowledge missing information, communicate relevant uncertainty, and respond appropriately
-to the user's context? An answer can succeed on one criterion and fail on another.
+For the title-only article question, a domain rubric would examine whether the response acknowledges
+that the evidence is missing, asks for information that could resolve the question, and avoids
+inventing support for the reader's conclusion. A response might satisfy some of these requirements
+while still introducing an unsupported claim. Separating the criteria makes that combination visible
+instead of letting the answer's reassuring tone determine the whole judgement.
 
-HealthBench attaches weights to criteria, including penalties for undesirable behaviour.
-That makes an omission or harmful statement visible in the scoring rather than allowing a
-polished overall impression to settle the judgement. The weighting is itself a measurement
-choice: it expresses the relative importance of different behaviours and affects the score.
+HealthBench weights its criteria and includes penalties for undesirable behaviour, so an omission
+or harmful statement can affect the result even when the response is otherwise well written.
+Those weights are part of the evaluation's design: their relative sizes express how much different
+behaviours contribute to the score. The illustration below shows how this works with an invented
+rubric and three example responses.
 
 <RubricExplorer />
 
-The useful thing to inspect is therefore more than the headline number. Look at the conversation,
-its rubric, the model response, and which criteria the grader marked as met. This turns
-“the model did badly” into a diagnosable failure: an unsupported statement, an omitted action,
-or an assumption that should have been questioned.
+Reading a score alongside the conversation, rubric, and criterion-level judgements makes the
+failure easier to diagnose. Instead of a general impression that the model performed badly,
+the evaluation can identify an unsupported statement, an omitted action, or an assumption that
+the response should have questioned.
 
 ### Separate the overall score from specific failures
 
-HealthBench includes variants designed to examine different aspects of performance. **Hard** contains 1,000 challenging
-examples; **Consensus** contains 3,671 examples evaluated with criteria filtered through further
-physician validation. Difficulty and agreement about what a response should do are distinct
-properties. These benchmark variants should also be distinguished from the narrower failure
-slices documented in the [GPT-5 system card, section 3.10](https://deploymentsafety.openai.com/gpt-5).
+The same attention to individual criteria helps explain why HealthBench has several variants.
+Hard contains 1,000 challenging examples, while Consensus contains 3,671 examples evaluated with
+criteria filtered through further physician validation. They address different properties:
+the difficulty of the conversation and agreement about what an adequate response should do.
+Within these variants, narrower failure slices examine particular kinds of error, as documented
+in the [GPT-5 system card, section 3.10](https://deploymentsafety.openai.com/gpt-5).
 
 <LectureSlide page={37} caption="Original HealthBench, Hard, and Consensus figures from Tatiana's presentation. These aggregate benchmark variants answer different questions from the narrower failure slices below." />
 
@@ -186,104 +187,105 @@ slices documented in the [GPT-5 system card, section 3.10](https://deploymentsaf
 
 <HealthBenchSlices />
 
-These slices use additional physician validation. Read the failure-rate
-charts with their direction in mind: lower is better for a measured failure, whereas higher is
-better for aggregate performance. Results across differently defined slices should not be
-compared as if they had the same denominator or difficulty.
+These slices use additional physician validation and report error rates, so lower values indicate
+better performance. Their different criteria and denominators also matter: comparing rates across
+slices is not equivalent to comparing models on the same test.
 
-Global Health is especially instructive. A response can be medically plausible yet assume
-resources, local risks, or care pathways that the conversation does not establish. This is a
-failure of contextual fit. For a social scientist evaluating a model across countries or languages,
-the same principle applies: a criterion that works for the dominant setting may not describe
-success for every population.
+The Global Health slice illustrates why context belongs in an evaluation. A medically plausible
+response may still assume resources, local risks, or care pathways that the conversation does
+not establish. Similar problems arise when social scientists evaluate models across countries
+or languages: criteria developed for a dominant setting may overlook what an adequate response
+requires elsewhere.
 
 <LectureSlide page={38} caption="Original slide 38 contains the source charts reproduced in the interactive view. These are historical error-rate results; each failure slice has its own criteria and denominator." />
 
 ### What HealthBench can establish
 
-HealthBench supplies evidence about responses to its conversation distribution under its rubric
-and grading procedure. It does not directly measure patient outcomes or certify a system for
-clinical deployment. The distinction follows from the task being measured: scored text responses
-are one part of a much larger real-world process.
+Taken together, these results provide evidence about responses to HealthBench's conversation
+distribution under its rubric and grading procedure. Because scored text responses represent
+only part of a real-world care process, they do not directly measure patient outcomes or certify
+a system for clinical deployment.
 
-For your own domain, the transferable idea is **expertise expressed as criteria**. A historian can
-specify how an answer should handle conflicting primary sources; a survey researcher can define
-which ambiguities a coding system must preserve. Useful evaluation makes both the required
-behaviours and critical failures explicit, then tests whether the measurement works across the
-intended population.
+The approach is useful beyond medicine because it gives domain expertise an explicit role in
+scoring. A historian might specify how an answer should handle conflicting primary sources,
+while a survey researcher might define which ambiguities a coding system must preserve.
+In either case, the evaluation needs to describe the required behaviours and critical failures,
+then establish whether its criteria work across the intended population.
 
 ## From an answer to a research experiment
 
-HealthBench asks whether a response meets professional requirements. Research-agent
-benchmarks extend the task from responding to **doing**: inspecting data, writing code,
-running experiments, and producing a result that can be checked. Knowledge exams, coding,
-medicine, and scientific experimentation demand different capabilities; their results cannot
-be summarised by one interchangeable leaderboard.
+Domain criteria become more complicated when a system must carry out work as well as explain it.
+A research agent may need to inspect data, write code, run experiments, and produce a result that
+someone else can check. Evaluating this workflow requires evidence about its intermediate
+decisions and execution, beyond the quality of its final answer.
 
-An MMLU-style question tests knowledge through a constrained answer format. A
-[SWE-bench task](https://www.swebench.com/) asks a system to resolve a repository issue,
-with executable tests providing part of the evidence.
-Neither automatically tells us whether an agent can design and complete an ML experiment.
-Long workflows introduce additional points of failure: a mistaken plan, broken environment,
-wasted budget, invalid output, or misleading interpretation of a result.
+The distinction is easier to see by comparing tasks. An MMLU-style question tests knowledge
+through a constrained answer format, while a [SWE-bench task](https://www.swebench.com/) asks a
+system to resolve an issue in a code repository, with executable tests providing part of the
+evidence. Completing an ML experiment places further demands on the system: it may choose a
+poor plan, struggle with its environment, exhaust its budget, or produce output that cannot be
+evaluated. Each benchmark captures a different part of this progression.
 
 <BenchmarkLive benchmark="swe-bench" />
 
 ### MLE-bench: the model operates inside a scaffold
 
-[MLE-bench](https://arxiv.org/abs/2410.07095) contains 75 Kaggle-derived
-competitions adapted for local evaluation. Agents work on ML engineering problems and their
-submissions are evaluated against the competition's task metric. This tests a sequence of
-practical decisions, rather than an explanation of how an experiment ought to work.
+[MLE-bench](https://arxiv.org/abs/2410.07095) examines this kind of practical work through 75
+Kaggle-derived competitions adapted for local evaluation. An agent works on an ML engineering
+problem and produces a submission scored using the competition's task metric, making its sequence
+of practical decisions part of the evaluation.
 
-The **agent scaffold** is the software that turns a language model into that workflow: it manages
-tools, state, execution, retries, and selection between candidate solutions. Sequential refinement
-revises a candidate over successive steps; the branching experiment search used by AIDE explores
-multiple candidates. A branch can pursue
-a different model or training choice, allowing exploration beyond repeatedly editing one candidate.
+The language model operates within an agent scaffold: software that manages tools, state,
+execution, retries, and selection between candidate solutions. The scaffold can shape the search
+substantially. Sequential refinement revises a candidate over successive steps, whereas the
+branching experiment search used by AIDE explores multiple candidates. For example, separate
+branches can pursue different models or training choices rather than continuing to edit the
+same solution.
 
-Search is also an allocation of resources. More branches, retries, or runtime can improve the
-chance of finding a strong solution, but change the comparison. To isolate a model difference,
-hold the scaffold, tools, tasks, budget, and scoring constant. To compare complete systems,
-describe each design and the constraints that make the comparison meaningful.
+Those opportunities come with resource costs. More branches, retries, or runtime may improve the
+chance of finding a strong solution, so a comparison needs to account for how much search each
+system can perform. Holding the scaffold, tools, tasks, budget, and scoring constant helps isolate
+a model difference. When the aim is to compare complete systems, their designs and constraints
+instead become part of what the reported result describes.
 
 ### AIRS-Bench: a valid run is only the first hurdle
 
-[AIRS-Bench](https://arxiv.org/abs/2602.06855) uses 20 research tasks
-drawn from machine-learning papers across several domains. The
-[repository](https://github.com/facebookresearch/airs-bench) exposes task definitions and
-evaluation code. The lecture's experiments compare models within one-shot, sequential, and
-tree-search approaches.
+[AIRS-Bench](https://arxiv.org/abs/2602.06855) extends the comparison to 20 research tasks drawn
+from machine-learning papers across several domains. Its
+[repository](https://github.com/facebookresearch/airs-bench) provides task definitions and
+evaluation code, while the results reproduced here compare models operating within one-shot,
+sequential, and tree-search approaches.
 
-Two measurements tell complementary stories. **Valid submission rate (VSR)** records whether
-a run produces a submission that can be evaluated. Valid-run proportions are computed within
-each task and then averaged across tasks; this need not equal the proportion obtained by pooling
-all runs when run counts differ. **Average normalised score (ANS)** measures
-task performance across different task metrics. VSR asks whether the workflow reached the
-scoring stage; ANS asks what it achieved under the benchmark's scoring convention.
+An important distinction is whether an agent produces an evaluable submission at all, and how
+well that submission performs. AIRS-Bench captures the first with **valid submission rate (VSR)**:
+the proportion of valid runs within each task, averaged across tasks. This task-level averaging
+matters because pooling all runs can give a different answer when tasks have different numbers
+of attempts. **Average normalised score (ANS)** then summarises task performance on a shared
+scale, allowing results measured by different task metrics to contribute to an aggregate.
 
 The [scoring convention](https://github.com/facebookresearch/airs-bench#readme) first transforms
-distance from the task's theoretical optimum using a negative logarithm. On that transformed
+distance from the task's theoretical optimum using a negative logarithm, so equal proportional
+reductions in the remaining distance produce equal increases in the transformed score. On that transformed
 scale, the worst observed run anchors the normalised score at 0 and the cited literature
 reference anchors it at 1. Invalid or failed runs receive a normalised score of 0 and remain
 in the average, so ANS includes workflow failures as well as the quality of valid results.
-These reference points matter: ANS is not simply a mean of accuracies, nor the fraction of
-tasks completed successfully.
+The resulting average depends on this transformation and its reference points; it cannot be
+interpreted as a mean accuracy or the fraction of tasks completed successfully.
 
-The lecture reports VSR of **65.8%** and ANS of **0.352** on average in the displayed evaluation.
-The latter does not mean “35.2% of tasks solved” or “35.2% of scientific ability.” The first
-number describes reaching a valid submission; the second is a benchmark-defined summary
-of performance. Both refer to the lecture's configuration set and run conditions.
+In the historical comparison shown in slides 47–48, the average VSR is 65.8% and the average
+ANS is 0.352. Together they describe both the difficulty of reaching an evaluable submission
+and the performance achieved under this scoring convention. In particular, 0.352 is neither
+a 35.2% task-success rate nor an accuracy of 35.2%. Both figures belong
+to the configuration set and run conditions shown in the presentation.
 
 <LectureSlide page={47} caption="Original slide 47: valid submission rates. The displayed model–scaffold combinations do not isolate either factor's causal effect. Reaching the scoring stage does not establish a strong task result." />
 
 <LectureSlide page={48} caption="Original slide 48: average normalised scores. The scoring scale uses task-specific reference points and a transformation; 0.352 should not be read as a percentage of tasks solved." />
 
-On selected tasks, evaluated agents exceeded the cited human reference result. That is compatible
-with modest average performance. Success on several
-tasks and reliability across the full task set are different claims. Also distinguish the paper's
-reference result from a claim about the best result available today: a “SOTA” label needs a date,
-a task definition, and a comparable evaluation protocol.
+The aggregate also leaves room for substantial differences between tasks. On some, evaluated
+agents exceeded the cited human reference result, even though performance across the full task
+set remained modest. The examples below show improvements in coreference resolution, molecular
+property prediction, and forecasting, each measured using its own task metric.
 
 <div class="lecture-table" role="region" aria-label="Selected AIRS-Bench results reported in lecture slide 50; scroll horizontally on small screens" tabIndex={0}>
 
@@ -295,107 +297,121 @@ a task definition, and a comparable evaluation protocol.
 
 </div>
 
-These are selected historical results reproduced from Tatiana's slide, not today's leaderboard
-or evidence of general superiority. All three selected rows report Gemini 3.1 Pro agents.
-The first row compares accuracy; the other two compare mean
-absolute error. A relative improvement is computed against the reference value, so it should
-not be mistaken for a percentage-point change or averaged across incompatible raw metrics.
+All three examples report Gemini 3.1 Pro agents and reproduce historical results from slide 50.
+Their metrics need to be read in the appropriate direction: accuracy increases, whereas mean
+absolute error decreases. Because relative improvements are computed against each reference
+value, they differ from percentage-point changes and should not be averaged across incompatible
+raw metrics. The reference results are also tied to the cited papers; establishing whether they
+remain state of the art would require a current comparison under equivalent conditions.
+
+The Winogrande result also shows what the agent contributed. Gemini 3.1 Pro acted as the controller
+developing the solution, which fine-tuned Qwen2.5-14B using LoRA. The reported accuracy belongs to
+that resulting prediction model, rather than to Gemini answering the test questions directly.
+The agent's work includes choosing and implementing a way to solve the task; its scaffold and
+resource budget affect which solutions it has the opportunity to develop.
 
 <LectureSlide page={50} caption="Original slide 50 reports seven selected task improvements, their reference methods, and the agents' proposed methods. The table above reproduces three examples; the full slide preserves the surrounding evidence." />
 
 <BenchmarkLive benchmark="airs-bench" />
 
-Across medicine, chemistry, social science, and other fields, a benchmark must encode what
-meaningful progress looks like in that domain. This makes domain specialists central to its
-design. An executable score is valuable,
-but it cannot supply the scientific question or validate every interpretation on its own.
+These examples show why domain expertise remains necessary even when the result can be scored
+automatically. Across medicine, chemistry, social science, and other fields, someone must decide
+what constitutes meaningful progress and which interpretations a metric supports. An executable
+score makes part of that judgement reproducible without settling the scientific question on its own.
 
 ## Why a ranking can change without a model changing
 
-A score is a property of the model **and** its evaluation system. Several parts of that system
-shape the result: the judge in preference evaluation,
-the rubric in HealthBench, and the scaffold and budget in research-agent benchmarks. One more
-is the **task distribution**: which cases count, and how often.
+The judge, the rubric, and the agent scaffold each influence the results above. Another part of
+the evaluation can change a ranking even when the systems themselves stay fixed: the distribution
+of tasks. An aggregate score depends on which cases are included and how much each contributes.
+The following illustration isolates that effect by keeping each system's performance within
+each type of case constant.
 
 <EvaluationMix />
 
-In this Oxford LLMs illustration, changing the mix of cases changes the aggregate score.
-A benchmark with a different case mix
-from your actual work can suggest a different model choice even if performance within each
-type of case is unchanged.
+As the mix changes, so does the overall ranking. A benchmark can therefore suggest a different
+model choice from the one suited to your work if the two contain different proportions of cases.
+This helps explain the value of HealthBench's urgent and global-health slices: a useful overall
+average may conceal performance differences that matter in a particular setting. For research
+agents, the relevant breakdown might instead separate classification, forecasting, and molecular
+prediction tasks. Reporting these alongside the aggregate makes its weighting easier to assess.
 
-HealthBench's failure slices make this concrete: overall performance and performance on urgent
-or global-health cases answer different questions. For research agents, the mix might instead
-be classification, forecasting, or molecular prediction tasks. Report the overall result alongside
-breakdowns that matter to the intended use, and explain how the aggregate weights them.
-
-Long workflows also require repeated runs. An execution can fail before scoring, or explore a
-different sequence of experiments. Report variation and retain failed attempts. “At least one
-success in five attempts” and “success on a single attempt” have different denominators and
-resource costs; neither should silently stand in for the other.
+Variation also occurs between attempts at the same task. A long-running agent may fail before
+scoring or follow a different sequence of experiments on its next run. Repeated runs help reveal
+that variation, provided failed attempts remain in the record. A report of at least one success
+in five attempts describes a different level of reliability and resource use from success on a
+single attempt, so the selection rule belongs with the result.
 
 ## Can we trust the evidence behind the score?
 
-Even a carefully chosen metric can become weak evidence if the test no longer measures what
-we think it does. Saturation and contamination can both weaken a benchmark's usefulness, but
-they call for different checks. Continuously refreshed tests address some of these concerns.
+Accounting for the judge, task mix, and run conditions still leaves a question about the test
+material itself. As models improve and public benchmarks become widely used, a score may become
+less informative for two different reasons: the test may no longer distinguish strong systems,
+or exposure to its contents may undermine the claim that it measures generalisation.
 
-**Saturation** occurs when a test stops separating strong systems because many scores approach
-its ceiling. A harder test can restore separation, provided the new difficulty still represents
-the capability of interest. Difficulty alone does not make a benchmark relevant.
+The first problem is saturation. When many scores approach a test's ceiling, a harder test can
+restore separation, provided its difficulty still represents the capability of interest. A task
+that is difficult for reasons unrelated to the intended use would offer little improvement.
 
-**Contamination** occurs when exposure to test material weakens the claim that the result
-demonstrates generalisation to unseen cases. Exposure may be difficult to establish when a
-training corpus is unavailable. Public tasks also create opportunities for adaptation through
-prompting, scaffold development, or repeated selection, even when training exposure is unknown.
+The second is contamination, where exposure to test material weakens the evidence of performance
+on unseen cases. Establishing exposure can be difficult when the training corpus is unavailable.
+Even without known training exposure, public tasks may influence prompt design, scaffold
+development, or repeated selection of systems, making the history of benchmark use relevant
+to its interpretation.
 
 ### Testing for exposure
 
-The [black-box contamination study](https://arxiv.org/abs/2310.17623) exploits
-an unusual feature: a model may assign greater likelihood to examples in their original dataset
-order than to shuffled orders. Under the paper's assumptions, that difference can provide
-statistical evidence of contamination without inspection of the full training corpus.
+One approach to investigating exposure is the [black-box contamination study](https://arxiv.org/abs/2310.17623),
+which compares the likelihood a model assigns to examples in their original dataset order with
+the likelihood of shuffled orders. Under the paper's assumptions, a difference can provide
+statistical evidence of contamination without access to the full training corpus.
 
-Other approaches include [recovery of masked benchmark content](https://arxiv.org/abs/2311.09783)
-and audits of training data. These techniques test different signals. Detection supports a
-specific exposure claim; failure to detect does not certify a clean test. Similarly, exposure to
-examples of a skill, such as translation, is not automatically exposure to a particular held-out
-benchmark. Keep the training question and the test-leakage question distinct.
+[Recovery of masked benchmark content](https://arxiv.org/abs/2311.09783) and audits of training
+data examine other signals. Each supports a particular kind of exposure claim, while a failure
+to detect exposure leaves uncertainty rather than certifying a clean test. It is also necessary
+to distinguish learning a skill from seeing its test cases: training on translation examples,
+for instance, does not by itself establish exposure to a particular held-out translation benchmark.
 
 ### LiveCodeBench: refresh the tasks, retain the conditions
 
-[LiveCodeBench](https://livecodebench.github.io/) collects coding
-problems from periodic contests over time. A dated task window helps compare models on problems
-released after a relevant cutoff, rather than relying indefinitely on the same public test set.
-The [paper](https://arxiv.org/abs/2403.07974) explains its evaluation across coding scenarios.
+[LiveCodeBench](https://livecodebench.github.io/) addresses part of the exposure problem by
+collecting coding problems from periodic contests over time. Dated task windows allow comparisons
+on problems released after a relevant cutoff, reducing reliance on a fixed public test set.
+The [paper](https://arxiv.org/abs/2403.07974) describes its evaluation across coding scenarios.
 
-Freshness helps, but it is not a certificate of non-exposure. A model's training cutoff may be
-unclear; tools may retrieve public solutions; a widely used window may become part of development.
-Check the release dates, allowed tools, evaluation setting, and the specific window behind a score.
-A current leaderboard is most useful when these conditions travel with the ranking.
+New problems still need to be considered alongside the evaluation conditions. A model's training
+cutoff may be unclear, tools may retrieve public solutions, and a widely used window may enter
+the development process. Release dates, permitted tools, and the specific task window therefore
+remain necessary context for reading the leaderboard.
 
 <BenchmarkLive benchmark="livecodebench" />
 
-The same discipline applies to broad claims about intelligence. Definitions of AGI can differ.
-A result on a domain benchmark supports a domain claim under its test conditions;
-it cannot resolve a broader definition merely by crossing a numerical threshold.
+The exposure question is one instance of a broader requirement: the evidence must match the claim
+being made. That requirement becomes particularly demanding when a domain result is used to
+support a claim about general intelligence. Different definitions of AGI can require different
+evidence, so a numerical threshold needs an argument linking the benchmark task to the proposed definition.
 
 ## Bring the evaluation back to your research
 
-Creating a benchmark begins with domain expertise: someone must decide which behaviours are required, which
-failures are consequential, and which contexts the test must cover. Research-agent benchmarks
-add the need to define a reproducible environment and a result that can actually be scored.
+Designing an evaluation for your own research brings these decisions together. Domain expertise
+determines which behaviours matter, which failures would undermine the work, and which contexts
+the test must cover. If an agent will carry out the task, the evaluation also needs a reproducible
+environment and a result that can be scored.
 
-For a concrete Oxford LLMs example, suppose an agent extracts policy commitments from speeches
-and returns supporting passages. A defensible claim would identify the speech population and
-languages, define what counts as a commitment, and require evidence for each extraction. The
-evaluation would separately measure missed commitments, unsupported extractions, and fabricated
-quotations, then inspect which groups or document types bear the errors.
+Consider an Oxford LLMs example: an agent extracts policy commitments from speeches and returns
+supporting passages. As with the title-only health question, the system needs to establish what
+the source actually supports before making a claim on its behalf. Before comparing systems, a researcher would need to specify the population
+of speeches and languages, define what counts as a commitment, and decide how to adjudicate
+ambiguous cases. Requiring a supporting passage makes it possible to distinguish missed
+commitments from unsupported extractions or fabricated quotations. Examining errors by group
+and document type would then show whether the aggregate conceals failures concentrated in
+particular parts of the material.
 
-Freeze the model, prompt, tools, scaffold, and budget before final evaluation. Keep development
-cases separate from the final test; define how ambiguous cases are adjudicated; repeat runs when
-the workflow is stochastic. The result becomes useful because a reader can reconstruct what
-was asked, what counted as success, and where the evidence stops.
+The same design needs to specify how the system is developed and tested. Keeping development
+cases separate from the final test, fixing the model, prompt, tools, scaffold, and budget before
+final evaluation, and repeating stochastic runs make the comparison easier to interpret.
+Recording these choices allows another researcher to reconstruct what was asked, what counted
+as success, and which limitations remain. The reference below collects them in one place.
 
 <details class="appendix-box">
   <summary>A compact evaluation record for your own work</summary>
@@ -414,10 +430,12 @@ Decision rule and location of run logs:`}</code></pre>
   </div>
 </details>
 
-The opening health answer is now easier to evaluate. Preference tells us how it was received;
-a domain rubric tells us which requirements it met; targeted failure slices reveal errors an
-average might hide. Extending the system into an agent adds execution, resources, and repeated
-attempts to the same argument. The question remains: **what claim does this evidence support?**
+For the reader who supplied only an article title, a helpful response would explain what remains
+unknown and ask for evidence that could resolve it. The rubric makes those requirements explicit
+and distinguishes them from the appeal of a confident answer. Research agents extend the same
+need for evidence into a workflow whose execution, resources, and variation across attempts also
+affect the result. Keeping these observations connected to the intended use gives a favourable
+score a meaning that another researcher can examine and defend.
 
 ## Original materials and sources
 
@@ -425,6 +443,8 @@ Tatiana's [original slides, 99 pages](/materials/lectures/2026/shavrina-llm-agen
 are the primary record of the lecture. The main presentation is pages 1–71; its appendix, pages
 72–99, extends the discussion to the Turing test, agent environments, alignment, and licensing.
 The explanations and synthetic examples on this page were written and assembled by Oxford LLMs.
+Reproduced figures retain their historical results, while current source views are labelled
+separately. PDF references use page numbers.
 
 - **Preference and judging:** [Zheng et al., Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena](https://arxiv.org/abs/2306.05685), accompanying slides 7–13.
 - **Medical conversation evaluation:** [HealthBench paper](https://arxiv.org/abs/2505.08775), [official introduction](https://openai.com/index/healthbench/), and [dataset and grader](https://github.com/openai/healthbench), accompanying slides 37–38. The three failure slices are documented in the [GPT-5 system card](https://deploymentsafety.openai.com/gpt-5).

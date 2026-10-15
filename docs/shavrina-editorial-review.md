@@ -33,4 +33,14 @@ Final critic verdict: accepted, with no material prose, fidelity, attribution or
 
 Astro production build passes. Browser checks cover rubric presets and negative scores, all HealthBench slice values, the synthetic task-mix ranking reversal, real SWE-bench and LiveCodeBench frame contents, real AIRS source rows, source-fetch failure fallback, local links and anchors, and absence of a problem set. Responsive checks at 1440, 768, 390 and 320 pixels show no page overflow. Original rendered slide excerpts and desktop/mobile screenshots were inspected.
 
-Recording URL and final thumbnail remain the publishing inputs needed from the team.
+The recording and thumbnail were subsequently connected on 15 October 2026; see `lecture-publishing.md`.
+
+## Narrative revision: 15 October 2026
+
+Two additional critic/revision rounds addressed the team's request for connected prose, concrete examples, and less bold emphasis. The primary writer revised the page; the separate critic checked the entire MDX and widget explanations against the original presentation.
+
+Round 1 accepted the cumulative structure but identified two gaps: the recurring health example needed to be a specific invented case, and the AIRS results needed to explain what the agent actually built. The revision introduced the rubric's title-only article query at the start, returned to it through the medical discussion, and connected its source-support requirement to the policy-extraction example. A worked Winogrande paragraph now distinguishes the Gemini controller from the Qwen2.5-14B LoRA solution it developed. Widget slogans became descriptive titles, their explanations became connected prose, the ANS transformation gained an interpretation, and current-source cards describe evaluation conditions without coaching or implementation language.
+
+Round 2 accepted the narrative, technical fidelity, student usefulness, and reduced emphasis, with only a subject–verb agreement correction, which was applied. The main prose now has three bold passages: the central claim about scores and the VSR/ANS definitions. Source-category labels and functional values in interactive controls remain visually distinct.
+
+The production build passed. Browser inspection confirmed the revised opening and emphasis count, with no page overflow at 390 or 320 pixels and no browser script errors. Desktop and mobile screenshots were reviewed.

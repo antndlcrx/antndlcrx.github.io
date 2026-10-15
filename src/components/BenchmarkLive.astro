@@ -2,19 +2,18 @@
 interface Props { benchmark: 'swe-bench' | 'livecodebench' | 'airs-bench' }
 const { benchmark } = Astro.props;
 const sources = {
-  'swe-bench': { title: 'SWE-bench', owner: 'the SWE-bench team', url: 'https://www.swebench.com/', kind: 'frame', note: 'Read the benchmark subset, percentage resolved, agent configuration and resource constraints together. A leaderboard row describes a tested system.' },
-  livecodebench: { title: 'LiveCodeBench', owner: 'the LiveCodeBench team', url: 'https://livecodebench.github.io/leaderboard.html', kind: 'frame', note: 'Use the source’s date ranges and settings to interpret a score. Fresh problems reduce some exposure risks; they do not establish that all evaluation data are unseen.' },
-  'airs-bench': { title: 'AIRS-Bench', owner: 'the AIRS-Bench authors', url: 'https://github.com/facebookresearch/airs-bench#leaderboard', kind: 'table', note: 'This fetches the public repository’s leaderboard. Its rows and publication dates can differ from the 27 agent configurations compared in Tanya’s slides. “Avg. norm. score” is not a percentage of tasks solved.' },
+  'swe-bench': { title: 'SWE-bench', owner: 'the SWE-bench team', url: 'https://www.swebench.com/', kind: 'frame', note: 'The percentage of issues resolved depends on the benchmark subset, agent configuration, and resource constraints. Each leaderboard row describes the system tested under those conditions.' },
+  livecodebench: { title: 'LiveCodeBench', owner: 'the LiveCodeBench team', url: 'https://livecodebench.github.io/leaderboard.html', kind: 'frame', note: 'Scores depend on the selected task dates and evaluation settings. Newly released problems reduce some exposure risks, although freshness alone cannot establish that all evaluation data are unseen.' },
+  'airs-bench': { title: 'AIRS-Bench', owner: 'the AIRS-Bench authors', url: 'https://github.com/facebookresearch/airs-bench#leaderboard', kind: 'table', note: 'The public repository reports a comparison whose rows and publication dates can differ from the 27 agent configurations in the presentation. Its average normalised scores use the benchmark’s scoring scale rather than reporting a percentage of tasks solved.' },
 };
 const source = sources[benchmark];
 ---
 <section class="benchmark-live" data-benchmark={benchmark} data-kind={source.kind} data-url={source.url} aria-label={`${source.title} current source view`}>
-  <p class="benchmark-live__label">Current source view</p>
+  <p class="benchmark-live__label">Current benchmark results</p>
   <p class="benchmark-live__title">{source.title}</p>
   <p>{source.note}</p>
   <div class="benchmark-live__actions"><button type="button">Load {source.title} here</button><a href={source.url} target="_blank" rel="noopener noreferrer">Open official source ↗</a></div>
   <p class="benchmark-live__status" role="status">Loads on request from {source.owner}. External content may change independently of these notes.</p>
-  {source.kind === 'table' && <p class="benchmark-live__scroll" hidden>Scroll horizontally for seeds and result dates →</p>}
   <div class="benchmark-live__content" role="region" aria-label={`${source.title} source results; scroll horizontally if needed`} tabindex="0" hidden></div>
   <noscript><p>Use the official source link to explore current results.</p></noscript>
 </section>
@@ -59,13 +58,9 @@ const source = sources[benchmark];
           status.textContent = `${rows.length} source rows fetched at ${new Date().toLocaleString()}. Result publication dates are shown separately in the table.`;
         }
         content.hidden = false;
-        const scrollHint = root.querySelector<HTMLElement>('.benchmark-live__scroll');
-        if (scrollHint) scrollHint.hidden = false;
         button.textContent = 'Reload source view';
       } catch {
         content.hidden = true;
-        const scrollHint = root.querySelector<HTMLElement>('.benchmark-live__scroll');
-        if (scrollHint) scrollHint.hidden = true;
         status.textContent = 'The current source could not be loaded or its format has changed. Use the official source link above; no substitute results are shown.';
         button.textContent = 'Try loading again';
       } finally { button.disabled = false; }
@@ -84,13 +79,10 @@ const source = sources[benchmark];
   .benchmark-live__actions a { font-size: 12px; }
   .benchmark-live__status { color: var(--text-sec); margin: 14px 0 0; }
   .benchmark-live__content { margin-top: 20px; overflow-x: auto; }
-  .benchmark-live__scroll { color: var(--text-sec); font: 10px var(--font-mono); margin: 16px 0 0; }
-  .benchmark-live__scroll:not([hidden]) { display: none; }
   .benchmark-live__content:focus-visible { outline: 2px solid var(--c-a); outline-offset: 3px; }
   .benchmark-live__content :global(iframe) { border: 1px solid var(--border); width: 100%; height: 560px; background: white; }
   .benchmark-live__content :global(table) { min-width: 600px; width: 100%; font-size: 11px; border-collapse: collapse; }
   .benchmark-live__content :global(th), .benchmark-live__content :global(td) { text-align: left; padding: 10px; border-bottom: 1px solid var(--border); }
   .benchmark-live__content :global(caption) { text-align: left; color: var(--text-sec); padding-bottom: 12px; }
-  @media (max-width: 700px) { .benchmark-live__scroll:not([hidden]) { display: block; } }
   @media (max-width: 500px) { .benchmark-live { padding: 18px; } .benchmark-live__content :global(iframe) { height: 480px; } }
 </style>
